@@ -138,7 +138,7 @@ def render_text(text, area, style="label", color=None, point=None, font="BOOKMAN
 
 def text_layer(name, text, area, ox=0, oy=0, **kw):
     img = render_text(text, area, **kw)
-    return layer(name, img, f"txt_{name}_{text}"[:80], area[0] + ox, area[1] + oy)
+    return dict(layer(name, img, f"txt_{name}_{text}"[:80], area[0] + ox, area[1] + oy), kind="text")
 
 
 # ------------------------------------------------------------------ annotations
@@ -191,7 +191,10 @@ def bam_states(name, bamres, seq, area, label_states, first_visible=True, ox=0, 
         sc = im.resize((w, h), Image.LANCZOS)
         kids.append(layer(f"{name} - {st} ({bamres} c{seq} f{fi})", sc, f"{bamres}_c{seq}_f{fi}_{w}x{h}",
                           x + ox, y + oy, visible=(first_visible and fi == fr0)))
-    return group(name, kids)  # draw order: frame 0 at the bottom, other states above (hidden)
+    gr = group(name, kids)  # draw order: frame 0 at the bottom, other states above (hidden)
+    if label_states is STATES_SLOT:
+        gr["kind"] = "slot"
+    return gr
 
 
 # ------------------------------------------------------------------ item icons
@@ -228,7 +231,7 @@ def icon_in_slot(itm, area, tint=None, count=None, plus=False):
         d.text((w - 12, -2), "+", font=f, fill=(0, 0, 0, 255))
         d.text((w - 13, -3), "+", font=f, fill=(255, 255, 255, 255))
     key = f"icon_{itm}_{w}x{h}_{tint}_{count}_{plus}"
-    return layer(f"{nm} ({itm})", canvas, key, x, y)
+    return dict(layer(f"{nm} ({itm})", canvas, key, x, y), kind="item")
 
 
 # ================================================================== 1. BACKGROUND
@@ -1105,6 +1108,18 @@ GUIDES = {"h": {0, 768, ACTIONBAR_Y}, "v": {0, 1024}}
 for r in (title, left, right):
     guide_box(*r)
 root = [background, vanilla, actionbar, mockups, library, annotations]
+
+
+def hide_kinds(nodes, kinds=("text", "item", "slot")):
+    """John (2026-10-21): show the bare panels by default; items, slot squares and texts stay as hidden layers."""
+    for n in nodes:
+        if n.get("kind") in kinds:
+            n["visible"] = False
+        if n["type"] == "group" and not n["name"].startswith("Library"):
+            hide_kinds(n["children"], kinds)
+
+
+hide_kinds(root)
 manifest = {"width": W, "height": H, "root": root,
             "guides": {"h": sorted(v for v in GUIDES["h"] if 0 <= v <= H),
                        "v": sorted(v for v in GUIDES["v"] if 0 <= v <= W)}}
