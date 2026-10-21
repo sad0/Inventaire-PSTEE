@@ -1100,6 +1100,10 @@ annotations = group("Annotations (element names, sizes, coords)", [
     group(sect, nodes, visible=not sect.startswith("Background")) for sect, nodes in ANNOT.items()
 ], visible=False)
 
+# keep only the main guides (too many guides hide the art): frame, action bar, variant E panels
+GUIDES = {"h": {0, 768, ACTIONBAR_Y}, "v": {0, 1024}}
+for r in (title, left, right):
+    guide_box(*r)
 root = [background, vanilla, actionbar, mockups, library, annotations]
 manifest = {"width": W, "height": H, "root": root,
             "guides": {"h": sorted(v for v in GUIDES["h"] if 0 <= v <= H),
