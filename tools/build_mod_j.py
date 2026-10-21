@@ -79,21 +79,74 @@ def part_frames(name, rect):
     return out  # BAM button order: normal, pressed, selected, disabled
 
 
+HI = 3840 / 1366   # 4K art for the 1366x768 background area (MOS V2 is scaled to its area by the engine)
+PVRZ_BASE = 9100   # our PVRZ page numbers (vanilla PTEE uses MOS0000-MOS2011)
+
+
+def write_pvrz(img, path):
+    """PVRZ page: zlib(PVR3 header + DXT5 data), prefixed by the uncompressed size."""
+    import io
+    import zlib
+    buf = io.BytesIO()
+    img.convert("RGBA").save(buf, format="DDS", pixel_format="DXT5")
+    dxt = buf.getvalue()[128:]
+    w, h = img.size
+    hdr = struct.pack("<IIQIIIIIIIII", 0x03525650, 0, 11, 0, 0, h, w, 1, 1, 1, 1, 0)
+    raw = hdr + dxt
+    with open(path, "wb") as f:
+        f.write(struct.pack("<I", len(raw)) + zlib.compress(raw, 9))
+
+
+def write_mos_v2(img, name, art, page0):
+    """MOS V2 split on 1024x1024 PVRZ pages MOS<page>.PVRZ."""
+    w, h = img.size
+    blocks, page = [], page0
+    for y in range(0, h, 1024):
+        for x in range(0, w, 1024):
+            tile = img.crop((x, y, min(w, x + 1024), min(h, y + 1024)))
+            pg = Image.new("RGBA", (1024, 1024), (0, 0, 0, 255))
+            pg.paste(tile, (0, 0))
+            write_pvrz(pg, os.path.join(art, f"MOS{page:04d}.PVRZ"))
+            blocks.append(struct.pack("<7I", page, 0, 0, tile.width, tile.height, x, y))
+            page += 1
+    with open(os.path.join(art, f"{name}.MOS"), "wb") as f:
+        f.write(b"MOS V2  " + struct.pack("<IIII", w, h, len(blocks), 24) + b"".join(blocks))
+    return page
+
+
+def cell(d, x, y, w, h, k):
+    d.rounded_rectangle((x - 2 * k, y - 2 * k, x + w + k, y + h + k), radius=5 * k, fill=(6, 5, 4, 200),
+                        outline=(0, 0, 0, 230), width=max(2, round(2 * k)))
+    d.line((x + 2 * k, y + h, x + w - 2 * k, y + h), fill=(140, 96, 58, 150), width=max(1, round(k)))
+    d.line((x + w, y + 2 * k, x + w, y + h - 2 * k), fill=(140, 96, 58, 150), width=max(1, round(k)))
+
+
 def background():
+    """4K background (MOS V2 + PVRZ): John's art + recessed cells under every grid slot (stash, backpack, ground)."""
     bw, bh = L["menu"]["bg_size"]
-    img = Image.new("RGB", (1366 * UP, 768 * UP), (0, 0, 0))
-    bg = Image.open(os.path.join(JD, "bg_clean_2x.png")).convert("RGB").resize((bw * UP, bh * UP), Image.LANCZOS)
-    img.paste(bg, ((171 + L["menu"]["bg_offset"]) * UP, 0))
-    # the stash grid is not engine slots yet (step 2): bake recessed cells into the background
+    W4, H4 = 3840, 2160
+    img = Image.new("RGB", (W4, H4), (0, 0, 0))
+    bg = Image.open(os.path.join(JD, "bg_clean_2x.png")).convert("RGB").resize((round(bw * HI), round(bh * HI)),
+                                                                                 Image.LANCZOS)
+    img.paste(bg, (round((171 + L["menu"]["bg_offset"]) * HI), 0))
     d = ImageDraw.Draw(img, "RGBA")
-    for (x, y, w, h) in L["stash"]:
-        x, y = (x + 171) * UP, y * UP
-        d.rounded_rectangle((x - 2, y - 2, x + w + 1, y + h + 1), radius=5, fill=(6, 5, 4, 200),
-                            outline=(0, 0, 0, 230), width=2)
-        d.line((x + 2, y + h, x + w - 2, y + h), fill=(140, 96, 58, 150))
-        d.line((x + w, y + 2, x + w, y + h - 2), fill=(140, 96, 58, 150))
-    img.save(os.path.join(ROOT, "design", "build", "ingame_bg_J.png"))
-    bm.write_mos_v1(img, os.path.join(MOD, "art", "PSIVBGJ.MOS"))
+    for (x, y, w, h) in L["stash"] + L["backpack"] + L["ground"]:
+        cell(d, (x + 171) * HI, y * HI, w * HI, h * HI, HI)
+    img.resize((1366, 768), Image.LANCZOS).save(os.path.join(ROOT, "design", "build", "ingame_bg_J.png"))
+    write_mos_v2(img, "PSIVBGJ", os.path.join(MOD, "art"), PVRZ_BASE)
+
+
+def slot_bam():
+    """Dark recessed slot (backpack, ground): normal, hover (copper rim), selected (purple), highlight (yellow)."""
+    frames = []
+    for rim in (None, (190, 120, 70, 255), (170, 90, 200, 255), (230, 200, 60, 255)):
+        im = Image.new("RGBA", (40, 40), (0, 0, 0, 0))
+        d = ImageDraw.Draw(im)
+        d.rounded_rectangle((0, 0, 39, 39), radius=5, fill=(6, 5, 4, 140))
+        if rim:
+            d.rounded_rectangle((0, 0, 39, 39), radius=5, outline=rim, width=2)
+        frames.append(im)
+    write_bam_v1(frames, os.path.join(MOD, "art", "PSJSLOT.BAM"))
 
 
 def piece(name, kind="button", action=None, text_lua=None, point=None, tooltip_lua=None, seq=0, frame_lua=None):
@@ -169,9 +222,9 @@ menu
     for i, (nm, a) in enumerate(L["body"].items()):
         m.append(bm.slot(f"slot_inv_{body_ids[nm]}", a, "IVSLOT", i % 10, nm))
     for n, a in enumerate(L["backpack"]):
-        m.append(bm.slot(f"slot_inv_{30 + n}", a, "IVSLOT", n % 10, f"group{n}"))
+        m.append(bm.slot(f"slot_inv_{30 + n}", a, "PSJSLOT", 0, f"group{n}"))
     for n, a in enumerate(L["ground"]):
-        m.append(bm.slot(f"slot_inv_{68 + n}", a, "IVSLOT", (n + 4) % 10, f"ground{n}"))
+        m.append(bm.slot(f"slot_inv_{68 + n}", a, "PSJSLOT", 0, f"ground{n}"))
     m.append(piece("page_prev", action="Infinity_OnGroundPage(-1)"))
     m.append(piece("page_next", action="Infinity_OnGroundPage(1)"))
     m.append(bm.label(L["ground_page"],
@@ -251,6 +304,7 @@ def main():
     for f in os.listdir(art):  # J replaces the F/G/H preview art
         os.remove(os.path.join(art, f))
     background()
+    slot_bam()
     for nm, res in BAMS.items():
         write_bam_v1(part_frames(nm, L["parts"][nm]), os.path.join(art, f"{res}.BAM"))
     menu = build_menu()
