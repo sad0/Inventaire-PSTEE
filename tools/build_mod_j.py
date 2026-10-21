@@ -126,7 +126,7 @@ def background():
     bw, bh = L["menu"]["bg_size"]
     W4, H4 = 3840, 2160
     img = Image.new("RGB", (W4, H4), (0, 0, 0))
-    bg = Image.open(os.path.join(JD, "bg_clean_2x.png")).convert("RGB").resize((round(bw * HI), round(bh * HI)),
+    bg = Image.open(os.path.join(JD, "bg_dressed_2x.png")).convert("RGB").resize((round(bw * HI), round(bh * HI)),
                                                                                  Image.LANCZOS)
     img.paste(bg, (round((171 + L["menu"]["bg_offset"]) * HI), 0))
     d = ImageDraw.Draw(img, "RGBA")

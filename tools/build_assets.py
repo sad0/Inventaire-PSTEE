@@ -1543,7 +1543,7 @@ varG["visible"] = False
 # geometry in design/build/layout_j.json (tools/variant_j.py). Detached pieces get hover/pressed/disabled states.
 LJ = json.load(open(os.path.join(BUILD, "layout_j.json"), encoding="utf-8"))
 JD = os.path.join(ROOT, "design", "art", "j")
-j_bg = Image.open(os.path.join(JD, "bg_clean_2x.png")).convert("RGBA").resize(tuple(LJ["menu"]["bg_size"]),
+j_bg = Image.open(os.path.join(JD, "bg_dressed_2x.png")).convert("RGBA").resize(tuple(LJ["menu"]["bg_size"]),
                                                                               Image.LANCZOS)
 
 

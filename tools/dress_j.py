@@ -42,13 +42,34 @@ def SR(a, pad=0):
     return x0, y0, x1, y1
 
 
-def socket(d, box, rim, k):
-    """Dark recessed square socket with a thick rim."""
+def wobbly(box, amp, rng, n=7):
+    """Irregular rounded outline (organic socket rim)."""
     x0, y0, x1, y1 = box
-    d.rounded_rectangle((x0 - 7 * k, y0 - 7 * k, x1 + 7 * k, y1 + 7 * k), radius=10 * k, fill=rim[2])
-    d.rounded_rectangle((x0 - 5 * k, y0 - 5 * k, x1 + 5 * k, y1 + 5 * k), radius=9 * k, fill=rim[0])
-    d.rounded_rectangle((x0 - 3 * k, y0 - 3 * k, x1 + 3 * k, y1 + 1 * k), radius=8 * k, fill=rim[1])
+    cx, cy, rx, ry = (x0 + x1) / 2, (y0 + y1) / 2, (x1 - x0) / 2, (y1 - y0) / 2
+    pts = []
+    for i in range(n * 4):
+        a = i / (n * 4) * math.tau
+        ca, sa = math.cos(a), math.sin(a)
+        # superellipse (rounded square) + noise
+        e = 0.35
+        x = cx + rx * math.copysign(abs(ca) ** e, ca) + rng.uniform(-amp, amp)
+        y = cy + ry * math.copysign(abs(sa) ** e, sa) + rng.uniform(-amp, amp)
+        pts.append((x, y))
+    return pts
+
+
+def socket(d, box, rim, k, rng):
+    """Dark recessed socket with a thick, irregular corroded rim."""
+    x0, y0, x1, y1 = box
+    d.polygon(wobbly((x0 - 5 * k, y0 - 5 * k, x1 + 5 * k, y1 + 5 * k), 2 * k, rng), fill=rim[2])
+    d.polygon(wobbly((x0 - 3.5 * k, y0 - 3.5 * k, x1 + 3.5 * k, y1 + 3.5 * k), 1.5 * k, rng), fill=rim[0])
+    d.polygon(wobbly((x0 - 2 * k, y0 - 2 * k, x1 + 2 * k, y1 + 1 * k), 1 * k, rng), fill=rim[1])
     d.rounded_rectangle((x0, y0, x1, y1), radius=6 * k, fill=(7, 6, 5))
+    for t in range(rng.randint(3, 6)):  # corrosion pits on the rim
+        px = rng.uniform(x0 - 7 * k, x1 + 7 * k)
+        py = rng.choice([y0 - 7 * k, y1 + 7 * k]) if rng.random() < 0.5 else rng.uniform(y0, y1)
+        r = rng.uniform(1.5, 3.5) * k
+        d.ellipse((px - r, py - r, px + r, py + r), fill=(12, 9, 7))
 
 
 def main():
@@ -59,8 +80,10 @@ def main():
     mask = Image.new("L", base.size, 0)
     md = ImageDraw.Draw(mask)
     k = 2 / K / 2  # sketch unit ~ 1 menu px at 2x
-    copper = ((122, 66, 38), (196, 128, 82), (40, 18, 10))
-    brass = ((120, 100, 52), (200, 176, 104), (40, 30, 12))
+    import random
+    rng = random.Random(seed)
+    copper = ((78, 40, 22), (128, 76, 44), (22, 10, 5))     # darker, like the rest of John's image
+    brass = ((84, 70, 36), (140, 118, 70), (24, 18, 8))
     # quick-slot rows: carrying pipe through the slot centres, sockets on it
     for key in ("quiver", "quick weapons", "quick items"):
         row = L[key]
@@ -68,10 +91,14 @@ def main():
         x1 = SR(row[-1])[2]
         cy = (y0 + y1) / 2
         md.rounded_rectangle((x0 - 40, y0 - 22, x1 + 40, y1 + 22), radius=30, fill=255)
-        tube(sk, [(x0 - 34, cy), (x1 + 34, cy)], 13 * k * 2, "copper")
+        tube(sk, [(x0 - 34, cy), (x1 + 34, cy)], 9 * k * 2, "rust")
         d = ImageDraw.Draw(sk)
-        for a in row:
-            socket(d, SR(a), brass if key == "quick weapons" else copper, k * 2)
+        for i, a in enumerate(row):
+            socket(d, SR(a), brass if key == "quick weapons" else copper, k * 2, rng)
+            if i:  # brass collar on the pipe between two sockets
+                gx = (SR(row[i - 1])[2] + SR(a)[0]) / 2
+                d.rounded_rectangle((gx - 6 * k, cy - 12 * k, gx + 6 * k, cy + 12 * k), radius=3 * k,
+                                    fill=brass[0], outline=brass[2], width=2)
     # body slots: organic sockets + thin pipes to the oval rim
     pd = L["paperdoll"]
     ocx, ocy = S(pd[0] + pd[2] / 2, pd[1] + pd[3] / 2)
@@ -90,7 +117,7 @@ def main():
             aa = t / 9 * math.tau
             d.ellipse((cx + math.cos(aa) * r - 9, cy + math.sin(aa) * r - 9, cx + math.cos(aa) * r + 9,
                        cy + math.sin(aa) * r + 9), fill=(10, 8, 6))
-        socket(d, bx, copper, k * 2)
+        socket(d, bx, copper, k * 2, rng)
     mask = mask.filter(ImageFilter.GaussianBlur(6))
     sk.save(os.path.join(J, "dress_sketch_2x.png"))
     mask.save(os.path.join(J, "dress_mask_2x.png"))

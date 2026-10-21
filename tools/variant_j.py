@@ -119,9 +119,9 @@ def layout():
     L = {"menu": {"width": 1024, "height": 768, "bg_offset": OXJ, "bg_size": [round(1579 * K), 683]}}
     L["parts"] = {name: FB(box) for name, _, box in PARTS}
     # left column: title bars at ref y 165/300/440, slots in the dark band under each bar
-    def rail(n, y):
-        return [(14 + i * 40, y, 36, 36) for i in range(n)]
-    L["quiver"], L["quick weapons"], L["quick items"] = rail(5, 150), rail(4, 248), rail(5, 340)
+    def rail(n, y):  # spaced so the carrying pipe shows between the slots (John 2026-10-22)
+        return [(14 + i * 40, y, 32, 32) for i in range(n)]
+    L["quiver"], L["quick weapons"], L["quick items"] = rail(5, 152), rail(4, 250), rail(5, 342)
     L["titles"] = {"Quiver": FB((55, 165, 335, 198)), "Quick Weapons": FB((55, 302, 335, 338)),
                    "Quick Items": FB((55, 442, 335, 478))}
     # paperdoll + 10 body slots around the oval (ref oval frame 410-625 x 220-505)
