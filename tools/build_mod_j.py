@@ -17,7 +17,7 @@ ROOT = bm.ROOT
 JD = os.path.join(ROOT, "design", "art", "j")
 L = json.load(open(os.path.join(ROOT, "design", "build", "layout_j.json"), encoding="utf-8"))
 MOD = bm.MOD
-UP = 2  # art stored at 2x, the engine scales to the area
+UP = 1  # MOS/BAM V1 are drawn 1:1 by the engine (no scaling to the area): keep menu-pixel size
 
 BAMS = {"tab1": "PSJTAB1", "tab2": "PSJTAB2", "tab3": "PSJTAB3", "tab4": "PSJTAB4", "tab5": "PSJTAB5",
         "tab6": "PSJTAB6", "tab7": "PSJTAB7", "tab8": "PSJTAB8", "tab_more": "PSJTABM", "close": "PSJCLOSE",

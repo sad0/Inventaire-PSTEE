@@ -281,7 +281,9 @@ REQUIRE_PREDICATE GAME_IS ~pstee~ ~Planescape: Torment EE only.~
 COPY ~InventairePTEE/art~ ~override~
 COPY ~InventairePTEE/lua/M_PSINV.lua~ ~override~
 
-COPY ~InventairePTEE/menu/inventory.menu~ ~InventairePTEE/menu/inventory.menu~
+// read the menu text through a scratch copy (copying onto the mod's own file makes WeiDU restore an old copy on
+// uninstall)
+COPY ~InventairePTEE/menu/inventory.menu~ ~weidu_external/InventairePTEE/inventory.menu~
 	READ_ASCII 0 psinv_menu (SOURCE_SIZE)
 
 COPY_EXISTING ~UI.MENU~ ~override~
