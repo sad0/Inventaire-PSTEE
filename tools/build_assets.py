@@ -6,6 +6,7 @@ Hi-res game art is scaled to each item's area, like the engine does.
 Usage: python tools/build_assets.py   (reads the game read-only, writes design/assets + design/build)
 """
 import io
+import re
 import json
 import os
 import sys
@@ -64,7 +65,7 @@ _saved = {}
 
 
 def save(img, key):
-    key = key.replace("/", "_").replace(" ", "_")
+    key = re.sub(r"[^A-Za-z0-9_.+-]", "_", key)
     if key not in _saved:
         p = os.path.join(PNG, key + ".png")
         img.save(p)
@@ -661,7 +662,7 @@ def panel(w, h, b=20):
 
 def panel_layer(name, area, b=20):
     x, y, w, h = area
-    annotate("Party Stash D", name, area, "mock")
+    annotate(f"Party Stash {name[0]}", name, area, "mock")
     guide_box(*area)
     return layer(name, panel(w, h, b), f"panel_{w}x{h}_{b}", x, y)
 
@@ -778,7 +779,207 @@ annotate("Party Stash D", "D grid backpack 2x10", (GX, GY, GW, 2 * STEP - 3), "m
 annotate("Party Stash D", "D grid stash 7x10", (GX, SY, GW, (SROWS - 1) * STEP + CELL), "mock")
 
 
-mockups = group("Party Stash mockup (PTEE style)", [varC, varB, varA, varD])
+# ---- Variant E: LeUI layout (Party Stash BG2 look on LeUI), PTEE textures (John's pick, 2026-10-21)
+# Positions are measured on docs/leui_bg2.png (1458x927) and mapped to the 1024x683 area above the action bar.
+LS, LY = 1024 / 1458, 16
+
+
+def L(x, y, w=0, h=0):
+    """LeUI screenshot rect -> frame rect."""
+    return (round(x * LS), round(y * LS) + LY, round(w * LS), round(h * LS))
+
+
+def E_panel(name, rect, b=14):
+    return panel_layer(name.replace("D ", "E "), rect, b)
+
+
+def E_text(name, text, rect, **kw):
+    annotate("Party Stash E", name, rect, "text")
+    return text_layer(name, text, rect, **kw)
+
+
+def E_slots(prefix, x, y, n, res, cell, step, seq0=0, vertical=False):
+    out = []
+    for i in range(n):
+        a = (x, y + i * step, cell, cell) if vertical else (x + i * step, y, cell, cell)
+        out.append(bam_states(f"{prefix} slot {i}", res, (seq0 + i) % (4 if res != "IVSLOT" else 10), a,
+                              STATES_SLOT))
+    annotate("Party Stash E", prefix, (x, y, (cell if vertical else (n - 1) * step + cell),
+                                       ((n - 1) * step + cell if vertical else cell)), "slot")
+    return group(prefix, out)
+
+
+E_items = []
+
+
+def E_icon(itm, a, **kw):
+    n = icon_in_slot(itm, a, **kw)
+    if n:
+        E_items.append(n)
+
+
+# backdrop over the whole usable area
+bdE = Image.alpha_composite(invbg.crop((-BG_OFF, 0, -BG_OFF + W, ACTIONBAR_Y)),
+                            Image.new("RGBA", (W, ACTIONBAR_Y), (0, 0, 0, 215)))
+
+# --- title + left column
+title = L(20, 12, 1418, 52)
+left = L(30, 68, 645, 815)
+right = L(690, 68, 745, 815)
+name_row = L(140, 75, 530, 40)
+cs, st = 36, 39                                   # left column slot size / step (5 quiver slots must fit)
+qx, qy0 = L(60, 0)[0], L(0, 182)[1]
+E_left = [
+    E_panel("E left panel", left, 16),
+    E_panel("E name/class bar", name_row, 10),
+    E_text("E name", "The Nameless One", (name_row[0], name_row[1], name_row[2] // 2, name_row[3]), style="label",
+           point=16),
+    E_text("E class", "Fighter", (name_row[0] + name_row[2] // 2, name_row[1], name_row[2] // 2, name_row[3]),
+           style="label", point=16),
+]
+# section headers + quick slots (PST: quiver 5, quick weapons 4, quick items 5)
+for title_txt, hy, n, res, items in (("Quiver", 130, 5, "SLOTARW", ["BOLT01", "BOLT03"]),
+                                     ("Quick Weapons", 264, 4, "SLOTSWRD", ["ADDAGGER"]),
+                                     ("Quick Items", 398, 5, "SLOTITM", ["EYEBALL", "BROBRA"])):
+    hb = L(40, hy, 270, 40)
+    E_left.append(E_panel(f"E {title_txt} header", hb, 10))
+    E_left.append(E_text(f"E {title_txt} title", title_txt, hb, style="label", point=16))
+    sy = hb[1] + hb[3] + 6
+    E_left.append(E_slots(f"E {title_txt}", qx, sy, n, res, cs, st))
+    for i, itm in enumerate(items):
+        E_icon(itm, (qx + i * st, sy, cs, cs), count=40 if itm.startswith("BOLT") else None)
+
+# --- paperdoll: PTEE oval reduced, body slots around it like LeUI
+s = 0.56
+ox, oy = L(372, 196)[0] + 4, L(0, 196)[1]
+ov = bg_piece("Paperdoll oval")
+ovw, ovh = round(ov.width * s), round(ov.height * s)
+pa = paperdoll["area"]
+doll = mos("IVPNOA")
+dt = doll.copy()
+dt.thumbnail((round(pa[2] * s), round(pa[3] * s)), Image.LANCZOS)
+dx = ox + round((pa[0] - 154) * s) + (round(pa[2] * s) - dt.width) // 2
+dy = oy + round((pa[1] - 78) * s) + (round(pa[3] * s) - dt.height) // 2
+E_doll = group("E paperdoll (PTEE oval reduced x0.56)", [
+    layer("E oval frame (INVBG cut-out)", ov.resize((ovw, ovh), Image.LANCZOS), "ovalE", ox, oy),
+    layer("E paperdoll IVPNOA", dt, "dollE", dx, dy),
+])
+annotate("Party Stash E", "E paperdoll oval", (ox, oy, ovw, ovh), "mock")
+guide_box(ox, oy, ovw, ovh)
+es, est = 40, 44
+top_y = L(0, 130)[1]
+body = []
+body_names = [("earringright0", "AMBEAR"), ("earringleft0", None), ("chest0", None), ("wrist0", "GOLBRA")]
+tx0 = L(320, 0)[0]
+for i, (nm, itm) in enumerate(body_names):
+    a = (tx0 + i * est, top_y, es, es)
+    body.append(bam_states(f"E body {nm}", "IVSLOT", i, a, STATES_SLOT))
+    if itm:
+        E_icon(itm, a)
+side_x = ox + ovw + 8
+for i, (nm, itm) in enumerate([("hand0", None), ("ring0", "BRORING"), ("ring1", None)]):
+    a = (side_x, top_y + (i + 1) * (est + 14) + 6, es, es) if i else (side_x, top_y, es, es)
+    body.append(bam_states(f"E body {nm}", "IVSLOT", 4 + i, a, STATES_SLOT))
+    if itm:
+        E_icon(itm, a)
+bot_y = oy + ovh + 6
+for i, (nm, itm) in enumerate([("tattoo0", "TTAC1"), ("tattoo1", None), ("tattoo2", None)]):
+    a = (ox + (ovw - (3 * est - 4)) // 2 + i * est, bot_y, es, es)
+    body.append(bam_states(f"E body {nm}", "IVSLOT", 7 + i, a, STATES_SLOT))
+    if itm:
+        E_icon(itm, a)
+annotate("Party Stash E", "E body slots (10, PST)", (tx0, top_y, side_x + es - tx0, bot_y + es - top_y), "slot")
+
+# --- stats: 2x2 blocks (icon disc + big value | detail lines)
+STATS = [("AC", "8", ["Base: 10", "Dex: -1", "Tattoo: -1"], "ICAC", 548, 45),
+         ("THAC0", "17", ["Base: 18", "Str: +0", "Prof.: -1", "Weapon: 0"], "ICAC", 548, 355),
+         ("HP", "64/64", ["Class: 1d10", "Con: +2"], "ICHPBG", 715, 45),
+         ("Damage", "1d6+1", ["Weapon: 1d6", "Str: +1", "Prof.: +0"], "ICHPBG", 715, 355)]
+E_stats = []
+for nm, val, lines, disc, yy, xx in STATS:
+    box = L(xx, yy, 125, 160)
+    det = L(xx + 130, yy, 175, 160)
+    d = min(box[2], box[3]) - 26
+    kids = [E_panel(f"E {nm} icon box", box, 10), E_panel(f"E {nm} detail box", det, 10),
+            layer(f"E {nm} disc ({disc})", mos(disc).resize((d, d), Image.LANCZOS), f"disc_{disc}_{d}",
+                  box[0] + (box[2] - d) // 2, box[1] + (box[3] - d) // 2),
+            E_text(f"E {nm} value", val, box, style="label", point=15),
+            E_text(f"E {nm} caption", nm, (box[0], box[1] + 4, box[2], 16), style="normal", point=11,
+                   color=COL["Y"], halign="center", valign="top"),
+            E_text(f"E {nm} detail", "\n".join(lines), (det[0] + 8, det[1] + 8, det[2] - 12, det[3] - 12),
+                   style="normal", point=13, color=COL["B"])]
+    E_stats.append(group(f"E stat {nm}", kids))
+
+# --- right panel: header, tabs, grid (backpack 2x10 + stash 7x10), ground column, bottom bar
+gxE, gyE = L(705, 0)[0], L(0, 175)[1]
+ce, se = 39, 42
+E_grid_bp = [bam_states(f"E backpack slot r{r}c{c}", "SLOTITM", (r * 10 + c) % 5,
+                        (gxE + c * se, gyE + r * se, ce, ce), STATES_SLOT) for r in range(2) for c in range(10)]
+syE = gyE + 2 * se + 8
+E_grid_st = [bam_states(f"E stash slot r{r}c{c}", "IVSLOT", (r * 10 + c) % 10,
+                        (gxE + c * se, syE + r * se, ce, ce), STATES_SLOT) for r in range(7) for c in range(10)]
+gwE = 9 * se + ce
+for i, itm in enumerate(["COPPER", "BREAST1", "KEYSNTRY", "LENS04"]):
+    E_icon(itm, (gxE + i * se, gyE, ce, ce), count=(3, 2, None, None)[i])
+for i in range(61):
+    mk = STASH_MARKS.get(i % len(STASH_ITEMS))
+    E_icon(STASH_ITEMS[i % len(STASH_ITEMS)], (gxE + (i % 10) * se, syE + (i // 10) * se, ce, ce),
+           tint=mk[1] if mk and mk[0] == "tint" else None, count=mk[1] if mk and mk[0] == "count" else None,
+           plus=bool(mk and mk[0] == "plus"))
+guide_box(gxE, gyE, gwE, 2 * se - 3)
+guide_box(gxE, syE, gwE, 6 * se + ce)
+annotate("Party Stash E", "E backpack 2x10", (gxE, gyE, gwE, 2 * se - 3), "mock")
+annotate("Party Stash E", "E stash 7x10", (gxE, syE, gwE, 6 * se + ce), "mock")
+sepE = Image.new("RGBA", (gwE, 3), (150, 90, 50, 255))
+ImageDraw.Draw(sepE).line((0, 1, gwE, 1), fill=(210, 140, 80, 255))
+hdr = L(705, 70, 560, 42)
+gnd_hdr = L(1280, 70, 105, 42)
+gxG = gxE + gwE + 14
+E_ground = [bam_states(f"E ground slot {r}", "IVSLOT", (r + 4) % 10, (gxG, gyE + r * se, ce, ce), STATES_SLOT)
+            for r in range(10) if gyE + r * se + ce <= L(0, 770)[1]]
+E_icon("CLUB2", (gxG, gyE, ce, ce))
+annotate("Party Stash E", f"E ground column 1x{len(E_ground)}", (gxG, gyE, ce, (len(E_ground) - 1) * se + ce), "slot")
+E_right = [
+    E_panel("E right panel", right, 16),
+    E_panel("E header bar", hdr, 10),
+    layer("E big bag (CONTBACK, overlaps title like LeUI)", bam_frame("CONTBACK", 0, 0, (50, 54)), "contbackE",
+          L(722, 0)[0], L(0, 12)[1]),
+    E_text("E stash weight", "816 / 2000 LB", (hdr[0] + 64, hdr[1], 200, hdr[3]), style="normal", point=15,
+           color=COL["$"], halign="left", valign="center"),
+    E_text("E sort", "Sort: Auto", (hdr[0] + hdr[2] - 130, hdr[1], 120, hdr[3]), style="label", point=15,
+           halign="right"),
+    E_panel("E ground header", gnd_hdr, 10),
+    E_text("E ground title", "Ground 1/1", gnd_hdr, style="label", point=13),
+    tab_strip("E", gxE - 2, L(0, 122)[1], 47, 24, TABS_SHORT[:8], active=0, gap=1, arrows=False),
+    button("E tabs more", "ARROBUTT", (gxE + 8 * 48 + 2, L(0, 122)[1], 24, 24), seq=1),
+    group("E backpack slots (SLOTITM)", E_grid_bp),
+    layer("E backpack / stash separator", sepE, "sepE", gxE, gyE + 2 * se + 2),
+    group("E stash slots (IVSLOT)", E_grid_st),
+    group("E ground slots", E_ground),
+    button("E ground prev", "ARROBUTT", L(1292, 790, 40, 40), seq=0),
+    button("E ground next", "ARROBUTT", L(1350, 790, 40, 40), seq=1),
+    button("E store all", "STRBUTT", L(708, 826, 180, 50), "Store all", point=15),
+    layer("E gold pile (ICGOLD)", mos("ICGOLD").resize((56, 40), Image.LANCZOS), "icgoldE", L(990, 0)[0],
+          L(0, 826)[1]),
+    E_panel("E gold box", L(1092, 832, 135, 40), 8),
+    E_text("E party gold", "1250", L(1092, 832, 135, 40), style="gold", point=16),
+]
+varE = group("Variant E - LeUI layout with PTEE textures (John's pick)", [
+    layer("E backdrop (INVBG darkened)", bdE, "E_backdrop", 0, 0),
+    E_panel("E title bar", title, 14),
+    E_text("E title", "Inventory", (title[0], title[1], title[2] - 260, title[3]), style="label", point=24,
+           font="EXOCET", color=COL["Y"], shadow=True),
+    group("E left column (name, quick slots)", E_left),
+    group("E body slots", body),
+    E_doll,
+    group("E stats blocks (bottom left)", E_stats),
+    group("E right column (stash)", E_right),
+    group("E items (sample)", E_items),
+    button("E close (XBUTT)", "XBUTT", (982, 14, 38, 38)),
+], visible=True)
+varD["visible"] = False
+
+mockups = group("Party Stash mockup (PTEE style)", [varC, varB, varA, varD, varE])
 
 # ================================================================== 5. LIBRARY
 usage = {}
