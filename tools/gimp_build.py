@@ -119,11 +119,13 @@ MOCK = "Party Stash mockup"
 export("inventory_ptee_preview.png")  # default visibility of the .xcf
 export("vanilla_1024.png", hide=[MOCK])
 export("vanilla_1366.png", hide=[MOCK], wide=True)
-export("stash_A_rail_toggle.png", show=["Variant A"], hide=["Variant B", "Variant C"])
-export("stash_B_window.png", show=["Variant B"], hide=["Variant A", "Variant C"])
-export("stash_C_ground_column.png", show=["Variant C"], hide=["Variant A", "Variant B"])
-export("annotated_vanilla.png", show=["Annotations"], hide=[MOCK, "Party Stash A", "Party Stash B", "Party Stash C"])
-export("annotated_stash.png", show=["Annotations", "Variant B"],
-       hide=["Slots", "Text", "Labels & icons", "Buttons", "Paperdoll", "Variant A", "Variant C",
-             "Party Stash A", "Party Stash C"])
+VARIANTS = ["Variant A", "Variant B", "Variant C", "Variant D"]
+for fn, v in (("stash_A_rail_toggle.png", "Variant A"), ("stash_B_window.png", "Variant B"),
+              ("stash_C_ground_column.png", "Variant C"), ("stash_D_redesign.png", "Variant D")):
+    export(fn, show=[v], hide=[x for x in VARIANTS if x != v])
+    export(fn.replace(".png", "_1366.png"), show=[v], hide=[x for x in VARIANTS if x != v], wide=True)
+export("annotated_vanilla.png", show=["Annotations"], hide=[MOCK, "Party Stash A", "Party Stash B", "Party Stash C", "Party Stash D"])
+export("annotated_stash_D.png", show=["Annotations"],
+       hide=["Party Stash A", "Party Stash B", "Party Stash C", "Slots", "Text", "Labels & icons", "Buttons",
+             "Background pieces"])
 LOG.close()

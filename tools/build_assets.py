@@ -549,7 +549,7 @@ varA = group("Variant A - Backpack rail toggles Backpack <-> Stash (in place)", 
         button("A sort button", "STRBUTT", (478, 614, 96, 34), "Sort: Auto", point=13),
         button("A store all button", "STRBUTT", (580, 614, 96, 34), "Store all", point=13),
     ]),
-], visible=True)
+], visible=False)
 for nm, a in [("A tabs", (430, 452, 420, 26)), ("A page up", (978, 515, 29, 28)), ("A page down", (978, 566, 29, 28)),
               ("A sort", (478, 614, 96, 34)), ("A store all", (580, 614, 96, 34)), ("A bag toggle", bagA)]:
     annotate("Party Stash A", nm, a, "mock")
@@ -628,7 +628,157 @@ varC = group("Variant C - Ground column switches Ground <-> Stash", [
 annotate("Party Stash C", "C mode tabs", (858, 122, 115, 24), "mock")
 annotate("Party Stash C", "C categories", (981, 140, 38, 7 * 44), "mock")
 
-mockups = group("Party Stash mockup (PTEE style)", [varC, varB, varA])
+
+# ---- Variant D: full redesign inspired by Party Stash BG (John's pick, 2026-10-21)
+def bg_piece(name):
+    x, y, w, h = BG_PIECES[name]
+    return invbg.crop((x - BG_OFF, y, x - BG_OFF + w, y + h))
+
+
+POPUP1_HI = mos("POPUP1")
+STONE = POPUP1_HI.crop([round(v * POPUP1_HI.width / 750) for v in (300, 146, 700, 470)])
+
+
+def panel(w, h, b=20):
+    """PTEE-looking panel: rusty 9-slice border from the message bar, stone fill from POPUP1."""
+    src = bg_piece("Message bar")
+    sw, sh = src.size
+    out = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+    out.paste(STONE.resize((w - 2 * b + 8, h - 2 * b + 8), Image.LANCZOS), (b - 4, b - 4))
+    bh = min(b, sh // 2)
+    parts = [  # (src box, dst box)
+        ((0, 0, b, bh), (0, 0, b, b)), ((sw - b, 0, sw, bh), (w - b, 0, w, b)),
+        ((0, sh - bh, b, sh), (0, h - b, b, h)), ((sw - b, sh - bh, sw, sh), (w - b, h - b, w, h)),
+        ((b, 0, sw - b, bh), (b, 0, w - b, b)), ((b, sh - bh, sw - b, sh), (b, h - b, w - b, h)),
+        ((0, bh, b, sh - bh), (0, b, b, h - b)), ((sw - b, bh, sw, sh - bh), (w - b, b, w, h - b)),
+    ]
+    for (sx0, sy0, sx1, sy1), (dx0, dy0, dx1, dy1) in parts:
+        if dx1 > dx0 and dy1 > dy0 and sx1 > sx0 and sy1 > sy0:
+            piece = src.crop((sx0, sy0, sx1, sy1)).resize((dx1 - dx0, dy1 - dy0), Image.LANCZOS)
+            out.alpha_composite(piece, (dx0, dy0))
+    return out
+
+
+def panel_layer(name, area, b=20):
+    x, y, w, h = area
+    annotate("Party Stash D", name, area, "mock")
+    guide_box(*area)
+    return layer(name, panel(w, h, b), f"panel_{w}x{h}_{b}", x, y)
+
+
+# backdrop: hides the vanilla right half, keeps INVBG pipes faintly visible
+bd = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+dark = Image.alpha_composite(invbg.crop((-BG_OFF, 0, -BG_OFF + W, H)), Image.new("RGBA", (W, H), (0, 0, 0, 200)))
+mask = Image.new("L", (W, H), 0)
+md = ImageDraw.Draw(mask)
+md.rectangle((478, 0, W, ACTIONBAR_Y), fill=255)
+md.rectangle((432, 430, 478, ACTIONBAR_Y), fill=255)
+md.rectangle((380, 495, 478, ACTIONBAR_Y), fill=255)
+md.rectangle((130, 600, 380, ACTIONBAR_Y), fill=255)
+bd.paste(dark, (0, 0), mask)
+
+CELL, STEP = 43, 46
+GX, GY = 486, 146                      # backpack rows
+SY = GY + 2 * STEP + 8                 # stash rows start (after a separator)
+SROWS = 7
+GW = 9 * STEP + CELL                   # 10 columns
+gridD = []
+for r in range(2):                     # backpack: 2 x 10 = the 20 PST backpack slots
+    for c in range(10):
+        a = (GX + c * STEP, GY + r * STEP, CELL, CELL)
+        gridD.append(bam_states(f"D backpack slot r{r}c{c}", "SLOTITM", (r * 10 + c) % 5, a, STATES_SLOT))
+stashD = []
+for r in range(SROWS):
+    for c in range(10):
+        a = (GX + c * STEP, SY + r * STEP, CELL, CELL)
+        stashD.append(bam_states(f"D stash slot r{r}c{c}", "IVSLOT", (r * 10 + c) % 10, a, STATES_SLOT))
+guide_box(GX, GY, GW, 2 * STEP - 3)
+guide_box(GX, SY, GW, (SROWS - 1) * STEP + CELL)
+itemsD = []
+for i, itm in enumerate(["COPPER", "BREAST1", "KEYSNTRY", "LENS04", "CLUB"]):
+    n = icon_in_slot(itm, (GX + (i % 10) * STEP, GY, CELL, CELL), count=(3, 2, None, None, None)[i])
+    if n:
+        itemsD.append(n)
+for i in range(SROWS * 10 - 9):
+    mk = STASH_MARKS.get(i % len(STASH_ITEMS))
+    a = (GX + (i % 10) * STEP, SY + (i // 10) * STEP, CELL, CELL)
+    n = icon_in_slot(STASH_ITEMS[i % len(STASH_ITEMS)], a, tint=mk[1] if mk and mk[0] == "tint" else None,
+                     count=mk[1] if mk and mk[0] == "count" else None, plus=bool(mk and mk[0] == "plus"))
+    if n:
+        itemsD.append(n)
+sep = Image.new("RGBA", (GW, 3), (150, 90, 50, 255))
+ImageDraw.Draw(sep).line((0, 1, GW, 1), fill=(210, 140, 80, 255))
+
+# ground column (1 x 6) on the far right
+groundD = []
+for r in range(6):
+    a = (968, GY + r * STEP, CELL, CELL)
+    groundD.append(bam_states(f"D ground slot {r}", "IVSLOT", (r + 4) % 10, a, STATES_SLOT))
+giD = icon_in_slot("CLUB2", (968, GY, CELL, CELL))
+
+
+def rail(prefix, x, y, n, res, cell=40, step=43, title=None):
+    """Quick-slot rail: panel frame + slots (+ optional title above)."""
+    kids = [panel_layer(f"{prefix} rail frame", (x - 8, y - 8, (n - 1) * step + cell + 16, cell + 16), 12)]
+    for i in range(n):
+        kids.append(bam_states(f"{prefix} slot {i}", res, i % 4, (x + i * step, y, cell, cell), STATES_SLOT))
+    if title:
+        kids.append(text_layer(f"{prefix} title", title, (x - 8, y - 28, (n - 1) * step + cell + 16, 18),
+                               style="label", point=14))
+    return group(prefix, kids)
+
+
+qx, qy = 494, 38
+varD = group("Variant D - Redesign inspired by Party Stash BG (big grid)", [
+    layer("D backdrop (hides vanilla right half, INVBG darkened)", bd, "D_backdrop", 0, 0),
+    group("D quick slots (moved)", [
+        rail("D quiver", qx, qy, 5, "SLOTARW", title="Quiver"),
+        rail("D quick items", qx + 5 * 43 + 30, qy, 5, "SLOTITM", title="Quick items"),
+        rail("D quick weapons", 150, 628, 4, "SLOTSWRD"),
+    ]),
+    group("D header (stash weight, sort)", [
+        panel_layer("D header bar", (478, 86, 482, 32), 12),
+        layer("D bag (CONTBACK)", bam_frame("CONTBACK", 0, 0, (26, 28)), "contback_D", 488, 88),
+        text_layer("D stash weight", "816 / 2000 LB", (522, 87, 200, 30), style="normal", point=15,
+                   color=COL["$"], halign="left", valign="center"),
+        button("D sort button", "STRBUTT", (836, 88, 116, 28), "Sort: Auto", point=13),
+    ]),
+    tab_strip("D", 478, 117, 59, 22, TABS_SHORT, active=0, gap=1, arrows=False),
+    group("D grid (backpack 2x10 + stash 7x10)", [
+        panel_layer("D grid frame", (GX - 10, GY - 6, GW + 20 + 18, SY + (SROWS - 1) * STEP + CELL - GY + 14), 14),
+        group("D backpack slots (SLOTITM)", gridD),
+        layer("D backpack / stash separator", sep, "sepD", GX, GY + 2 * STEP + 1),
+        group("D stash slots (IVSLOT)", stashD),
+        group("D items (sample, marks: red/blue/+ /count)", itemsD),
+        group("D grid scrollbar (CGSCRL1)", [
+            layer("D scroll up", bam_frame("CGSCRL1", 0, 0, (14, 16)), "cgscrl_upD", GX + GW + 2, SY),
+            layer("D scroll trough", bam_frame("CGSCRL1", 0, 5, (6, 270)), "cgscrl_troughD", GX + GW + 6, SY + 18),
+            layer("D scroll knob", bam_frame("CGSCRL1", 0, 4, (14, 12)), "cgscrl_knobD", GX + GW + 2, SY + 40),
+            layer("D scroll down", bam_frame("CGSCRL1", 0, 2, (14, 16)), "cgscrl_dnD", GX + GW + 2,
+                  SY + (SROWS - 1) * STEP + CELL - 16),
+        ]),
+    ]),
+    group("D ground column", [
+        panel_layer("D ground frame", (962, GY - 30, 56, 6 * STEP + 70), 12),
+        layer("D ground pickup hand (ICPICKUP)", mos("ICPICKUP").resize((12, 24), Image.LANCZOS), "pickupD", 984,
+              GY - 27),
+        group("D ground slots", groundD),
+        giD if giD else group("D ground item", []),
+        button("D ground page", "ARROBUTT", (976, GY + 6 * STEP, 26, 24), seq=2),
+        text_layer("D ground page label", "1/1", (962, GY + 6 * STEP + 22, 56, 18), style="label", point=13),
+    ]),
+    button("D close (XBUTT, same as vanilla)", "XBUTT", (974, 12, 50, 50)),
+    group("D bottom bar", [
+        button("D store all", "STRBUTT", (486, 586, 130, 40), "Store all", point=15),
+        layer("D gold pile (ICGOLD)", mos("ICGOLD").resize((52, 44), Image.LANCZOS), "icgoldD", 812, 584),
+        text_layer("D party gold", "1250", (868, 594, 90, 24), style="gold", point=16),
+    ]),
+], visible=True)
+annotate("Party Stash D", "D grid backpack 2x10", (GX, GY, GW, 2 * STEP - 3), "mock")
+annotate("Party Stash D", "D grid stash 7x10", (GX, SY, GW, (SROWS - 1) * STEP + CELL), "mock")
+
+
+mockups = group("Party Stash mockup (PTEE style)", [varC, varB, varA, varD])
 
 # ================================================================== 5. LIBRARY
 usage = {}
