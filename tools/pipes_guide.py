@@ -210,4 +210,5 @@ def main():
     print("guide:", os.path.join(OUT, "guide_2x.png"))
 
 
-main()
+if __name__ == "__main__":
+    main()

@@ -11,7 +11,7 @@ import json
 import os
 import sys
 
-from PIL import Image, ImageChops, ImageDraw, ImageFilter, ImageFont
+from PIL import Image, ImageChops, ImageDraw, ImageEnhance, ImageFilter, ImageFont
 
 sys.path.insert(0, os.path.dirname(__file__))
 import ie  # noqa: E402
@@ -1539,7 +1539,109 @@ varH = group("Variant H - Tentacular pipes (SwarmUI img2img of the pipes guide, 
 ], visible=True)
 varG["visible"] = False
 
-mockups = group("Party Stash mockup (PTEE style)", [varC, varB, varA, varD, varE, varF, varG, varH])
+# ---- Variant J (John 2026-10-22): John's painted inventory as is (x2 SwarmUI, pieces detached + inpainted),
+# geometry in design/build/layout_j.json (tools/variant_j.py). Detached pieces get hover/pressed/disabled states.
+LJ = json.load(open(os.path.join(BUILD, "layout_j.json"), encoding="utf-8"))
+JD = os.path.join(ROOT, "design", "art", "j")
+j_bg = Image.open(os.path.join(JD, "bg_clean_2x.png")).convert("RGBA").resize(tuple(LJ["menu"]["bg_size"]),
+                                                                              Image.LANCZOS)
+
+
+def part_states(name, rect, label_states=STATES_BTN, visible=True):
+    """Detached piece + generated states (normal, hover = brighter, pressed = darker, disabled = grey)."""
+    x, y, w, h = rect
+    base = Image.open(os.path.join(JD, "parts", f"{name}.png")).convert("RGBA").resize((w, h), Image.LANCZOS)
+    a = base.getchannel("A")
+    rgb = base.convert("RGB")
+    states = [rgb, ImageEnhance.Brightness(rgb).enhance(1.35), ImageEnhance.Brightness(rgb).enhance(0.7),
+              ImageEnhance.Brightness(ImageEnhance.Color(rgb).enhance(0.15)).enhance(0.6)]
+    kids = []
+    for i, (st, im) in enumerate(zip(["normal", "hover", "pressed", "disabled"], states)):
+        im = im.convert("RGBA")
+        im.putalpha(a)
+        kids.append(layer(f"{name} - {st}", im, f"J_{name}_{st}_{w}x{h}", x, y, visible=visible and i == 0))
+    gr = group(f"J {name} (detached, 4 states)", kids)
+    gr["kind_bg"] = "button"  # engine-drawn in the mod (BAM)
+    return gr
+
+
+def J_cells(prefix, areas, res="IVSLOT"):
+    kids = []
+    for i, a in enumerate(areas):
+        x, y, w, h = a
+        c = Image.new("RGBA", (w + 4, h + 4), (0, 0, 0, 0))
+        d = ImageDraw.Draw(c)
+        d.rounded_rectangle((0, 0, w + 3, h + 3), radius=5, fill=(6, 5, 4, 200), outline=(0, 0, 0, 230), width=2)
+        d.line((4, h + 2, w, h + 2), fill=(140, 96, 58, 150))
+        d.line((w + 2, 4, w + 2, h), fill=(140, 96, 58, 150))
+        kids.append(layer(f"{prefix} cell {i}", c, f"Jcell_{w}x{h}", x - 2, y - 2))
+        ncyc = len([c for c in bam(res) if c])
+        kids.append(bam_states(f"{prefix} slot {i}", res, i % ncyc, a, STATES_SLOT))
+    return group(prefix, kids)
+
+
+J_items = []
+
+
+def J_icon(itm, a, **kw):
+    n = icon_in_slot(itm, a, **kw)
+    if n:
+        J_items.append(n)
+
+
+pdJ = LJ["paperdoll"]
+dollJ = mos("IVPNOA").copy()
+dollJ.thumbnail((pdJ[2], pdJ[3]), Image.LANCZOS)
+J_left = [J_cells("J quiver", LJ["quiver"], "SLOTARW"), J_cells("J quick weapons", LJ["quick weapons"], "SLOTSWRD"),
+          J_cells("J quick items", LJ["quick items"], "SLOTITM"), J_cells("J body slots", list(LJ["body"].values()))]
+for t_, r_ in LJ["titles"].items():
+    J_left.append(text_layer(f"J {t_} title", t_, r_, style="label", point=14))
+J_left += [text_layer("J name", "The Nameless One", LJ["text"]["name"], style="label", point=14),
+           text_layer("J class", "Fighter", LJ["text"]["class"], style="label", point=14)]
+J_stats = []
+for nm, stt in LJ["stats"].items():
+    dd, pp = stt["disc"], stt["plate"]
+    J_stats.append(group(f"J stat {nm}", [
+        text_layer(f"J {nm} value", {"AC": "8", "THAC0": "17", "HP": "64/64", "Damage": "1d6+1"}[nm],
+                   (dd[0], dd[1] + 14, dd[2], 34), style="label", point=15),
+        text_layer(f"J {nm} caption", nm, (dd[0], dd[1] - 16, dd[2], 14), style="normal", point=11, color=COL["Y"],
+                   halign="center", valign="top"),
+        text_layer(f"J {nm} detail", {"AC": "Base: 10\nDex: -1", "THAC0": "Base: 18\nProf.: -1",
+                                      "HP": "Class: 1d10\nCon: +2", "Damage": "Weapon: 1d6\nStr: +1"}[nm],
+                   (pp[0] + 10, pp[1] + 10, pp[2] - 16, pp[3] - 16), style="normal", point=12, color=COL["B"]),
+    ]))
+J_right = [J_cells("J backpack", LJ["backpack"], "SLOTITM"), J_cells("J stash", LJ["stash"]),
+           J_cells("J ground", LJ["ground"]),
+           text_layer("J stash weight", "816 / 2000 LB", LJ["text"]["weight"], style="normal", point=15, color=COL["$"],
+                      halign="left", valign="center"),
+           text_layer("J sort", "Sort: Auto", LJ["buttons"]["sort"], style="label", point=14, halign="right"),
+           text_layer("J party gold", "1250", LJ["text"]["gold"], style="gold", point=16),
+           text_layer("J ground page", "1/1", LJ["ground_page"], style="label", point=13)]
+for i, nm in enumerate(LJ["buttons"]["tab_names"]):
+    J_right.append(text_layer(f"J tab caption {nm}", nm, LJ["buttons"]["tabs"][i], style="button", point=12,
+                              color=COL["Y"] if i == 0 else None))
+J_right.append(text_layer("J store all caption", "Store all", LJ["buttons"]["store_all"], style="button", point=15))
+for i, itm in enumerate(["COPPER", "BREAST1", "KEYSNTRY", "LENS04", "CLUB"]):
+    J_icon(itm, LJ["backpack"][i * 2], count=(3, 2, None, None, None)[i])
+for i in range(55):
+    mk = STASH_MARKS.get(i % len(STASH_ITEMS))
+    J_icon(STASH_ITEMS[i % len(STASH_ITEMS)], LJ["stash"][i], tint=mk[1] if mk and mk[0] == "tint" else None,
+           count=mk[1] if mk and mk[0] == "count" else None, plus=bool(mk and mk[0] == "plus"))
+J_icon("CLUB2", LJ["ground"][0])
+J_parts = [part_states(nm, LJ["parts"][nm]) for nm in LJ["parts"]]
+varJ = group("Variant J - John's painted inventory, pieces detached (SwarmUI x2 + inpaint)", [
+    layer("J background (bg_clean_2x, 1083x683 @ -30,0)", j_bg, "J_bg", LJ["menu"]["bg_offset"], 0),
+    group("J paperdoll", [layer("J paperdoll IVPNOA", dollJ, "dollJ", pdJ[0] + (pdJ[2] - dollJ.width) // 2,
+                                pdJ[1] + (pdJ[3] - dollJ.height) // 2)]),
+    group("J detached pieces (buttons, bag, face, gauges, tubes)", J_parts),
+    group("J left column", J_left),
+    group("J stats", J_stats),
+    group("J right column", J_right),
+    group("J items (sample)", J_items),
+], visible=True)
+varH["visible"] = False
+
+mockups = group("Party Stash mockup (PTEE style)", [varC, varB, varA, varD, varE, varF, varG, varH, varJ])
 
 # ================================================================== 5. LIBRARY
 usage = {}

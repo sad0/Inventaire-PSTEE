@@ -1,32 +1,26 @@
--- Inventaire PTEE (Party Stash for Planescape: Torment EE), step 1: redesigned inventory page.
--- Background art variant: 'H' (tentacular pipes), 'G' (generated pieces) or 'F' (PTEE pieces), saved in the ini.
-psInvVariants = {F = 'G', G = 'H', H = 'F'}
-psInvVariant = Infinity_GetINIString('Party Stash', 'Inventory Art', 'H')
-if psInvVariants[psInvVariant] == nil then psInvVariant = 'H' end
-
-function psInvBackground()
-	return 'PSIVBG' .. psInvVariant
-end
-
-function psInvToggleVariant()
-	psInvVariant = psInvVariants[psInvVariant]
-	Infinity_SetINIValue('Party Stash', 'Inventory Art', psInvVariant)
-	Infinity_SetBackground('BACKGROUND_INVENTORY')
-end
-
-function psInvVariantLabel()
-	return 'Art: ' .. psInvVariant
-end
-
+-- Inventaire PTEE (Party Stash for Planescape: Torment EE), step 1: redesigned inventory page (art J).
 psInvTexts = {
-	title = 'Inventory', Quiver = 'Quiver', ['Quick Weapons'] = 'Quick Weapons', ['Quick Items'] = 'Quick Items',
+	Quiver = 'Quiver', ['Quick Weapons'] = 'Quick Weapons', ['Quick Items'] = 'Quick Items',
 	AC = 'AC', THAC0 = 'THAC0', HP = 'HP', Damage = 'Damage', Sort = 'Sort: Auto', ['Store all'] = 'Store all',
-	Swap = 'Swap the inventory art (F: game pieces, G: generated pieces, H: tentacular pipes)',
+	Help = 'Help',
 }
 psInvTabs = {'All', 'Weap.', 'Tatt.', 'Jewel', 'Eyes', 'Charm', 'Quest', 'Misc'}
+psInvActiveTab = 1
 
+function psInvBackground() return 'PSIVBGJ' end
 function psInvText(key) return psInvTexts[key] or key end
 function psInvTab(i) return psInvTabs[i] end
+function psInvSelectTab(i) psInvActiveTab = i end
+-- selected tab shows the "selected" frame (2)
+function psInvTabFrame(i) if psInvActiveTab == i then return 2 end return 0 end
+
+-- gauges and glass tubes: slow pulse between the normal (0) and lit (2) frames, each piece with its own phase
+psInvPhase = {gauge_top = 0, gauge_left = 7, gauge_right = 13, tube_left = 3, tube_right = 9, tube_mid = 5}
+function psInvPulse(name)
+	local t = math.floor(Infinity_GetClockTicks() / 400) + (psInvPhase[name] or 0)
+	if t % 6 == 0 then return 2 end
+	return 0
+end
 
 function psInvYellow()
 	return bit32.band(tonumber(fontcolors['Y'], 16), 0x00FFFFFF)

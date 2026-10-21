@@ -267,7 +267,7 @@ end
 TP2 = r'''// Inventaire PTEE: Party Stash inventory page for Planescape: Torment EE (step 1 preview).
 BACKUP ~weidu_external/backup/InventairePTEE~
 AUTHOR ~sad0~
-VERSION ~v0.1~
+VERSION ~v0.2~
 
 LANGUAGE ~English~ ~english~
 
@@ -316,4 +316,5 @@ def main():
     print("mod written:", MOD)
 
 
-main()
+if __name__ == "__main__":
+    main()

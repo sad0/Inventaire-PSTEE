@@ -19,37 +19,71 @@ menu
 		popSidebars()
 		Infinity_SetBackground(nil)
 	"
+	label
+	{
+		area 425 32 27 29
+		bam "PSJGTOP"
+		sequence 0
+		frame lua "psInvPulse('gauge_top')"
+	}
+	label
+	{
+		area -29 167 39 43
+		bam "PSJGLEFT"
+		sequence 0
+		frame lua "psInvPulse('gauge_left')"
+	}
+	label
+	{
+		area 1012 332 37 39
+		bam "PSJGRGHT"
+		sequence 0
+		frame lua "psInvPulse('gauge_right')"
+	}
+	label
+	{
+		area -25 245 28 86
+		bam "PSJTUBEL"
+		sequence 0
+		frame lua "psInvPulse('tube_left')"
+	}
+	label
+	{
+		area 1016 191 30 92
+		bam "PSJTUBER"
+		sequence 0
+		frame lua "psInvPulse('tube_right')"
+	}
+	label
+	{
+		area 425 122 26 102
+		bam "PSJTUBEM"
+		sequence 0
+		frame lua "psInvPulse('tube_mid')"
+	}
 	button
 	{
-		area 296 186 108 147
+		area 263 163 121 172
 		paperdoll 1
 		actiondrag "Infinity_SwapWithAppearance()"
 	}
 	label
 	{
-		area 150 8 300 40
-		text lua "psInvText('title')"
-		text style "label_parchment"
-		text font "EXOCET"
-		text point 22
-	}
-	label
-	{
-		area 30 82 170 34
+		area 92 69 104 24
 		text lua "characters[id].name"
 		text style "label"
-		text point 15
+		text point 14
 	}
 	label
 	{
-		area 200 82 130 34
+		area 196 69 95 24
 		text lua "characters[id].class"
 		text style "label"
-		text point 15
+		text point 14
 	}
 	label
 	{
-		area 574 82 200 34
+		area 567 71 171 22
 		text lua "psInvWeight()"
 		text style "normal"
 		text point 15
@@ -58,35 +92,35 @@ menu
 	}
 	label
 	{
-		area 888 606 90 30
+		area 765 624 100 26
 		text lua "characters[id].gold"
 		text style "gold"
 		text point 16
 	}
 	label
 	{
-		area 28 128 228 20
+		area 8 113 192 23
 		text lua "psInvText('Quiver')"
 		text style "label"
-		text point 15
+		text point 14
 	}
 	label
 	{
-		area 28 214 210 20
+		area 8 207 192 25
 		text lua "psInvText('Quick Weapons')"
 		text style "label"
-		text point 15
+		text point 14
 	}
 	label
 	{
-		area 28 302 228 20
+		area 8 303 192 25
 		text lua "psInvText('Quick Items')"
 		text style "label"
-		text point 15
+		text point 14
 	}
 	label
 	{
-		area 24 408 78 14
+		area 21 426 62 14
 		text lua "psInvText('AC')"
 		text style "normal"
 		text point 11
@@ -95,14 +129,14 @@ menu
 	}
 	label
 	{
-		area 24 444 78 40
+		area 21 456 62 34
 		text lua "psInvStat('AC')"
 		text style "label"
 		text point 15
 	}
 	label
 	{
-		area 112 422 114 88
+		area 117 432 90 85
 		text lua "psInvStatDetail('AC')"
 		text style "normal"
 		text point 12
@@ -110,7 +144,7 @@ menu
 	}
 	label
 	{
-		area 244 408 78 14
+		area 248 426 62 14
 		text lua "psInvText('THAC0')"
 		text style "normal"
 		text point 11
@@ -119,14 +153,14 @@ menu
 	}
 	label
 	{
-		area 244 444 78 40
+		area 248 456 62 34
 		text lua "psInvStat('THAC0')"
 		text style "label"
 		text point 15
 	}
 	label
 	{
-		area 332 422 114 88
+		area 326 432 118 85
 		text lua "psInvStatDetail('THAC0')"
 		text style "normal"
 		text point 12
@@ -134,7 +168,7 @@ menu
 	}
 	label
 	{
-		area 24 534 78 14
+		area 21 536 62 14
 		text lua "psInvText('HP')"
 		text style "normal"
 		text point 11
@@ -143,14 +177,14 @@ menu
 	}
 	label
 	{
-		area 24 570 78 40
+		area 21 566 62 34
 		text lua "psInvStat('HP')"
 		text style "label"
 		text point 15
 	}
 	label
 	{
-		area 112 548 114 88
+		area 117 544 90 85
 		text lua "psInvStatDetail('HP')"
 		text style "normal"
 		text point 12
@@ -158,7 +192,7 @@ menu
 	}
 	label
 	{
-		area 244 534 78 14
+		area 248 536 62 14
 		text lua "psInvText('Damage')"
 		text style "normal"
 		text point 11
@@ -167,14 +201,14 @@ menu
 	}
 	label
 	{
-		area 244 570 78 40
+		area 248 566 62 34
 		text lua "psInvStat('Damage')"
 		text style "label"
 		text point 15
 	}
 	label
 	{
-		area 332 548 114 88
+		area 326 544 118 85
 		text lua "psInvStatDetail('Damage')"
 		text style "normal"
 		text point 12
@@ -188,166 +222,187 @@ menu
 		text point 12
 		text align left center
 	}
-	slot {name "slot_inv_1"	area 46 248 34 35	bam "SLOTSWRD"	sequence 0	slotinfo "characters[id].equipment.weapon0"	highlight selected 1}
-	slot {name "slot_inv_2"	area 87 248 34 35	bam "SLOTSWRD"	sequence 1	slotinfo "characters[id].equipment.weapon1"	highlight selected 1}
-	slot {name "slot_inv_3"	area 127 248 34 35	bam "SLOTSWRD"	sequence 2	slotinfo "characters[id].equipment.weapon2"	highlight selected 1}
-	slot {name "slot_inv_4"	area 167 248 34 35	bam "SLOTSWRD"	sequence 3	slotinfo "characters[id].equipment.weapon3"	highlight selected 1}
-	slot {name "slot_inv_5"	area 47 335 34 34	bam "SLOTITM"	sequence 0	slotinfo "characters[id].equipment.personal0"	highlight selected 1}
-	slot {name "slot_inv_6"	area 87 335 34 34	bam "SLOTITM"	sequence 1	slotinfo "characters[id].equipment.personal1"	highlight selected 1}
-	slot {name "slot_inv_7"	area 128 335 34 34	bam "SLOTITM"	sequence 2	slotinfo "characters[id].equipment.personal2"	highlight selected 1}
-	slot {name "slot_inv_8"	area 169 335 34 34	bam "SLOTITM"	sequence 3	slotinfo "characters[id].equipment.personal3"	highlight selected 1}
-	slot {name "slot_inv_9"	area 209 335 34 34	bam "SLOTITM"	sequence 4	slotinfo "characters[id].equipment.personal4"	highlight selected 1}
-	slot {name "slot_inv_15"	area 47 161 34 34	bam "SLOTARW"	sequence 0	slotinfo "characters[id].equipment.quiver0"	highlight selected 1}
-	slot {name "slot_inv_16"	area 87 161 34 34	bam "SLOTARW"	sequence 1	slotinfo "characters[id].equipment.quiver1"	highlight selected 1}
-	slot {name "slot_inv_17"	area 128 161 34 34	bam "SLOTARW"	sequence 2	slotinfo "characters[id].equipment.quiver2"	highlight selected 1}
-	slot {name "slot_inv_18"	area 169 161 34 34	bam "SLOTARW"	sequence 3	slotinfo "characters[id].equipment.quiver3"	highlight selected 1}
-	slot {name "slot_inv_19"	area 209 161 34 34	bam "SLOTARW"	sequence 4	slotinfo "characters[id].equipment.quiver4"	highlight selected 1}
-	slot {name "slot_inv_14"	area 270 130 34 34	bam "IVSLOT"	sequence 0	slotinfo "characters[id].equipment.earringright0"	highlight selected 1}
-	slot {name "slot_inv_13"	area 322 130 34 34	bam "IVSLOT"	sequence 1	slotinfo "characters[id].equipment.earringleft0"	highlight selected 1}
-	slot {name "slot_inv_11"	area 374 130 34 34	bam "IVSLOT"	sequence 2	slotinfo "characters[id].equipment.chest0"	highlight selected 1}
-	slot {name "slot_inv_12"	area 426 130 34 34	bam "IVSLOT"	sequence 3	slotinfo "characters[id].equipment.wrist0"	highlight selected 1}
-	slot {name "slot_inv_25"	area 426 194 34 34	bam "IVSLOT"	sequence 4	slotinfo "characters[id].equipment.hand0"	highlight selected 1}
-	slot {name "slot_inv_22"	area 426 248 34 34	bam "IVSLOT"	sequence 5	slotinfo "characters[id].equipment.ring0"	highlight selected 1}
-	slot {name "slot_inv_23"	area 426 302 34 34	bam "IVSLOT"	sequence 6	slotinfo "characters[id].equipment.ring1"	highlight selected 1}
-	slot {name "slot_inv_21"	area 286 350 34 34	bam "IVSLOT"	sequence 7	slotinfo "characters[id].equipment.tattoo0"	highlight selected 1}
-	slot {name "slot_inv_24"	area 338 350 34 34	bam "IVSLOT"	sequence 8	slotinfo "characters[id].equipment.tattoo1"	highlight selected 1}
-	slot {name "slot_inv_26"	area 390 350 34 34	bam "IVSLOT"	sequence 9	slotinfo "characters[id].equipment.tattoo2"	highlight selected 1}
-	slot {name "slot_inv_30"	area 501 164 35 35	bam "IVSLOT"	sequence 0	slotinfo "characters[id].equipment.group0"	highlight selected 1}
-	slot {name "slot_inv_31"	area 501 205 35 35	bam "IVSLOT"	sequence 1	slotinfo "characters[id].equipment.group1"	highlight selected 1}
-	slot {name "slot_inv_32"	area 542 164 35 35	bam "IVSLOT"	sequence 2	slotinfo "characters[id].equipment.group2"	highlight selected 1}
-	slot {name "slot_inv_33"	area 542 205 35 35	bam "IVSLOT"	sequence 3	slotinfo "characters[id].equipment.group3"	highlight selected 1}
-	slot {name "slot_inv_34"	area 583 164 35 35	bam "IVSLOT"	sequence 4	slotinfo "characters[id].equipment.group4"	highlight selected 1}
-	slot {name "slot_inv_35"	area 583 205 35 35	bam "IVSLOT"	sequence 5	slotinfo "characters[id].equipment.group5"	highlight selected 1}
-	slot {name "slot_inv_36"	area 624 164 35 35	bam "IVSLOT"	sequence 6	slotinfo "characters[id].equipment.group6"	highlight selected 1}
-	slot {name "slot_inv_37"	area 624 205 35 35	bam "IVSLOT"	sequence 7	slotinfo "characters[id].equipment.group7"	highlight selected 1}
-	slot {name "slot_inv_38"	area 665 164 35 35	bam "IVSLOT"	sequence 8	slotinfo "characters[id].equipment.group8"	highlight selected 1}
-	slot {name "slot_inv_39"	area 665 205 35 35	bam "IVSLOT"	sequence 9	slotinfo "characters[id].equipment.group9"	highlight selected 1}
-	slot {name "slot_inv_40"	area 706 164 35 35	bam "IVSLOT"	sequence 0	slotinfo "characters[id].equipment.group10"	highlight selected 1}
-	slot {name "slot_inv_41"	area 706 205 35 35	bam "IVSLOT"	sequence 1	slotinfo "characters[id].equipment.group11"	highlight selected 1}
-	slot {name "slot_inv_42"	area 747 164 35 35	bam "IVSLOT"	sequence 2	slotinfo "characters[id].equipment.group12"	highlight selected 1}
-	slot {name "slot_inv_43"	area 747 205 35 35	bam "IVSLOT"	sequence 3	slotinfo "characters[id].equipment.group13"	highlight selected 1}
-	slot {name "slot_inv_44"	area 788 164 35 35	bam "IVSLOT"	sequence 4	slotinfo "characters[id].equipment.group14"	highlight selected 1}
-	slot {name "slot_inv_45"	area 788 205 35 35	bam "IVSLOT"	sequence 5	slotinfo "characters[id].equipment.group15"	highlight selected 1}
-	slot {name "slot_inv_46"	area 829 164 35 35	bam "IVSLOT"	sequence 6	slotinfo "characters[id].equipment.group16"	highlight selected 1}
-	slot {name "slot_inv_47"	area 829 205 35 35	bam "IVSLOT"	sequence 7	slotinfo "characters[id].equipment.group17"	highlight selected 1}
-	slot {name "slot_inv_48"	area 870 164 35 35	bam "IVSLOT"	sequence 8	slotinfo "characters[id].equipment.group18"	highlight selected 1}
-	slot {name "slot_inv_49"	area 870 205 35 35	bam "IVSLOT"	sequence 9	slotinfo "characters[id].equipment.group19"	highlight selected 1}
-	slot {name "slot_inv_68"	area 945 150 34 34	bam "IVSLOT"	sequence 4	slotinfo "characters[id].equipment.ground0"	highlight selected 1}
-	slot {name "slot_inv_69"	area 945 190 34 34	bam "IVSLOT"	sequence 5	slotinfo "characters[id].equipment.ground1"	highlight selected 1}
-	slot {name "slot_inv_70"	area 945 230 34 34	bam "IVSLOT"	sequence 6	slotinfo "characters[id].equipment.ground2"	highlight selected 1}
-	slot {name "slot_inv_71"	area 945 270 34 34	bam "IVSLOT"	sequence 7	slotinfo "characters[id].equipment.ground3"	highlight selected 1}
-	slot {name "slot_inv_72"	area 945 310 34 34	bam "IVSLOT"	sequence 8	slotinfo "characters[id].equipment.ground4"	highlight selected 1}
-	slot {name "slot_inv_73"	area 945 350 34 34	bam "IVSLOT"	sequence 9	slotinfo "characters[id].equipment.ground5"	highlight selected 1}
-	slot {name "slot_inv_74"	area 945 390 34 34	bam "IVSLOT"	sequence 0	slotinfo "characters[id].equipment.ground6"	highlight selected 1}
-	slot {name "slot_inv_75"	area 945 430 34 34	bam "IVSLOT"	sequence 1	slotinfo "characters[id].equipment.ground7"	highlight selected 1}
-	slot {name "slot_inv_76"	area 945 470 34 34	bam "IVSLOT"	sequence 2	slotinfo "characters[id].equipment.ground8"	highlight selected 1}
-	slot {name "slot_inv_77"	area 945 510 34 34	bam "IVSLOT"	sequence 3	slotinfo "characters[id].equipment.ground9"	highlight selected 1}
+	slot {name "slot_inv_1"	area 14 248 36 36	bam "SLOTSWRD"	sequence 0	slotinfo "characters[id].equipment.weapon0"	highlight selected 1}
+	slot {name "slot_inv_2"	area 54 248 36 36	bam "SLOTSWRD"	sequence 1	slotinfo "characters[id].equipment.weapon1"	highlight selected 1}
+	slot {name "slot_inv_3"	area 94 248 36 36	bam "SLOTSWRD"	sequence 2	slotinfo "characters[id].equipment.weapon2"	highlight selected 1}
+	slot {name "slot_inv_4"	area 134 248 36 36	bam "SLOTSWRD"	sequence 3	slotinfo "characters[id].equipment.weapon3"	highlight selected 1}
+	slot {name "slot_inv_5"	area 14 340 36 36	bam "SLOTITM"	sequence 0	slotinfo "characters[id].equipment.personal0"	highlight selected 1}
+	slot {name "slot_inv_6"	area 54 340 36 36	bam "SLOTITM"	sequence 1	slotinfo "characters[id].equipment.personal1"	highlight selected 1}
+	slot {name "slot_inv_7"	area 94 340 36 36	bam "SLOTITM"	sequence 2	slotinfo "characters[id].equipment.personal2"	highlight selected 1}
+	slot {name "slot_inv_8"	area 134 340 36 36	bam "SLOTITM"	sequence 3	slotinfo "characters[id].equipment.personal3"	highlight selected 1}
+	slot {name "slot_inv_9"	area 174 340 36 36	bam "SLOTITM"	sequence 4	slotinfo "characters[id].equipment.personal4"	highlight selected 1}
+	slot {name "slot_inv_15"	area 14 150 36 36	bam "SLOTARW"	sequence 0	slotinfo "characters[id].equipment.quiver0"	highlight selected 1}
+	slot {name "slot_inv_16"	area 54 150 36 36	bam "SLOTARW"	sequence 1	slotinfo "characters[id].equipment.quiver1"	highlight selected 1}
+	slot {name "slot_inv_17"	area 94 150 36 36	bam "SLOTARW"	sequence 2	slotinfo "characters[id].equipment.quiver2"	highlight selected 1}
+	slot {name "slot_inv_18"	area 134 150 36 36	bam "SLOTARW"	sequence 3	slotinfo "characters[id].equipment.quiver3"	highlight selected 1}
+	slot {name "slot_inv_19"	area 174 150 36 36	bam "SLOTARW"	sequence 4	slotinfo "characters[id].equipment.quiver4"	highlight selected 1}
+	slot {name "slot_inv_14"	area 256 104 36 36	bam "IVSLOT"	sequence 0	slotinfo "characters[id].equipment.earringright0"	highlight selected 1}
+	slot {name "slot_inv_13"	area 296 104 36 36	bam "IVSLOT"	sequence 1	slotinfo "characters[id].equipment.earringleft0"	highlight selected 1}
+	slot {name "slot_inv_11"	area 336 104 36 36	bam "IVSLOT"	sequence 2	slotinfo "characters[id].equipment.chest0"	highlight selected 1}
+	slot {name "slot_inv_12"	area 376 104 36 36	bam "IVSLOT"	sequence 3	slotinfo "characters[id].equipment.wrist0"	highlight selected 1}
+	slot {name "slot_inv_25"	area 404 158 36 36	bam "IVSLOT"	sequence 4	slotinfo "characters[id].equipment.hand0"	highlight selected 1}
+	slot {name "slot_inv_22"	area 404 204 36 36	bam "IVSLOT"	sequence 5	slotinfo "characters[id].equipment.ring0"	highlight selected 1}
+	slot {name "slot_inv_23"	area 404 250 36 36	bam "IVSLOT"	sequence 6	slotinfo "characters[id].equipment.ring1"	highlight selected 1}
+	slot {name "slot_inv_21"	area 270 350 36 36	bam "IVSLOT"	sequence 7	slotinfo "characters[id].equipment.tattoo0"	highlight selected 1}
+	slot {name "slot_inv_24"	area 310 350 36 36	bam "IVSLOT"	sequence 8	slotinfo "characters[id].equipment.tattoo1"	highlight selected 1}
+	slot {name "slot_inv_26"	area 350 350 36 36	bam "IVSLOT"	sequence 9	slotinfo "characters[id].equipment.tattoo2"	highlight selected 1}
+	slot {name "slot_inv_30"	area 501 137 40 40	bam "IVSLOT"	sequence 0	slotinfo "characters[id].equipment.group0"	highlight selected 1}
+	slot {name "slot_inv_31"	area 501 180 40 40	bam "IVSLOT"	sequence 1	slotinfo "characters[id].equipment.group1"	highlight selected 1}
+	slot {name "slot_inv_32"	area 551 137 40 40	bam "IVSLOT"	sequence 2	slotinfo "characters[id].equipment.group2"	highlight selected 1}
+	slot {name "slot_inv_33"	area 551 180 40 40	bam "IVSLOT"	sequence 3	slotinfo "characters[id].equipment.group3"	highlight selected 1}
+	slot {name "slot_inv_34"	area 601 137 40 40	bam "IVSLOT"	sequence 4	slotinfo "characters[id].equipment.group4"	highlight selected 1}
+	slot {name "slot_inv_35"	area 601 180 40 40	bam "IVSLOT"	sequence 5	slotinfo "characters[id].equipment.group5"	highlight selected 1}
+	slot {name "slot_inv_36"	area 651 137 40 40	bam "IVSLOT"	sequence 6	slotinfo "characters[id].equipment.group6"	highlight selected 1}
+	slot {name "slot_inv_37"	area 651 180 40 40	bam "IVSLOT"	sequence 7	slotinfo "characters[id].equipment.group7"	highlight selected 1}
+	slot {name "slot_inv_38"	area 701 137 40 40	bam "IVSLOT"	sequence 8	slotinfo "characters[id].equipment.group8"	highlight selected 1}
+	slot {name "slot_inv_39"	area 701 180 40 40	bam "IVSLOT"	sequence 9	slotinfo "characters[id].equipment.group9"	highlight selected 1}
+	slot {name "slot_inv_40"	area 751 137 40 40	bam "IVSLOT"	sequence 0	slotinfo "characters[id].equipment.group10"	highlight selected 1}
+	slot {name "slot_inv_41"	area 751 180 40 40	bam "IVSLOT"	sequence 1	slotinfo "characters[id].equipment.group11"	highlight selected 1}
+	slot {name "slot_inv_42"	area 801 137 40 40	bam "IVSLOT"	sequence 2	slotinfo "characters[id].equipment.group12"	highlight selected 1}
+	slot {name "slot_inv_43"	area 801 180 40 40	bam "IVSLOT"	sequence 3	slotinfo "characters[id].equipment.group13"	highlight selected 1}
+	slot {name "slot_inv_44"	area 851 137 40 40	bam "IVSLOT"	sequence 4	slotinfo "characters[id].equipment.group14"	highlight selected 1}
+	slot {name "slot_inv_45"	area 851 180 40 40	bam "IVSLOT"	sequence 5	slotinfo "characters[id].equipment.group15"	highlight selected 1}
+	slot {name "slot_inv_46"	area 901 137 40 40	bam "IVSLOT"	sequence 6	slotinfo "characters[id].equipment.group16"	highlight selected 1}
+	slot {name "slot_inv_47"	area 901 180 40 40	bam "IVSLOT"	sequence 7	slotinfo "characters[id].equipment.group17"	highlight selected 1}
+	slot {name "slot_inv_48"	area 951 137 40 40	bam "IVSLOT"	sequence 8	slotinfo "characters[id].equipment.group18"	highlight selected 1}
+	slot {name "slot_inv_49"	area 951 180 40 40	bam "IVSLOT"	sequence 9	slotinfo "characters[id].equipment.group19"	highlight selected 1}
+	slot {name "slot_inv_68"	area 501 540 38 38	bam "IVSLOT"	sequence 4	slotinfo "characters[id].equipment.ground0"	highlight selected 1}
+	slot {name "slot_inv_69"	area 543 540 38 38	bam "IVSLOT"	sequence 5	slotinfo "characters[id].equipment.ground1"	highlight selected 1}
+	slot {name "slot_inv_70"	area 585 540 38 38	bam "IVSLOT"	sequence 6	slotinfo "characters[id].equipment.ground2"	highlight selected 1}
+	slot {name "slot_inv_71"	area 627 540 38 38	bam "IVSLOT"	sequence 7	slotinfo "characters[id].equipment.ground3"	highlight selected 1}
+	slot {name "slot_inv_72"	area 669 540 38 38	bam "IVSLOT"	sequence 8	slotinfo "characters[id].equipment.ground4"	highlight selected 1}
+	slot {name "slot_inv_73"	area 711 540 38 38	bam "IVSLOT"	sequence 9	slotinfo "characters[id].equipment.ground5"	highlight selected 1}
+	slot {name "slot_inv_74"	area 753 540 38 38	bam "IVSLOT"	sequence 0	slotinfo "characters[id].equipment.ground6"	highlight selected 1}
+	slot {name "slot_inv_75"	area 795 540 38 38	bam "IVSLOT"	sequence 1	slotinfo "characters[id].equipment.ground7"	highlight selected 1}
+	slot {name "slot_inv_76"	area 837 540 38 38	bam "IVSLOT"	sequence 2	slotinfo "characters[id].equipment.ground8"	highlight selected 1}
+	slot {name "slot_inv_77"	area 879 540 38 38	bam "IVSLOT"	sequence 3	slotinfo "characters[id].equipment.ground9"	highlight selected 1}
 	button
 	{
-		area 935 566 26 26
-		bam "ARROBUTT"
+		area 931 574 34 32
+		bam "PSJPREV"
 		sequence 0
 		action "Infinity_OnGroundPage(-1)"
 	}
 	button
 	{
-		area 963 566 26 26
-		bam "ARROBUTT"
-		sequence 1
+		area 972 574 34 32
+		bam "PSJNEXT"
+		sequence 0
 		action "Infinity_OnGroundPage(1)"
 	}
 	label
 	{
-		area 929 592 66 18
+		area 930 548 80 20
 		text lua "Infinity_GetCurrentGroundPage()+1 .. '/' .. Infinity_GetMaxGroundPage()+1"
 		text style "label"
 		text point 13
 	}
 	button
 	{
-		area 496 122 48 22
-		bam "GENBUT1"
-		sequence 2
+		area 490 99 46 26
+		bam "PSJTAB1"
+		sequence 0
+		frame lua "psInvTabFrame(1)"
 		text lua "psInvTab(1)"
 		text style "button"
 		text point 12
+		action "psInvSelectTab(1)"
 	}
 	button
 	{
-		area 545 122 48 22
-		bam "GENBUT1"
+		area 539 99 47 26
+		bam "PSJTAB2"
 		sequence 0
+		frame lua "psInvTabFrame(2)"
 		text lua "psInvTab(2)"
 		text style "button"
 		text point 12
+		action "psInvSelectTab(2)"
 	}
 	button
 	{
-		area 594 122 48 22
-		bam "GENBUT1"
+		area 589 99 47 26
+		bam "PSJTAB3"
 		sequence 0
+		frame lua "psInvTabFrame(3)"
 		text lua "psInvTab(3)"
 		text style "button"
 		text point 12
+		action "psInvSelectTab(3)"
 	}
 	button
 	{
-		area 643 122 48 22
-		bam "GENBUT1"
+		area 639 99 46 26
+		bam "PSJTAB4"
 		sequence 0
+		frame lua "psInvTabFrame(4)"
 		text lua "psInvTab(4)"
 		text style "button"
 		text point 12
+		action "psInvSelectTab(4)"
 	}
 	button
 	{
-		area 692 122 48 22
-		bam "GENBUT1"
+		area 688 99 47 26
+		bam "PSJTAB5"
 		sequence 0
+		frame lua "psInvTabFrame(5)"
 		text lua "psInvTab(5)"
 		text style "button"
 		text point 12
+		action "psInvSelectTab(5)"
 	}
 	button
 	{
-		area 741 122 48 22
-		bam "GENBUT1"
+		area 738 99 47 26
+		bam "PSJTAB6"
 		sequence 0
+		frame lua "psInvTabFrame(6)"
 		text lua "psInvTab(6)"
 		text style "button"
 		text point 12
+		action "psInvSelectTab(6)"
 	}
 	button
 	{
-		area 790 122 48 22
-		bam "GENBUT1"
+		area 787 99 47 26
+		bam "PSJTAB7"
 		sequence 0
+		frame lua "psInvTabFrame(7)"
 		text lua "psInvTab(7)"
 		text style "button"
 		text point 12
+		action "psInvSelectTab(7)"
 	}
 	button
 	{
-		area 839 122 48 22
-		bam "GENBUT1"
+		area 837 99 46 26
+		bam "PSJTAB8"
 		sequence 0
+		frame lua "psInvTabFrame(8)"
 		text lua "psInvTab(8)"
 		text style "button"
 		text point 12
+		action "psInvSelectTab(8)"
 	}
 	button
 	{
-		area 830 85 108 28
-		bam "STRBUTT"
+		area 895 99 29 27
+		bam "PSJTABM"
 		sequence 0
+	}
+	label
+	{
+		area 759 71 123 22
 		text lua "psInvText('Sort')"
-		text style "button"
-		text point 13
+		text style "label"
+		text point 14
+		text align right center
 	}
 	button
 	{
-		area 496 604 140 40
-		bam "STRBUTT"
+		area 490 600 127 40
+		bam "PSJSTORE"
 		sequence 0
 		text lua "psInvText('Store all')"
 		text style "button"
@@ -355,19 +410,23 @@ menu
 	}
 	button
 	{
-		area 880 16 80 26
-		bam "GENBUT1"
+		area 493 11 65 64
+		bam "PSJBAG"
 		sequence 0
-		text lua "psInvVariantLabel()"
-		text style "button"
-		text point 12
-		tooltip lua "psInvText('Swap')"
-		action "psInvToggleVariant()"
+		tooltip lua "psInvWeight()"
 	}
 	button
 	{
-		area 972 4 46 46
-		bam "XBUTT"
+		area -21 4 71 78
+		bam "PSJFACE"
+		sequence 0
+		tooltip lua "psInvText('Help')"
+		action "Infinity_PushMenu('INVENTORY_HELP')"
+	}
+	button
+	{
+		area 997 19 37 37
+		bam "PSJCLOSE"
 		sequence 0
 		action "e:GetActiveEngine():SelectEngine(worldScreen)"
 	}
