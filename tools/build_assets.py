@@ -982,7 +982,239 @@ varE = group("Variant E - LeUI layout with PTEE textures (John's pick)", [
 ], visible=True)
 varD["visible"] = False
 
-mockups = group("Party Stash mockup (PTEE style)", [varC, varB, varA, varD, varE])
+# ---- Variant F: art-direction guide (John, 2026-10-21): Variant E organisation, built only from PTEE pieces
+# (WIRESBG cables, LOADBG frames, vanilla rails/frames/discs/plates), Lady of Pain (JRNLOP) as top keystone.
+def nine(src, w, h, l, t, r, b, k=1.0):
+    """9-slice `src` (borders l,t,r,b in src px) into w x h; borders drawn at scale k."""
+    sw, sh = src.size
+    L_, T_, R_, B_ = (max(1, round(v * k)) for v in (l, t, r, b))
+    out = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+    xs = [(0, l, 0, L_), (l, sw - r, L_, w - R_), (sw - r, sw, w - R_, w)]
+    ys = [(0, t, 0, T_), (t, sh - b, T_, h - B_), (sh - b, sh, h - B_, h)]
+    for sx0, sx1, dx0, dx1 in xs:
+        for sy0, sy1, dy0, dy1 in ys:
+            if dx1 > dx0 and dy1 > dy0:
+                out.alpha_composite(src.crop((sx0, sy0, sx1, sy1)).resize((dx1 - dx0, dy1 - dy0), Image.LANCZOS),
+                                    (dx0, dy0))
+    return out
+
+
+wires = mos("WIRESBG").resize((1366, 768), Image.LANCZOS)
+loadbg = mos("LOADBG").resize((1366, 768), Image.LANCZOS)
+lb = loadbg.crop((112, 12, 1240, 762))
+# replace the ladder side with the mirrored right border
+right_strip = lb.crop((lb.width - 40, 0, lb.width, lb.height)).transpose(Image.FLIP_LEFT_RIGHT)
+lb2 = lb.copy()
+lb2.paste(Image.new("RGBA", (100, lb.height), (0, 0, 0, 0)), (0, 0))
+lb2.paste(lb.crop((100, 0, 140, lb.height)).resize((60, lb.height)), (40, 0))  # stone filler over the ladder
+lb2.paste(right_strip, (0, 0))
+LB = lb2
+
+
+def F_frame(name, rect, k=0.5):
+    x, y, w, h = rect
+    annotate("Party Stash F", name, rect, "mock")
+    guide_box(*rect)
+    return layer(name, nine(LB, w, h, 40, 66, 40, 82, k), f"Fframe_{w}x{h}_{k}", x, y)
+
+
+def F_bar(name, rect):
+    """Rounded rusty bar (vanilla message bar), 3-slice horizontally."""
+    x, y, w, h = rect
+    src = bg_piece("Message bar")
+    annotate("Party Stash F", name, rect, "mock")
+    return layer(name, nine(src, w, h, 30, 12, 30, 12, h / src.height), f"Fbar_{w}x{h}", x, y)
+
+
+def F_slotframe(name, rect):
+    """Red riveted slot frame (vanilla earring frame), 9-slice."""
+    x, y, w, h = rect
+    src = bg_piece("Earring frame left")
+    return layer(name, nine(src, w, h, 22, 20, 22, 20, w / src.width), f"Fsf_{w}x{h}", x, y)
+
+
+def F_text(name, text, rect, **kw):
+    annotate("Party Stash F", name, rect, "text")
+    return text_layer(name, text, rect, **kw)
+
+
+def F_piece(name, piece, rect):
+    x, y, w, h = rect
+    annotate("Party Stash F", name, rect, "mock")
+    return layer(name, bg_piece(piece).resize((w, h), Image.LANCZOS), f"Fp_{piece}_{w}x{h}", x, y)
+
+
+F_items = []
+
+
+def F_icon(itm, a, **kw):
+    n = icon_in_slot(itm, a, **kw)
+    if n:
+        F_items.append(n)
+
+
+def F_rail(prefix, piece, slots_prefix, rect, title):
+    """A vanilla rail piece scaled into rect, slots placed on its baked cells, title above."""
+    x, y, w, h = rect
+    px, py, pw, ph = BG_PIECES[piece]
+    sx, sy = w / pw, h / ph
+    cells = [i["area"] for i in inv["items"] if i.get("slotinfo", "").split(".")[-1].startswith(slots_prefix)]
+    kids = [F_piece(f"{prefix} rail ({piece})", piece, rect)]
+    for n, a in enumerate(sorted(cells)):
+        ca = (x + round((a[0] - px) * sx), y + round((a[1] - py) * sy), round(a[2] * sx), round(a[3] * sy))
+        kids.append(bam_states(f"{prefix} slot {n}", "IVSLOT", n, ca, STATES_SLOT))
+    kids.append(F_text(f"{prefix} title", title, (x, y - 22, w, 20), style="label", point=15))
+    return group(prefix, kids), [k for k in kids if k.get("kind") == "slot"]
+
+
+# --- frame layout (menu px). Usable area 1024x683.
+LP = (10, 52, 462, 628)
+RP = (478, 52, 536, 628)
+F_bg = [layer("F WIRESBG (cables background, 1366x683 @ -171,0)", wires.crop((0, 0, 1366, ACTIONBAR_Y)),
+              "WIRESBG_1366x683", BG_OFF, 0)]
+
+# title band + Lady keystone + close
+F_top = [
+    F_bar("F title band", (120, 8, 784, 40)),
+    F_text("F title", "Inventory", (150, 8, 300, 40), style="label", point=22, font="EXOCET", color=COL["Y"],
+           shadow=True),
+]
+lady = mos("JRNLOP")
+lw = 112
+lh = round(lady.height * lw / lady.width)
+F_top.append(layer("F Lady of Pain keystone (JRNLOP)", lady.resize((lw, lh), Image.LANCZOS), f"lady_{lw}",
+                   512 - lw // 2, 0))
+annotate("Party Stash F", "F Lady of Pain keystone", (512 - lw // 2, 0, lw, lh), "mock")
+F_top.append(button("F close (XBUTT)", "XBUTT", (972, 4, 46, 46)))
+
+# left column
+F_left = [F_frame("F left frame (LOADBG 9-slice)", LP)]
+F_left.append(F_bar("F name/class bar", (30, 82, 300, 34)))
+F_left.append(F_text("F name", "The Nameless One", (30, 82, 170, 34), style="label", point=15))
+F_left.append(F_text("F class", "Fighter", (200, 82, 130, 34), style="label", point=15))
+rq, _ = F_rail("F quiver", "Personal items rail", "personal", (28, 150, 228, 54), "Quiver")
+rw, _ = F_rail("F quick weapons", "Weapons rail", "weapon", (28, 236, 210, 58), "Quick Weapons")
+ri, _ = F_rail("F quick items", "Personal items rail", "personal", (28, 324, 228, 54), "Quick Items")
+F_left += [rq, rw, ri]
+for i, itm in enumerate(["BOLT01", "BOLT03"]):
+    F_icon(itm, (28 + round((529 - 505 + i * 50) * 0.8), 150 + round((112 - 98) * 54 / 68), 34, 34), count=40)
+
+# paperdoll: reduced oval + 10 red riveted frames around it
+s = 0.52
+ov = bg_piece("Paperdoll oval")
+ovw, ovh = round(ov.width * s), round(ov.height * s)
+ox, oy = 286, 178
+dt = mos("IVPNOA").copy()
+dt.thumbnail((round(pa[2] * s), round(pa[3] * s)), Image.LANCZOS)
+F_doll = [layer("F oval frame (INVBG cut-out)", ov.resize((ovw, ovh), Image.LANCZOS), "ovalF", ox, oy),
+          layer("F paperdoll IVPNOA", dt, "dollF", ox + round((pa[0] - 154) * s) + (round(pa[2] * s) - dt.width) // 2,
+                oy + round((pa[1] - 78) * s) + (round(pa[3] * s) - dt.height) // 2)]
+fs, sl = 50, 34          # frame size, slot size inside
+off = (fs - sl) // 2
+body_pos = [("earringright0", 262, 122), ("earringleft0", 314, 122), ("chest0", 366, 122), ("wrist0", 418, 122),
+            ("hand0", 418, 186), ("ring0", 418, 240), ("ring1", 418, 294),
+            ("tattoo0", 278, 342), ("tattoo1", 330, 342), ("tattoo2", 382, 342)]
+F_body = []
+for i, (nm, x, y) in enumerate(body_pos):
+    F_body.append(group(f"F body {nm}", [
+        F_slotframe(f"F frame {nm}", (x, y, fs, fs)),
+        bam_states(f"F body slot {nm}", "IVSLOT", i, (x + off, y + off, sl, sl), STATES_SLOT),
+    ]))
+annotate("Party Stash F", "F body slots (10 riveted frames)", (262, 122, 206, 270), "slot")
+
+# stats: 2x2 blocks = disc piece + plate piece
+F_stats = []
+for nm, val, lines, piece, bx, by in (("AC", "8", ["Base: 10", "Dex: -1", "Tattoo: -1"], "AC disc", 24, 408),
+                                      ("THAC0", "17", ["Base: 18", "Prof.: -1", "Weapon: 0"], "AC disc", 244, 408),
+                                      ("HP", "64/64", ["Class: 1d10", "Con: +2"], "HP disc", 24, 534),
+                                      ("Damage", "1d6+1", ["Weapon: 1d6", "Str: +1"], "HP disc", 244, 534)):
+    disc = (bx, by + 14, 78, 84)
+    plate = (bx + 70, by, 140, 112)
+    F_stats.append(group(f"F stat {nm}", [
+        layer(f"F {nm} plate (message bar 9-slice)", nine(bg_piece("Message bar"), plate[2], plate[3], 30, 14, 30, 14,
+                                                          0.9), f"Fplate_{plate[2]}x{plate[3]}", plate[0], plate[1]),
+        F_piece(f"F {nm} disc ({piece})", piece, disc),
+        F_text(f"F {nm} value", val, (disc[0], disc[1] + 22, disc[2], 40), style="label", point=15),
+        F_text(f"F {nm} caption", nm, (disc[0], disc[1] - 14, disc[2], 14), style="normal", point=11,
+               color=COL["Y"], halign="center", valign="top"),
+        F_text(f"F {nm} detail", "\n".join(lines), (plate[0] + 18, plate[1] + 14, plate[2] - 26, plate[3] - 24),
+               style="normal", point=12, color=COL["B"]),
+    ]))
+
+# right column: header, tabs, grid from the backpack rail piece, ground column, bottom bar
+F_right = [F_frame("F right frame (LOADBG 9-slice)", RP)]
+F_right.append(F_bar("F header bar", (496, 82, 448, 34)))
+F_right.append(F_text("F stash weight", "816 / 2000 LB", (574, 82, 200, 34), style="normal", point=15,
+                      color=COL["$"], halign="left", valign="center"))
+F_right.append(button("F sort", "STRBUTT", (830, 85, 108, 28), "Sort: Auto", point=13))
+F_right.append(tab_strip("F", 496, 122, 48, 22, TABS_SHORT, active=0, gap=1, arrows=False))
+# backpack rail piece: rail part only (x 470..996 of the piece), 2 rows; stash = same rail stretched to 7 rows
+rx0, ry0 = 470, 500
+rail_src = invbg.crop((rx0 - BG_OFF, ry0, 996 - BG_OFF, 624))
+k = 0.82
+GXF, GYF = 494, 152
+bp_w, bp_h = round(rail_src.width * k), round(rail_src.height * k)
+F_right.append(layer("F backpack rail (vanilla piece x0.82)", rail_src.resize((bp_w, bp_h), Image.LANCZOS),
+                     "Fbprail", GXF, GYF))
+annotate("Party Stash F", "F backpack 2x10 (vanilla rail)", (GXF, GYF, bp_w, bp_h), "mock")
+top, row = rail_src.crop((0, 0, rail_src.width, 65)), rail_src.crop((0, 65, rail_src.width, 115))
+bot = rail_src.crop((0, 115, rail_src.width, rail_src.height))
+st = Image.new("RGBA", (rail_src.width, 65 + 6 * 50 + bot.height))
+st.paste(top, (0, 0))
+for r in range(6):
+    st.paste(row, (0, 65 + r * 50))
+st.paste(bot, (0, 65 + 300))
+SYF = GYF + bp_h + 6
+st_w, st_h = round(st.width * k), round(st.height * k)
+F_right.append(layer("F stash rail (vanilla rail stretched to 7 rows)", st.resize((st_w, st_h), Image.LANCZOS),
+                     "Fstrail", GXF, SYF))
+annotate("Party Stash F", "F stash 7x10 (vanilla rail x7)", (GXF, SYF, st_w, st_h), "mock")
+cx = [round((a[0] - rx0) * k) for a in sorted({i["area"][0]: i["area"] for i in inv["items"]
+                                                  if i.get("slotinfo", "").endswith(tuple(f"group{n}" for n in
+                                                                                         range(0, 20, 2)))}.values())]
+cell = round(43 * k)
+F_bp = [bam_states(f"F backpack slot r{r}c{c}", "SLOTITM", (r + c) % 5,
+                   (GXF + cx[c], GYF + round((15 + 50 * r) * k), cell, cell), STATES_SLOT)
+        for r in range(2) for c in range(10)]
+F_st = [bam_states(f"F stash slot r{r}c{c}", "IVSLOT", (r + c) % 10,
+                   (GXF + cx[c], SYF + round((15 + 50 * r) * k), cell, cell), STATES_SLOT)
+        for r in range(7) for c in range(10)]
+for i in range(64):
+    mk = STASH_MARKS.get(i % len(STASH_ITEMS))
+    F_icon(STASH_ITEMS[i % len(STASH_ITEMS)], (GXF + cx[i % 10], SYF + round((15 + 50 * (i // 10)) * k), cell, cell),
+           tint=mk[1] if mk and mk[0] == "tint" else None, count=mk[1] if mk and mk[0] == "count" else None,
+           plus=bool(mk and mk[0] == "plus"))
+F_right += [group("F backpack slots", F_bp), group("F stash slots", F_st)]
+# ground column: the vanilla arched ground panel, squeezed to one column
+gpx, gpy = GXF + bp_w + 8, 116
+gnd = bg_piece("Ground column")
+F_right.append(layer("F ground column (vanilla piece, 9-slice 1 col)", nine(gnd, 58, 440, 22, 70, 22, 20, 0.6),
+                     "Fground", gpx, gpy))
+annotate("Party Stash F", "F ground column", (gpx, gpy, 58, 440), "mock")
+F_right.append(group("F ground slots", [bam_states(f"F ground slot {r}", "IVSLOT", r, (gpx + 12, gpy + 50 + r * 42,
+                                                                                         34, 34), STATES_SLOT)
+                                        for r in range(9)]))
+F_right.append(button("F ground prev", "ARROBUTT", (gpx + 2, gpy + 446, 26, 26), seq=0))
+F_right.append(button("F ground next", "ARROBUTT", (gpx + 30, gpy + 446, 26, 26), seq=1))
+F_right.append(F_text("F ground page", "1/1", (gpx, gpy + 474, 58, 18), style="label", point=13))
+F_right.append(button("F store all", "STRBUTT", (496, 604, 140, 40), "Store all", point=15))
+F_right.append(F_piece("F gold box (vanilla piece)", "Gold box", (812, 588, 76, 70)))
+F_right.append(layer("F gold coins (ICGOLD)", mos("ICGOLD").resize((60, 50), Image.LANCZOS), "icgoldF", 820, 596))
+F_right.append(F_text("F party gold", "1250", (888, 606, 90, 30), style="gold", point=16))
+
+varF = group("Variant F - Art guide: E layout built from PTEE pieces (WIRESBG, LOADBG, rails, frames)", [
+    group("F background (cables)", F_bg),
+    group("F left column", F_left),
+    group("F paperdoll", F_doll),
+    group("F body slots", F_body),
+    group("F stats blocks", F_stats),
+    group("F right column", F_right),
+    group("F items (sample)", F_items),
+    group("F top (title, Lady keystone, close)", F_top),
+], visible=True)
+varE["visible"] = False
+
+mockups = group("Party Stash mockup (PTEE style)", [varC, varB, varA, varD, varE, varF])
 
 # ================================================================== 5. LIBRARY
 usage = {}
@@ -1105,7 +1337,7 @@ annotations = group("Annotations (element names, sizes, coords)", [
 
 # keep only the main guides (too many guides hide the art): frame, action bar, variant E panels
 GUIDES = {"h": {0, 768, ACTIONBAR_Y}, "v": {0, 1024}}
-for r in (title, left, right):
+for r in (LP, RP):
     guide_box(*r)
 root = [background, vanilla, actionbar, mockups, library, annotations]
 

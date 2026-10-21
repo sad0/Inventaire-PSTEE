@@ -1,7 +1,7 @@
 """Composite the manifest's visible layers with PIL (quick check, independent of GIMP).
 
 Usage: python tools/preview.py out.png [--show "group name" ...] [--hide "group name" ...] [--wide]
---show/--hide override the visibility of nodes whose name starts with the given text. --wide renders 1366x768.
+--show/--hide override the visibility of nodes whose name starts with the given text. --wide renders 1366x768. --full also shows items, slot squares and texts.
 """
 import json
 import os
@@ -15,7 +15,7 @@ ROOT = os.path.normpath(os.path.join(os.path.dirname(__file__), ".."))
 def main():
     args = sys.argv[1:]
     out = args.pop(0)
-    show, hide, wide = [], [], False
+    show, hide, wide, full = [], [], False, False
     while args:
         a = args.pop(0)
         if a == "--show":
@@ -24,6 +24,8 @@ def main():
             hide.append(args.pop(0))
         elif a == "--wide":
             wide = True
+        elif a == "--full":
+            full = True
     m = json.load(open(os.path.join(ROOT, "design", "build", "manifest.json"), encoding="utf-8"))
     ox = 171 if wide else 0
     img = Image.new("RGBA", (m["width"] + 2 * ox, m["height"]), (0, 0, 0, 255))
@@ -33,6 +35,8 @@ def main():
             return True
         if any(n["name"].startswith(s) for s in hide):
             return False
+        if full and n.get("kind"):
+            return True  # items, slot squares and texts (hidden by default in the .xcf)
         return n["visible"]
 
     def walk(nodes):
