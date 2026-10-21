@@ -167,6 +167,7 @@ def annotate(section, name, area, kind, ox=0, oy=0, short=None):
 
 
 GUIDES = {"h": set(), "v": set()}
+LAYOUT = {}  # in-game geometry shared by variants F and G (written to design/build/layout.json for the mod)
 
 
 def guide_box(x, y, w, h):
@@ -194,6 +195,8 @@ def bam_states(name, bamres, seq, area, label_states, first_visible=True, ox=0, 
     gr = group(name, kids)  # draw order: frame 0 at the bottom, other states above (hidden)
     if label_states is STATES_SLOT:
         gr["kind"] = "slot"
+    elif label_states is STATES_BTN:
+        gr["kind_bg"] = "button"  # engine-drawn: excluded from the flattened in-game backgrounds
     return gr
 
 
@@ -1063,6 +1066,7 @@ def F_rail(prefix, piece, slots_prefix, rect, title):
     for n, a in enumerate(sorted(cells)):
         ca = (x + round((a[0] - px) * sx), y + round((a[1] - py) * sy), round(a[2] * sx), round(a[3] * sy))
         kids.append(bam_states(f"{prefix} slot {n}", "IVSLOT", n, ca, STATES_SLOT))
+        LAYOUT.setdefault(prefix[2:], []).append(ca)
     kids.append(F_text(f"{prefix} title", title, (x, y - 22, w, 20), style="label", point=15))
     return group(prefix, kids), [k for k in kids if k.get("kind") == "slot"]
 
@@ -1169,10 +1173,10 @@ st_w, st_h = round(st.width * k), round(st.height * k)
 F_right.append(layer("F stash rail (vanilla rail stretched to 7 rows)", st.resize((st_w, st_h), Image.LANCZOS),
                      "Fstrail", GXF, SYF))
 annotate("Party Stash F", "F stash 7x10 (vanilla rail x7)", (GXF, SYF, st_w, st_h), "mock")
-cx = [round((a[0] - rx0) * k) for a in sorted({i["area"][0]: i["area"] for i in inv["items"]
-                                                  if i.get("slotinfo", "").endswith(tuple(f"group{n}" for n in
-                                                                                         range(0, 20, 2)))}.values())]
+cx = [round(8 * k) + c * 41 for c in range(10)]   # uniform 41 px step (same cells in variant G)
 cell = round(43 * k)
+LAYOUT["backpack"] = [(GXF + cx[c], GYF + round((15 + 50 * r) * k), cell, cell) for c in range(10) for r in range(2)]
+LAYOUT["stash"] = [(GXF + cx[c], SYF + round((15 + 50 * r) * k), cell, cell) for r in range(7) for c in range(10)]
 F_bp = [bam_states(f"F backpack slot r{r}c{c}", "SLOTITM", (r + c) % 5,
                    (GXF + cx[c], GYF + round((15 + 50 * r) * k), cell, cell), STATES_SLOT)
         for r in range(2) for c in range(10)]
@@ -1191,16 +1195,30 @@ gnd = bg_piece("Ground column")
 F_right.append(layer("F ground column (vanilla piece, 9-slice 1 col)", nine(gnd, 58, 440, 22, 70, 22, 20, 0.6),
                      "Fground", gpx, gpy))
 annotate("Party Stash F", "F ground column", (gpx, gpy, 58, 440), "mock")
-F_right.append(group("F ground slots", [bam_states(f"F ground slot {r}", "IVSLOT", r, (gpx + 12, gpy + 50 + r * 42,
-                                                                                         34, 34), STATES_SLOT)
-                                        for r in range(9)]))
-F_right.append(button("F ground prev", "ARROBUTT", (gpx + 2, gpy + 446, 26, 26), seq=0))
-F_right.append(button("F ground next", "ARROBUTT", (gpx + 30, gpy + 446, 26, 26), seq=1))
-F_right.append(F_text("F ground page", "1/1", (gpx, gpy + 474, 58, 18), style="label", point=13))
+LAYOUT["ground"] = [(gpx + 12, gpy + 34 + r * 40, 34, 34) for r in range(10)]
+F_right.append(group("F ground slots", [bam_states(f"F ground slot {r}", "IVSLOT", r, a, STATES_SLOT)
+                                        for r, a in enumerate(LAYOUT["ground"])]))
+LAYOUT["ground_prev"], LAYOUT["ground_next"] = (gpx + 2, gpy + 450, 26, 26), (gpx + 30, gpy + 450, 26, 26)
+LAYOUT["ground_page"] = (gpx - 4, gpy + 476, 66, 18)
+F_right.append(button("F ground prev", "ARROBUTT", LAYOUT["ground_prev"], seq=0))
+F_right.append(button("F ground next", "ARROBUTT", LAYOUT["ground_next"], seq=1))
+F_right.append(F_text("F ground page", "1/1", LAYOUT["ground_page"], style="label", point=13))
 F_right.append(button("F store all", "STRBUTT", (496, 604, 140, 40), "Store all", point=15))
 F_right.append(F_piece("F gold box (vanilla piece)", "Gold box", (812, 588, 76, 70)))
 F_right.append(layer("F gold coins (ICGOLD)", mos("ICGOLD").resize((60, 50), Image.LANCZOS), "icgoldF", 820, 596))
 F_right.append(F_text("F party gold", "1250", (888, 606, 90, 30), style="gold", point=16))
+
+# in-game geometry for the mod (tools/build_mod.py)
+LAYOUT["body"] = {nm: (x + off, y + off, sl, sl) for nm, x, y in body_pos}
+LAYOUT["paperdoll"] = (ox + round((pa[0] - 154) * s), oy + round((pa[1] - 78) * s), round(pa[2] * s), round(pa[3] * s))
+LAYOUT["stats"] = {nm: {"disc": (bx, by + 14, 78, 84), "plate": (bx + 70, by, 140, 112)}
+                   for nm, bx, by in (("AC", 24, 408), ("THAC0", 244, 408), ("HP", 24, 534), ("Damage", 244, 534))}
+LAYOUT["text"] = {"title": (150, 8, 300, 40), "name": (30, 82, 170, 34), "class": (200, 82, 130, 34),
+                  "weight": (574, 82, 200, 34), "gold": (888, 606, 90, 30)}
+LAYOUT["titles"] = {"Quiver": (28, 128, 228, 20), "Quick Weapons": (28, 214, 210, 20), "Quick Items": (28, 302, 228, 20)}
+LAYOUT["buttons"] = {"close": (972, 4, 46, 46), "sort": (830, 85, 108, 28), "store_all": (496, 604, 140, 40),
+                     "tabs": [(496 + i * 49, 122, 48, 22) for i in range(8)], "tab_names": TABS_SHORT}
+LAYOUT["menu"] = {"width": W, "height": H, "bg_offset": BG_OFF}
 
 varF = group("Variant F - Art guide: E layout built from PTEE pieces (WIRESBG, LOADBG, rails, frames)", [
     group("F background (cables)", F_bg),
@@ -1214,7 +1232,215 @@ varF = group("Variant F - Art guide: E layout built from PTEE pieces (WIRESBG, L
 ], visible=True)
 varE["visible"] = False
 
-mockups = group("Party Stash mockup (PTEE style)", [varC, varB, varA, varD, varE, varF])
+# ---- Variant G: Variant F organisation dressed with the generated art (design/art/gen, SwarmUI, no game art)
+# except the Lady (JRNLOP), paperdoll, buttons and discs which stay game assets.
+GEN = os.path.join(ROOT, "design", "art", "gen")
+
+
+def gen(name):
+    return Image.open(os.path.join(GEN, name)).convert("RGBA")
+
+
+g_frame = gen("final/slot_frame_22.png").crop((50, 49, 975, 975))   # 925x925, border ~140 (+bolts)
+g_panel = gen("final/panel_frame_31.png").crop((50, 49, 975, 975))
+g_fill = gen("final/plate_fill_61_tile.png")
+g_rail = gen("final/rail_body_71.png").crop((39, 66, 1490, 314))
+g_pipes = [gen("final/pipes_41.png").crop((29, 59, 1512, 442)), gen("final/pipes_42.png").crop((29, 59, 1512, 442))]
+g_cables = gen("cables_bg_51.png")
+
+
+def tiled(w, h, k=0.25):
+    """Tile the plate fill scaled by k over w x h."""
+    t = g_fill.resize((round(g_fill.width * k), round(g_fill.height * k)), Image.LANCZOS)
+    out = Image.new("RGBA", (w, h))
+    for yy in range(0, h, t.height):
+        for xx in range(0, w, t.width):
+            out.paste(t, (xx, yy))
+    return out
+
+
+def G_box(name, rect, border=22, fill=True, k_fill=0.25, frame=None, dark=0):
+    """Riveted frame (9-slice of the generated frame) with an optional tiled rust-plate fill."""
+    x, y, w, h = rect
+    fr = frame or g_panel
+    img = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+    if fill:
+        inset = border // 2
+        f = tiled(w - 2 * inset, h - 2 * inset, k_fill)
+        if dark:
+            f = Image.alpha_composite(f, Image.new("RGBA", f.size, (0, 0, 0, dark)))
+        img.paste(f, (inset, inset))
+    k = border / 150
+    img.alpha_composite(nine(fr, w, h, 165, 165, 165, 165, k))
+    annotate("Party Stash G", name, rect, "mock")
+    return layer(name, img, f"G_{name}_{w}x{h}", x, y)
+
+
+def G_text(name, text, rect, **kw):
+    annotate("Party Stash G", name, rect, "text")
+    return text_layer(name, text, rect, **kw)
+
+
+def G_rail(name, rect):
+    x, y, w, h = rect
+    return layer(name, nine(g_rail, w, h, 230, 0, 230, 0, h / g_rail.height), f"G_rail_{w}x{h}", x, y)
+
+
+def G_cells(prefix, x0, y0, cols, rows, cell, step, res="IVSLOT"):
+    """Recessed dark cells painted on the plate + the game slot squares (hidden by default)."""
+    w, h = (cols - 1) * step + cell, (rows - 1) * step + cell
+    img = Image.new("RGBA", (w, h), (0, 0, 0, 0))
+    d = ImageDraw.Draw(img)
+    for r in range(rows):
+        for c in range(cols):
+            cx, cy = c * step, r * step
+            d.rectangle((cx, cy, cx + cell - 1, cy + cell - 1), fill=(12, 10, 8, 200))
+            d.line((cx, cy, cx + cell - 1, cy), fill=(0, 0, 0, 255), width=2)
+            d.line((cx, cy, cx, cy + cell - 1), fill=(0, 0, 0, 255), width=2)
+            d.line((cx, cy + cell - 1, cx + cell - 1, cy + cell - 1), fill=(150, 90, 50, 200))
+            d.line((cx + cell - 1, cy, cx + cell - 1, cy + cell - 1), fill=(150, 90, 50, 200))
+    slots = [bam_states(f"{prefix} slot r{r}c{c}", res, (r + c) % (10 if res == "IVSLOT" else 5),
+                        (x0 + c * step, y0 + r * step, cell, cell), STATES_SLOT)
+             for r in range(rows) for c in range(cols)]
+    guide_box(x0, y0, w, h)
+    return [layer(f"{prefix} cells (painted recesses)", img, f"Gcells_{cols}x{rows}_{cell}_{step}", x0, y0),
+            group(f"{prefix} slot squares (game IVSLOT)", slots)]
+
+
+G_items = []
+
+
+def G_icon(itm, a, **kw):
+    n = icon_in_slot(itm, a, **kw)
+    if n:
+        G_items.append(n)
+
+
+# background: generated radiating cables, covering 1366x683
+cb = g_cables.resize((1366, round(g_cables.height * 1366 / g_cables.width)), Image.LANCZOS)
+cb = cb.crop((0, (cb.height - ACTIONBAR_Y) // 2, 1366, (cb.height - ACTIONBAR_Y) // 2 + ACTIONBAR_Y))
+G_bg = [layer("G cables background (cables_bg_51, 1366x683 @ -171,0)", cb, "G_cables", BG_OFF, 0)]
+# pipe connectors bridging the two columns (behind the frames)
+p1 = g_pipes[0].resize((300, round(300 * g_pipes[0].height / g_pipes[0].width)), Image.LANCZOS)
+p2 = g_pipes[1].resize((260, round(260 * g_pipes[1].height / g_pipes[1].width)), Image.LANCZOS)
+# vertical pipe bundles bridging the seam between the two columns (drawn above the frames)
+pv = g_pipes[1].rotate(90, expand=True)
+pv = pv.resize((44, round(44 * pv.height / pv.width)), Image.LANCZOS)
+G_conn = [layer("G pipes connector (seam, upper)", pv, "G_pv", 475 - pv.width // 2, 170),
+          layer("G pipes connector (seam, lower)", pv.transpose(Image.FLIP_TOP_BOTTOM), "G_pv2", 475 - pv.width // 2,
+                420)]
+
+G_cols = [G_box("G left column frame", LP, 30), G_box("G right column frame", RP, 30)]
+
+G_top = [G_box("G title band", (120, 6, 784, 44), 14, k_fill=0.15, dark=60),
+         G_text("G title", "Inventory", (150, 6, 300, 44), style="label", point=22, font="EXOCET", color=COL["Y"],
+                shadow=True),
+         layer("G Lady of Pain keystone (JRNLOP)", lady.resize((lw, lh), Image.LANCZOS), f"lady_{lw}",
+               512 - lw // 2, 0),
+         button("G close (XBUTT)", "XBUTT", (972, 4, 46, 46))]
+
+G_left = [G_box("G name/class bar", (28, 80, 304, 38), 12, k_fill=0.15, dark=80),
+          G_text("G name", "The Nameless One", (30, 82, 170, 34), style="label", point=15),
+          G_text("G class", "Fighter", (200, 82, 130, 34), style="label", point=15)]
+for title_txt, y, n, res in (("Quiver", 150, 5, "SLOTARW"), ("Quick Weapons", 236, 4, "SLOTSWRD"),
+                             ("Quick Items", 324, 5, "SLOTITM")):
+    areas = LAYOUT[title_txt.lower()]
+    x0_, y0_ = areas[0][0], areas[0][1]
+    w_ = areas[-1][0] + areas[-1][2] - x0_
+    cs_ = areas[0][2]
+    kids = [G_rail(f"G {title_txt} rail (rail_body_71)", (x0_ - 20, y0_ - 8, w_ + 40, cs_ + 16)),
+            G_text(f"G {title_txt} title", title_txt, (x0_ - 20, y0_ - 30, w_ + 40, 20), style="label", point=15)]
+    for i, a in enumerate(areas):
+        kids.append(layer(f"G {title_txt} frame {i}", g_frame.resize((cs_ + 12, cs_ + 12), Image.LANCZOS),
+                          f"G_sf_{cs_ + 12}", a[0] - 6, a[1] - 6))
+        kids.append(bam_states(f"G {title_txt} slot {i}", res, i % 4, a, STATES_SLOT))
+    G_left.append(group(f"G {title_txt}", kids))
+G_icon("BOLT01", LAYOUT["quiver"][0], count=40)
+G_icon("BOLT03", LAYOUT["quiver"][1], count=40)
+G_icon("ADDAGGER", LAYOUT["quick weapons"][0])
+G_icon("EYEBALL", LAYOUT["quick items"][0])
+
+G_doll = [layer("G oval frame (game)", ov.resize((ovw, ovh), Image.LANCZOS), "ovalF", ox, oy),
+          dict(F_doll[1], name="G paperdoll IVPNOA")]
+G_body = []
+for i, (nm, x, y) in enumerate(body_pos):
+    G_body.append(group(f"G body {nm}", [
+        layer(f"G frame {nm} (slot_frame_22)", g_frame.resize((fs, fs), Image.LANCZOS), f"G_sf_{fs}", x, y),
+        bam_states(f"G body slot {nm}", "IVSLOT", i, (x + off, y + off, sl, sl), STATES_SLOT),
+    ]))
+G_icon("AMBEAR", (262 + off, 122 + off, sl, sl))
+G_icon("BRORING", (418 + off, 240 + off, sl, sl))
+G_icon("TTAC1", (278 + off, 342 + off, sl, sl))
+
+G_stats = []
+for nm, val, lines, piece, bx, by in (("AC", "8", ["Base: 10", "Dex: -1", "Tattoo: -1"], "AC disc", 24, 408),
+                                      ("THAC0", "17", ["Base: 18", "Prof.: -1", "Weapon: 0"], "AC disc", 244, 408),
+                                      ("HP", "64/64", ["Class: 1d10", "Con: +2"], "HP disc", 24, 534),
+                                      ("Damage", "1d6+1", ["Weapon: 1d6", "Str: +1"], "HP disc", 244, 534)):
+    disc = (bx, by + 14, 78, 84)
+    plate = (bx + 70, by, 140, 112)
+    G_stats.append(group(f"G stat {nm}", [
+        G_box(f"G {nm} plate", plate, 14, k_fill=0.18, dark=70),
+        layer(f"G {nm} disc ({piece}, game)", bg_piece(piece).resize((disc[2], disc[3]), Image.LANCZOS),
+              f"Fp_{piece}_{disc[2]}x{disc[3]}", disc[0], disc[1]),
+        G_text(f"G {nm} value", val, (disc[0], disc[1] + 22, disc[2], 40), style="label", point=15),
+        G_text(f"G {nm} caption", nm, (disc[0], disc[1] - 14, disc[2], 14), style="normal", point=11,
+               color=COL["Y"], halign="center", valign="top"),
+        G_text(f"G {nm} detail", "\n".join(lines), (plate[0] + 18, plate[1] + 14, plate[2] - 26, plate[3] - 24),
+               style="normal", point=12, color=COL["B"]),
+    ]))
+
+cellG, stepG = cell, 41
+GXG, GYG = LAYOUT["backpack"][0][0], LAYOUT["backpack"][0][1]
+gwG = 9 * stepG + cellG
+SYG = LAYOUT["stash"][0][1]
+G_right = [
+    G_box("G header bar", (496, 80, 448, 38), 12, k_fill=0.15, dark=80),
+    G_text("G stash weight", "816 / 2000 LB", (574, 82, 200, 34), style="normal", point=15, color=COL["$"],
+           halign="left", valign="center"),
+    button("G sort", "STRBUTT", (830, 85, 108, 28), "Sort: Auto", point=13),
+    tab_strip("G", 496, 124, 48, 22, TABS_SHORT, active=0, gap=1, arrows=False),
+    G_box("G backpack well", (GXG - 12, GYG - 12, gwG + 24, 2 * stepG - stepG + cellG + 24), 18, k_fill=0.2,
+          dark=40, frame=g_frame),
+    *G_cells("G backpack", GXG, GYG, 10, 2, cellG, stepG, res="SLOTITM"),
+    G_box("G stash well", (GXG - 12, SYG - 12, gwG + 24, 6 * stepG + cellG + 24), 18, k_fill=0.2, dark=60,
+          frame=g_frame),
+    *G_cells("G stash", GXG, SYG, 10, 7, cellG, stepG),
+    G_box("G ground column", (gpx, gpy, 58, 448), 16, k_fill=0.2, dark=60, frame=g_frame),
+    *G_cells("G ground", LAYOUT["ground"][0][0], LAYOUT["ground"][0][1], 1, 10, 34, 40),
+    button("G ground prev", "ARROBUTT", LAYOUT["ground_prev"], seq=0),
+    button("G ground next", "ARROBUTT", LAYOUT["ground_next"], seq=1),
+    layer("G ground pickup hand (ICPICKUP)", mos("ICPICKUP").resize((14, 26), Image.LANCZOS), "pickupG", gpx + 22, gpy + 6),
+    button("G store all", "STRBUTT", (496, 604, 140, 40), "Store all", point=15),
+    G_box("G gold box", (800, 592, 196, 52), 12, k_fill=0.15, dark=80),
+    layer("G gold coins (ICGOLD)", mos("ICGOLD").resize((52, 44), Image.LANCZOS), "icgoldG", 812, 596),
+    G_text("G party gold", "1250", (870, 602, 110, 30), style="gold", point=16),
+]
+for i in range(5):
+    G_icon(["COPPER", "BREAST1", "KEYSNTRY", "LENS04", "CLUB"][i], (GXG + i * stepG, GYG, cellG, cellG),
+           count=(3, 2, None, None, None)[i])
+for i in range(64):
+    mk = STASH_MARKS.get(i % len(STASH_ITEMS))
+    G_icon(STASH_ITEMS[i % len(STASH_ITEMS)], (GXG + (i % 10) * stepG, SYG + (i // 10) * stepG, cellG, cellG),
+           tint=mk[1] if mk and mk[0] == "tint" else None, count=mk[1] if mk and mk[0] == "count" else None,
+           plus=bool(mk and mk[0] == "plus"))
+G_icon("CLUB2", LAYOUT["ground"][0])
+
+varG = group("Variant G - Generated art (SwarmUI) on the F organisation", [
+    group("G background (generated cables)", G_bg),
+    group("G column frames (generated frame + rust plate)", G_cols),
+    group("G pipe connectors (generated)", G_conn),
+    group("G left column", G_left),
+    group("G paperdoll", G_doll),
+    group("G body slots", G_body),
+    group("G stats blocks", G_stats),
+    group("G right column", G_right),
+    group("G items (sample)", G_items),
+    group("G top (title, Lady keystone, close)", G_top),
+], visible=True)
+varF["visible"] = False
+
+mockups = group("Party Stash mockup (PTEE style)", [varC, varB, varA, varD, varE, varF, varG])
 
 # ================================================================== 5. LIBRARY
 usage = {}
@@ -1355,6 +1581,8 @@ hide_kinds(root)
 manifest = {"width": W, "height": H, "root": root,
             "guides": {"h": sorted(v for v in GUIDES["h"] if 0 <= v <= H),
                        "v": sorted(v for v in GUIDES["v"] if 0 <= v <= W)}}
+with open(os.path.join(BUILD, "layout.json"), "w", encoding="utf-8") as f:
+    json.dump(LAYOUT, f, indent=1)
 with open(os.path.join(BUILD, "manifest.json"), "w", encoding="utf-8") as f:
     json.dump(manifest, f, indent=1, ensure_ascii=False)
 
