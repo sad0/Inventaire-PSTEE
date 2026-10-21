@@ -9,7 +9,7 @@ import json
 import os
 import struct
 
-from PIL import Image, ImageEnhance
+from PIL import Image, ImageDraw, ImageEnhance
 
 import build_mod as bm  # noqa: F401  (reuses write_mos_v1, menu helpers, TP2)
 
@@ -84,6 +84,14 @@ def background():
     img = Image.new("RGB", (1366 * UP, 768 * UP), (0, 0, 0))
     bg = Image.open(os.path.join(JD, "bg_clean_2x.png")).convert("RGB").resize((bw * UP, bh * UP), Image.LANCZOS)
     img.paste(bg, ((171 + L["menu"]["bg_offset"]) * UP, 0))
+    # the stash grid is not engine slots yet (step 2): bake recessed cells into the background
+    d = ImageDraw.Draw(img, "RGBA")
+    for (x, y, w, h) in L["stash"]:
+        x, y = (x + 171) * UP, y * UP
+        d.rounded_rectangle((x - 2, y - 2, x + w + 1, y + h + 1), radius=5, fill=(6, 5, 4, 200),
+                            outline=(0, 0, 0, 230), width=2)
+        d.line((x + 2, y + h, x + w - 2, y + h), fill=(140, 96, 58, 150))
+        d.line((x + w, y + 2, x + w, y + h - 2), fill=(140, 96, 58, 150))
     img.save(os.path.join(ROOT, "design", "build", "ingame_bg_J.png"))
     bm.write_mos_v1(img, os.path.join(MOD, "art", "PSIVBGJ.MOS"))
 
@@ -148,7 +156,7 @@ menu
         p = st["plate"]
         m.append(bm.label((p[0] + 10, p[1] + 10, p[2] - 16, p[3] - 16), text_lua=f"psInvStatDetail('{nm}')",
                           style="normal", point=12, align="left top"))
-    m.append("\ttext\n\t{\n\t\tarea 640 606 150 34\n\t\ttext lua \"TEXT_inventoryError\"\n\t\ttext style normal\n"
+    m.append("\ttext\n\t{\n\t\tarea 501 512 420 24\n\t\ttext lua \"TEXT_inventoryError\"\n\t\ttext style normal\n"
              "\t\ttext point 12\n\t\ttext align left center\n\t}\n")
     for i, a in enumerate(L["quick weapons"]):
         m.append(bm.slot(f"slot_inv_{1 + i}", a, "SLOTSWRD", i, f"weapon{i}"))

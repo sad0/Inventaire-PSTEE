@@ -216,7 +216,7 @@ menu
 	}
 	text
 	{
-		area 640 606 150 34
+		area 501 512 420 24
 		text lua "TEXT_inventoryError"
 		text style normal
 		text point 12
