@@ -17,7 +17,7 @@ BUILD = os.path.join(ROOT, "design", "build")
 MOD = os.path.join(ROOT, "mod", "InventairePTEE")
 M = json.load(open(os.path.join(BUILD, "manifest.json"), encoding="utf-8"))
 L = json.load(open(os.path.join(BUILD, "layout.json"), encoding="utf-8"))
-VARIANTS = {"F": "Variant F", "G": "Variant G"}
+VARIANTS = {"F": "Variant F", "G": "Variant G", "H": "Variant H"}
 BG_W, BG_H, OX = 1366, 768, 171
 
 
@@ -204,16 +204,17 @@ menu
 
 
 LUA = r'''-- Inventaire PTEE (Party Stash for Planescape: Torment EE), step 1: redesigned inventory page.
--- Background art variant: 'G' (generated art) or 'F' (PTEE pieces), saved in Baldur.lua/ini.
-psInvVariant = Infinity_GetINIString('Party Stash', 'Inventory Art', 'G')
+-- Background art variant: 'H' (tentacular pipes), 'G' (generated pieces) or 'F' (PTEE pieces), saved in the ini.
+psInvVariants = {F = 'G', G = 'H', H = 'F'}
+psInvVariant = Infinity_GetINIString('Party Stash', 'Inventory Art', 'H')
+if psInvVariants[psInvVariant] == nil then psInvVariant = 'H' end
 
 function psInvBackground()
-	if psInvVariant == 'F' then return 'PSIVBGF' end
-	return 'PSIVBGG'
+	return 'PSIVBG' .. psInvVariant
 end
 
 function psInvToggleVariant()
-	if psInvVariant == 'F' then psInvVariant = 'G' else psInvVariant = 'F' end
+	psInvVariant = psInvVariants[psInvVariant]
 	Infinity_SetINIValue('Party Stash', 'Inventory Art', psInvVariant)
 	Infinity_SetBackground('BACKGROUND_INVENTORY')
 end
@@ -225,7 +226,7 @@ end
 psInvTexts = {
 	title = 'Inventory', Quiver = 'Quiver', ['Quick Weapons'] = 'Quick Weapons', ['Quick Items'] = 'Quick Items',
 	AC = 'AC', THAC0 = 'THAC0', HP = 'HP', Damage = 'Damage', Sort = 'Sort: Auto', ['Store all'] = 'Store all',
-	Swap = 'Swap the inventory art (F: game pieces, G: generated art)',
+	Swap = 'Swap the inventory art (F: game pieces, G: generated pieces, H: tentacular pipes)',
 }
 psInvTabs = {'All', 'Weap.', 'Tatt.', 'Jewel', 'Eyes', 'Charm', 'Quest', 'Misc'}
 

@@ -11,7 +11,7 @@ import json
 import os
 import sys
 
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageChops, ImageDraw, ImageFilter, ImageFont
 
 sys.path.insert(0, os.path.dirname(__file__))
 import ie  # noqa: E402
@@ -1440,7 +1440,106 @@ varG = group("Variant G - Generated art (SwarmUI) on the F organisation", [
 ], visible=True)
 varF["visible"] = False
 
-mockups = group("Party Stash mockup (PTEE style)", [varC, varB, varA, varD, varE, varF, varG])
+# ---- Variant H (John 2026-10-22): F palette, tentacular pipes invading the whole background, zones delimited by
+# pipes and materials. Background = SwarmUI img2img of tools/pipes_guide.py (creativity 0.45, seed 12), colour
+# matched to variant F (tools/recolor.py, 85 %). UI pieces on top use the same LAYOUT as F/G.
+h_bg = Image.open(os.path.join(ROOT, "design", "art", "h", "bg_h.png")).convert("RGBA").resize((1366, ACTIONBAR_Y),
+                                                                                               Image.LANCZOS)
+
+
+def ellipse_cut(img, inset=2, feather=1.5):
+    """Clean elliptical cut-out (no square corners)."""
+    m = Image.new("L", (img.width * 4, img.height * 4), 0)
+    ImageDraw.Draw(m).ellipse((inset * 4, inset * 4, (img.width - inset) * 4, (img.height - inset) * 4), fill=255)
+    m = m.resize(img.size, Image.LANCZOS).filter(ImageFilter.GaussianBlur(feather))
+    out = img.copy()
+    out.putalpha(ImageChops.multiply(out.getchannel("A"), m))
+    return out
+
+
+def H_cells(prefix, areas, res="IVSLOT"):
+    """Recessed dark cells at the slot areas (the engine draws slot squares/items over them)."""
+    kids = []
+    for i, a in enumerate(areas):
+        x, y, w, h = a
+        c = Image.new("RGBA", (w + 4, h + 4), (0, 0, 0, 0))
+        d = ImageDraw.Draw(c)
+        d.rounded_rectangle((0, 0, w + 3, h + 3), radius=4, fill=(8, 7, 5, 235), outline=(0, 0, 0, 255), width=2)
+        d.line((3, h + 2, w + 2, h + 2), fill=(120, 84, 52, 170))
+        d.line((w + 2, 3, w + 2, h + 2), fill=(120, 84, 52, 170))
+        kids.append(layer(f"{prefix} cell {i}", c, f"Hcell_{w}x{h}", x - 2, y - 2))
+        kids.append(bam_states(f"{prefix} slot {i}", res, i % (10 if res == "IVSLOT" else 4), a, STATES_SLOT))
+    return group(prefix, kids)
+
+
+H_items = []
+
+
+def H_icon(itm, a, **kw):
+    n = icon_in_slot(itm, a, **kw)
+    if n:
+        H_items.append(n)
+
+
+ov_cut = ellipse_cut(ov.resize((ovw, ovh), Image.LANCZOS))
+H_doll = [layer("H oval frame (game, clean elliptical cut)", ov_cut, "ovalH", ox, oy),
+          dict(F_doll[1], name="H paperdoll IVPNOA")]
+H_left = [H_cells("H quiver", LAYOUT["quiver"], "SLOTARW"), H_cells("H quick weapons", LAYOUT["quick weapons"], "SLOTSWRD"),
+          H_cells("H quick items", LAYOUT["quick items"], "SLOTITM"),
+          H_cells("H body slots", list(LAYOUT["body"].values()))]
+for t_, r_ in LAYOUT["titles"].items():
+    H_left.append(text_layer(f"H {t_} title", t_, r_, style="label", point=15))
+H_left += [text_layer("H name", "The Nameless One", LAYOUT["text"]["name"], style="label", point=15),
+           text_layer("H class", "Fighter", LAYOUT["text"]["class"], style="label", point=15)]
+H_stats = []
+for nm, stt in LAYOUT["stats"].items():
+    dd, pp = stt["disc"], stt["plate"]
+    piece = "AC disc" if nm in ("AC", "THAC0") else "HP disc"
+    H_stats.append(group(f"H stat {nm}", [
+        layer(f"H {nm} disc ({piece}, elliptical cut)", ellipse_cut(bg_piece(piece).resize((dd[2], dd[3]), Image.LANCZOS)),
+              f"Hdisc_{piece}", dd[0], dd[1]),
+        text_layer(f"H {nm} value", {"AC": "8", "THAC0": "17", "HP": "64/64", "Damage": "1d6+1"}[nm],
+                   (dd[0], dd[1] + 22, dd[2], 40), style="label", point=15),
+        text_layer(f"H {nm} caption", nm, (dd[0], dd[1] - 14, dd[2], 14), style="normal", point=11, color=COL["Y"],
+                   halign="center", valign="top"),
+    ]))
+H_right = [
+    H_cells("H backpack", LAYOUT["backpack"], "SLOTITM"),
+    H_cells("H stash", LAYOUT["stash"]),
+    H_cells("H ground", LAYOUT["ground"]),
+    text_layer("H stash weight", "816 / 2000 LB", LAYOUT["text"]["weight"], style="normal", point=15, color=COL["$"],
+               halign="left", valign="center"),
+    button("H sort", "STRBUTT", LAYOUT["buttons"]["sort"], "Sort: Auto", point=13),
+    tab_strip("H", 496, 122, 48, 22, TABS_SHORT, active=0, gap=1, arrows=False),
+    button("H ground prev", "ARROBUTT", LAYOUT["ground_prev"], seq=0),
+    button("H ground next", "ARROBUTT", LAYOUT["ground_next"], seq=1),
+    button("H store all", "STRBUTT", LAYOUT["buttons"]["store_all"], "Store all", point=15),
+    layer("H gold coins (ICGOLD)", mos("ICGOLD").resize((52, 44), Image.LANCZOS), "icgoldG", 812, 596),
+    text_layer("H party gold", "1250", LAYOUT["text"]["gold"], style="gold", point=16),
+]
+for i, itm in enumerate(["COPPER", "BREAST1", "KEYSNTRY", "LENS04", "CLUB"]):
+    H_icon(itm, LAYOUT["backpack"][i * 2], count=(3, 2, None, None, None)[i])
+for i in range(64):
+    mk = STASH_MARKS.get(i % len(STASH_ITEMS))
+    H_icon(STASH_ITEMS[i % len(STASH_ITEMS)], LAYOUT["stash"][i], tint=mk[1] if mk and mk[0] == "tint" else None,
+           count=mk[1] if mk and mk[0] == "count" else None, plus=bool(mk and mk[0] == "plus"))
+varH = group("Variant H - Tentacular pipes (SwarmUI img2img of the pipes guide, F palette)", [
+    layer("H background (generated from guide, recoloured to F)", h_bg, "H_bg", BG_OFF, 0),
+    group("H left column", H_left),
+    group("H paperdoll", H_doll),
+    group("H stats", H_stats),
+    group("H right column", H_right),
+    group("H items (sample)", H_items),
+    group("H top", [
+        text_layer("H title", "Inventory", LAYOUT["text"]["title"], style="label", point=22, font="EXOCET",
+                   color=COL["Y"], shadow=True),
+        layer("H Lady of Pain keystone (JRNLOP)", lady.resize((lw, lh), Image.LANCZOS), f"lady_{lw}", 512 - lw // 2, 0),
+        button("H close (XBUTT)", "XBUTT", LAYOUT["buttons"]["close"]),
+    ]),
+], visible=True)
+varG["visible"] = False
+
+mockups = group("Party Stash mockup (PTEE style)", [varC, varB, varA, varD, varE, varF, varG, varH])
 
 # ================================================================== 5. LIBRARY
 usage = {}
