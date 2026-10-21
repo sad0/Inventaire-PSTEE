@@ -1,0 +1,5 @@
+# Regenerated from the game by tools/build_xcf.ps1 (game art, large)
+design/assets/
+design/build/
+design/*.xcf
+__pycache__/
