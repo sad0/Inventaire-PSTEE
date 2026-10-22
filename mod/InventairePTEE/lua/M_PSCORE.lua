@@ -12,7 +12,8 @@ P.RES = 'PSTASH'
 -- { address, first prologue bytes, args }
 local FUNCS = {
 	AddItemToStore = { 0x1402D0DD0, { 0x40, 0x55, 0x53, 0x56, 0x57, 0x41, 0x54, 0x41 }, 4 },
-	-- 8 args in Torment (BG 9): the trailing byte argument is gone (Torment caller at 0x140150c2f).
+	-- 8 args in Torment (BG 9): BG's 8th argument is gone, Torment's 8th = BG's 9th flag (EEex-PTEE analysis):
+	-- BG passes (..., 0xFFFF, 0, 1, 0), Torment (..., 0xFFFF, 0, 0). Passing 1 corrupted the heap.
 	SwapItemPersonal = { 0x1402F81B0, { 0x40, 0x55, 0x53, 0x56, 0x57, 0x41, 0x54, 0x41 }, 8 },
 	AddDisposableItem = { 0x1402D0DB0, { 0x48, 0x85, 0xD2, 0x74, 0x0C, 0x48, 0x81, 0xC1 }, 2 },
 	DemandServerStore = { 0x1402D74D0, { 0x48, 0x89, 0x5C, 0x24, 0x10, 0x48, 0x89, 0x74 }, 3 },
@@ -153,7 +154,7 @@ function PSC_Add(portrait, slot)
 			return false, string.format('refused (0x%x)', EEex_ReadU32(buf + 24))
 		end
 		EEex_Write64(buf + 16, 0)
-		PSC_Eng_SwapItemPersonal(game, portrait, buf + 16, slot, buf + 24, 0xFFFF, 0, 1)
+		PSC_Eng_SwapItemPersonal(game, portrait, buf + 16, slot, buf + 24, 0xFFFF, 0, 0)
 		local out = EEex_ReadU64(buf + 16)
 		if out ~= itemPtr then return false, 'in the stash but the slot kept it (duplicate!)' end
 		PSC_Eng_AddDisposableItem(game, out)
