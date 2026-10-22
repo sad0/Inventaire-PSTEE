@@ -60,7 +60,7 @@ menu
 	{
 		name "psinv_gold"
 		area 765 624 100 26
-		text lua "characters[id].gold"
+		text lua "game:GetPartyGold()"
 		text style "gold"
 		text point 16
 		text color lua "psInvYellow()"

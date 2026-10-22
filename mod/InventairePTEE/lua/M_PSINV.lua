@@ -126,6 +126,49 @@ function psInvShorten(key, text)
 	return table.concat(out, '\n')
 end
 
+-- Item lines grouped by equipment slot, like Party Stash BG (John 2026-10-22): "Tattoo: -3" instead of each
+-- tattoo's full name. Names come from the equipped items; same-slot values are added up.
+psInvSlotLabels = {
+	{'tattoo0', 'Tatouage', 'Tattoo'}, {'tattoo1', 'Tatouage', 'Tattoo'}, {'tattoo2', 'Tatouage', 'Tattoo'},
+	{'earringleft0', 'Oreille', 'Ear'}, {'earringright0', 'Oreille', 'Ear'}, {'ring0', 'Anneau', 'Ring'},
+	{'ring1', 'Anneau', 'Ring'}, {'chest0', 'Torse', 'Chest'}, {'wrist0', 'Poignet', 'Wrist'},
+	{'hand0', 'Main', 'Hand'}, {'weapon0', 'Arme', 'Weapon'}, {'weapon1', 'Arme', 'Weapon'},
+	{'weapon2', 'Arme', 'Weapon'}, {'weapon3', 'Arme', 'Weapon'},
+}
+local function psInvEquippedNames()
+	local out, fr = {}, psInvFr()
+	local eq = characters[id] and characters[id].equipment
+	if not eq then return out end
+	for _, l in ipairs(psInvSlotLabels) do
+		local slot = eq[l[1]]
+		local nm = slot and slot.item and slot.item.name
+		if nm and nm ~= '' and (slot.empty == nil or slot.empty == 0) then
+			out[#out + 1] = {nm, fr and l[2] or l[3]}
+		end
+	end
+	table.sort(out, function(a, b) return #a[1] > #b[1] end)
+	return out
+end
+function psInvGroupBySlot(text)
+	local names = psInvEquippedNames()
+	local order, sum, other = {}, {}, {}
+	for line in string.gmatch(text, '[^\n]+') do
+		local label
+		for _, n in ipairs(names) do
+			if string.sub(line, 1, #n[1]) == n[1] then label = n[2] break end
+		end
+		local v = string.match(line, '([%+%-]?%d+)%s*$')
+		if label and v then
+			if not sum[label] then order[#order + 1] = label sum[label] = 0 end
+			sum[label] = sum[label] + tonumber(v)
+		else
+			other[#other + 1] = line
+		end
+	end
+	for _, label in ipairs(order) do other[#other + 1] = label .. ': ' .. string.format('%+d', sum[label]) end
+	return table.concat(other, '\n')
+end
+
 -- Detail lines: the engine's own breakdown (AC/HP/THAC0/damage .details), shortened.
 function psInvStatDetail(key)
 	local c = characters[id]
@@ -133,6 +176,7 @@ function psInvStatDetail(key)
 		THAC0 = function() return c.THAC0.details end, Damage = function() return c.damage.details end}
 	if key == 'HP' then return psInvHPDetail(c) end
 	local text = psInvShorten(key, tostring(psInvField(f[key]) or ''))
+	if key == 'AC' then text = psInvGroupBySlot(text) end
 	if key == 'Damage' then
 		local apr = psInvAPR()
 		if apr then
@@ -190,7 +234,7 @@ local function psInvConBonus(con, warrior)
 	if not warrior and b > 2 then b = 2 end
 	return b
 end
-local function psInvFr()
+function psInvFr()
 	local lang = string.lower(Infinity_GetINIString('Language', 'Text', '') or '')
 	return string.sub(lang, 1, 2) == 'fr'
 end
