@@ -429,24 +429,36 @@ local function psInvEquippedNames()
 	table.sort(out, function(a, b) return #a[1] > #b[1] end)
 	return out
 end
+-- PTEE's AC breakdown also lists AC items carried in the backpack, then a "Bonus" line that cancels them
+-- (John 2026-10-22: "my character has none of that"). Keep the base line and the equipped items only (grouped by
+-- slot), and show what is left as "Other" = current AC - base - equipped items.
 function psInvGroupBySlot(text)
 	local names = psInvEquippedNames()
-	local order, sum, other = {}, {}, {}
+	local order, sum, base = {}, {}, nil
+	local equipped = 0
 	for line in string.gmatch(text, '[^\n]+') do
+		local v = string.match(line, '([%+%-]?%d+)%s*$')
 		local label
 		for _, n in ipairs(names) do
 			if string.sub(line, 1, #n[1]) == n[1] then label = n[2] break end
 		end
-		local v = string.match(line, '([%+%-]?%d+)%s*$')
-		if label and v then
+		if v and not base and (string.match(line, '^CA%s*:') or string.match(line, '^AC%s*:')) then
+			base = tonumber(v)
+		elseif label and v then
 			if not sum[label] then order[#order + 1] = label sum[label] = 0 end
 			sum[label] = sum[label] + tonumber(v)
-		else
-			other[#other + 1] = line
+			equipped = equipped + tonumber(v)
 		end
 	end
-	for _, label in ipairs(order) do other[#other + 1] = label .. ': ' .. string.format('%+d', sum[label]) end
-	return table.concat(other, '\n')
+	local out = {}
+	if base then out[#out + 1] = (psInvFr() and 'Base : ' or 'Base: ') .. base end
+	for _, label in ipairs(order) do out[#out + 1] = label .. ' : ' .. string.format('%+d', sum[label]) end
+	local cur = tonumber(psInvField(function() return characters[id].AC.current end) or '')
+	if base and cur then
+		local rest = cur - base - equipped
+		if rest ~= 0 then out[#out + 1] = (psInvFr() and 'Autre : ' or 'Other: ') .. string.format('%+d', rest) end
+	end
+	return table.concat(out, '\n')
 end
 
 -- Detail lines: the engine's own breakdown (AC/HP/THAC0/damage .details), shortened.
