@@ -1,4 +1,4 @@
--- Inventaire PTEE, step 2b (John 2026-10-22): the stash grid on the inventory page, over the core (M_PSCORE.lua).
+-- Inventaire PSTEE, step 2b (John 2026-10-22): the stash grid on the inventory page, over the core (M_PSCORE.lua).
 -- 60 cells show the stash filtered by the active tab; click = take into the shown character's backpack;
 -- "Store all" = every backpack item into the stash. Item data read from the ITM headers (EEex).
 

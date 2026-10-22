@@ -1,4 +1,4 @@
--- Inventaire PTEE (Party Stash for Planescape: Torment EE), step 1: redesigned inventory page (art J).
+-- Inventaire PSTEE (Party Stash for Planescape: Torment EE), step 1: redesigned inventory page (art J).
 psInvTexts = {
 	Quiver = 'Quiver', ['Quick Weapons'] = 'Quick Weapons', ['Quick Items'] = 'Quick Items',
 	AC = 'AC', THAC0 = 'THAC0', HP = 'HP', Damage = 'Damage', Sort = 'Sort: Auto', ['Store all'] = 'Store all',
@@ -149,7 +149,7 @@ local function psInvEquippedNames()
 	table.sort(out, function(a, b) return #a[1] > #b[1] end)
 	return out
 end
--- PTEE's AC breakdown also lists AC items carried in the backpack, then a "Bonus" line that cancels them
+-- PSTEE's AC breakdown also lists AC items carried in the backpack, then a "Bonus" line that cancels them
 -- (John 2026-10-22: "my character has none of that"). Keep the base line and the equipped items only (grouped by
 -- slot), and show what is left as "Other" = current AC - base - equipped items.
 function psInvGroupBySlot(text)
@@ -223,7 +223,7 @@ function psInvAPR()
 end
 
 -- HP block (John 2026-10-22): level-up hit die, Constitution bonus per level, "Other" = flat sum of every other
--- bonus the engine lists. PTEE has no HPCLASS/HPCONBON tables: AD&D 2e rules as in PST, hard-coded.
+-- bonus the engine lists. PSTEE has no HPCLASS/HPCONBON tables: AD&D 2e rules as in PST, hard-coded.
 -- Fighter 1d10 up to level 9 then +3; thief 1d6 up to 10 then +2; mage 1d4 up to 10 then +1.
 local PSINV_DIE = {[2] = {10, 9, 3}, [4] = {6, 10, 2}, [1] = {4, 10, 1}}
 local function psInvSprite()

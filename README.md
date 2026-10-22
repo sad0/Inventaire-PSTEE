@@ -1,4 +1,4 @@
-# Inventaire-PTEE
+# Inventaire-PSTEE
 
 Party Stash (shared infinite party stash, see `../PartyStash-EE`) brought to **Planescape: Torment EE** (v3.2.2.0).
 Step 1: design mockup.
@@ -16,7 +16,7 @@ Top-level groups:
 | Background | `INVBG` + hidden cut-outs of every panel (rails, ground column, gold box, discs...) |
 | Inventory (vanilla INVENTORY menu) | Paperdolls (`IVP*`, one per companion), slots by category (one group per slot; frame 0 visible, other states hidden), labels/icons, sample items, text in game fonts, buttons with all states |
 | Action bar | `WORLD_ACTIONBAR` + `_LEFT`, drawn over the inventory: portraits, buttons with all states |
-| Party Stash mockup | **Variant E (John's pick: LeUI layout, PTEE textures, visible)**; D (first redesign), A (rail toggle), B (stash window), C (ground column) hidden |
+| Party Stash mockup | **Variant E (John's pick: LeUI layout, PSTEE textures, visible)**; D (first redesign), A (rail toggle), B (stash window), C (ground column) hidden |
 | Library (hidden) | Buttons, tabs, slots/placeholders, scrollbars, BAM/MOS icons, panels/popups, bars, 120 item icons, paperdolls |
 | Annotations (hidden) | Box + name + size + coords for each element |
 

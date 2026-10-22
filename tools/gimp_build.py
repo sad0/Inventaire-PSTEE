@@ -1,5 +1,5 @@
 # Runs INSIDE GIMP 3.x (python-fu-eval batch). Builds design/inventory_ptee.xcf from design/build/manifest.json.
-# Launched by tools/build_xcf.ps1; the project root comes from the INVPTEE_ROOT environment variable.
+# Launched by tools/build_xcf.ps1; the project root comes from the INVPSTEE_ROOT environment variable.
 import json
 import os
 
@@ -9,7 +9,7 @@ gi.require_version("Gimp", "3.0")
 gi.require_version("Gegl", "0.4")
 from gi.repository import Gegl, Gimp, Gio  # noqa: E402
 
-ROOT = os.environ["INVPTEE_ROOT"]
+ROOT = os.environ["INVPSTEE_ROOT"]
 RUN = Gimp.RunMode.NONINTERACTIVE
 LOG = open(os.path.join(ROOT, "design", "build", "gimp_build.log"), "w", encoding="utf-8")
 
@@ -114,7 +114,7 @@ def export(fname, show=(), hide=(), wide=False):
     log("exported", fname)
 
 
-if os.environ.get("INVPTEE_PREVIEWS", "1") != "0":
+if os.environ.get("INVPSTEE_PREVIEWS", "1") != "0":
     os.makedirs(os.path.join(ROOT, "design", "preview"), exist_ok=True)
     MOCK = "Party Stash mockup"
     export("inventory_ptee_preview.png")  # default visibility of the .xcf

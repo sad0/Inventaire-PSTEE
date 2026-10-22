@@ -1,10 +1,10 @@
 """Build the in-game preview mod (WeiDU) from the design manifest + layout.
 
 Step 1 (John 2026-10-22): the redesigned inventory page, functional (equipment, quick slots, backpack, ground),
-with a button to swap the F (PTEE pieces) and G (generated art) backgrounds. The stash grid/tabs/sort/store-all
+with a button to swap the F (PSTEE pieces) and G (generated art) backgrounds. The stash grid/tabs/sort/store-all
 are drawn but inactive until the EEex stash (step 2).
 
-Usage: python tools/build_mod.py  (after tools/build_assets.py). Writes mod/InventairePTEE/.
+Usage: python tools/build_mod.py  (after tools/build_assets.py). Writes mod/InventairePSTEE/.
 """
 import json
 import os
@@ -14,7 +14,7 @@ from PIL import Image
 
 ROOT = os.path.normpath(os.path.join(os.path.dirname(__file__), ".."))
 BUILD = os.path.join(ROOT, "design", "build")
-MOD = os.path.join(ROOT, "mod", "InventairePTEE")
+MOD = os.path.join(ROOT, "mod", "InventairePSTEE")
 M = json.load(open(os.path.join(BUILD, "manifest.json"), encoding="utf-8"))
 L = json.load(open(os.path.join(BUILD, "layout.json"), encoding="utf-8"))
 VARIANTS = {"F": "Variant F", "G": "Variant G", "H": "Variant H"}
@@ -203,8 +203,8 @@ menu
     return "".join(m)
 
 
-LUA = r'''-- Inventaire PTEE (Party Stash for Planescape: Torment EE), step 1: redesigned inventory page.
--- Background art variant: 'H' (tentacular pipes), 'G' (generated pieces) or 'F' (PTEE pieces), saved in the ini.
+LUA = r'''-- Inventaire PSTEE (Party Stash for Planescape: Torment EE), step 1: redesigned inventory page.
+-- Background art variant: 'H' (tentacular pipes), 'G' (generated pieces) or 'F' (PSTEE pieces), saved in the ini.
 psInvVariants = {F = 'G', G = 'H', H = 'F'}
 psInvVariant = Infinity_GetINIString('Party Stash', 'Inventory Art', 'H')
 if psInvVariants[psInvVariant] == nil then psInvVariant = 'H' end
@@ -264,24 +264,24 @@ function psInvStatDetail(key)
 end
 '''
 
-TP2 = r'''// Inventaire PTEE: Party Stash inventory page for Planescape: Torment EE (step 1 preview).
-BACKUP ~weidu_external/backup/InventairePTEE~
+TP2 = r'''// Inventaire PSTEE: Party Stash inventory page for Planescape: Torment EE (step 1 preview).
+BACKUP ~weidu_external/backup/InventairePSTEE~
 AUTHOR ~sad0~
 VERSION ~v0.3~
 
 LANGUAGE ~English~ ~english~
 
-// #0 Redesigned inventory page (BG Party Stash / LeUI organisation, PTEE art). Equipment, quick slots, backpack
+// #0 Redesigned inventory page (BG Party Stash / LeUI organisation, PSTEE art). Equipment, quick slots, backpack
 // and ground work; the stash grid, tabs, sort and store-all are drawn but wait for the EEex stash (step 2).
-// The "Art" button swaps the two background styles (F = PTEE pieces, G = generated art).
+// The "Art" button swaps the two background styles (F = PSTEE pieces, G = generated art).
 BEGIN ~Party Stash inventory page (preview)~ DESIGNATED 0
-LABEL ~INVENTAIREPTEE-PAGE~
+LABEL ~INVENTAIREPSTEE-PAGE~
 REQUIRE_PREDICATE GAME_IS ~pstee~ ~Planescape: Torment EE only.~
 
-COPY ~InventairePTEE/art~ ~override~
-COPY ~InventairePTEE/lua/M_PSINV.lua~ ~override~
-COPY ~InventairePTEE/lua/M_PSCORE.lua~ ~override~   // step 2a: stash core (EEex), console-tested
-COPY ~InventairePTEE/lua/M_PSUI.lua~ ~override~     // step 2b: stash grid on the inventory page
+COPY ~InventairePSTEE/art~ ~override~
+COPY ~InventairePSTEE/lua/M_PSINV.lua~ ~override~
+COPY ~InventairePSTEE/lua/M_PSCORE.lua~ ~override~   // step 2a: stash core (EEex), console-tested
+COPY ~InventairePSTEE/lua/M_PSUI.lua~ ~override~     // step 2b: stash grid on the inventory page
 
 // The stash store (step 2a): a hidden bag store (type 5) built from a vanilla STORV1.1 store, no stock, buys every
 // item type, practically unlimited capacity.
@@ -304,7 +304,7 @@ BUT_ONLY
 
 // read the menu text through a scratch copy (copying onto the mod's own file makes WeiDU restore an old copy on
 // uninstall)
-COPY ~InventairePTEE/menu/inventory.menu~ ~weidu_external/InventairePTEE/inventory.menu~
+COPY ~InventairePSTEE/menu/inventory.menu~ ~weidu_external/InventairePSTEE/inventory.menu~
 	READ_ASCII 0 psinv_menu (SOURCE_SIZE)
 
 COPY_EXISTING ~UI.MENU~ ~override~
@@ -334,7 +334,7 @@ def main():
         f.write(menu)
     with open(os.path.join(MOD, "lua", "M_PSINV.lua"), "w", encoding="utf-8", newline="\n") as f:
         f.write(LUA)
-    with open(os.path.join(MOD, "InventairePTEE.tp2"), "w", encoding="utf-8", newline="\n") as f:
+    with open(os.path.join(MOD, "InventairePSTEE.tp2"), "w", encoding="utf-8", newline="\n") as f:
         f.write(TP2)
     print("mod written:", MOD)
 

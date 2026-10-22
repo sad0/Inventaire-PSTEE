@@ -1,4 +1,4 @@
-"""Paint the layout guide for variant H: serpentine pipes + material zones, in the PTEE (variant F) palette.
+"""Paint the layout guide for variant H: serpentine pipes + material zones, in the PSTEE (variant F) palette.
 
 The guide is fed to SwarmUI img2img (tools/swarm.py) so the generated art follows our pipe paths and zones.
 Output: design/art/h/guide_2x.png (2732x1366 = the 1366x683 area above the action bar, x2) + guide_mask.png
@@ -21,7 +21,7 @@ S = 2                       # guide scale
 OX = 171                    # 1024 frame -> 1366 screen
 W, H = 1366 * S, 683 * S
 
-# PTEE palette (measured on variant F + vanilla art)
+# PSTEE palette (measured on variant F + vanilla art)
 VOID = (8, 6, 4)
 PLATE = (43, 40, 30)
 PLATE_DARK = (25, 21, 14)

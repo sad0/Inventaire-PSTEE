@@ -1,5 +1,5 @@
 -- Debug: load the grid Lua, store backpack slot 18, refresh, print the view, take it back.
-dofile('E:/Enhanced Edition/Inventaire-PTEE/mod/InventairePTEE/lua/M_PSUI.lua')
+dofile('E:/Enhanced Edition/Inventaire-PSTEE/mod/InventairePSTEE/lua/M_PSUI.lua')
 print('PSC portrait ' .. tostring(PSUI_Portrait()))
 print('PSC add18 ' .. tostring(PSC_Add(PSUI_Portrait(), 18)))
 PSUI_Refresh()

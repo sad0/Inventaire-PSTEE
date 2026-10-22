@@ -1,4 +1,4 @@
-"""Extract PTEE inventory art and write a layer manifest for the GIMP builder.
+"""Extract PSTEE inventory art and write a layer manifest for the GIMP builder.
 
 Canvas = the INVENTORY menu frame (1024x768): GIMP pointer coordinates == UI.MENU 'area' coordinates.
 Hi-res game art is scaled to each item's area, like the engine does.
@@ -647,7 +647,7 @@ STONE = POPUP1_HI.crop([round(v * POPUP1_HI.width / 750) for v in (300, 146, 700
 
 
 def panel(w, h, b=20):
-    """PTEE-looking panel: rusty 9-slice border from the message bar, stone fill from POPUP1."""
+    """PSTEE-looking panel: rusty 9-slice border from the message bar, stone fill from POPUP1."""
     src = bg_piece("Message bar")
     sw, sh = src.size
     out = Image.new("RGBA", (w, h), (0, 0, 0, 0))
@@ -785,7 +785,7 @@ annotate("Party Stash D", "D grid backpack 2x10", (GX, GY, GW, 2 * STEP - 3), "m
 annotate("Party Stash D", "D grid stash 7x10", (GX, SY, GW, (SROWS - 1) * STEP + CELL), "mock")
 
 
-# ---- Variant E: LeUI layout (Party Stash BG2 look on LeUI), PTEE textures (John's pick, 2026-10-21)
+# ---- Variant E: LeUI layout (Party Stash BG2 look on LeUI), PSTEE textures (John's pick, 2026-10-21)
 # Positions are measured on docs/leui_bg2.png (1458x927) and mapped to the 1024x683 area above the action bar.
 LS, LY = 1024 / 1458, 16
 
@@ -855,7 +855,7 @@ for title_txt, hy, n, res, items in (("Quiver", 130, 5, "SLOTARW", ["BOLT01", "B
     for i, itm in enumerate(items):
         E_icon(itm, (qx + i * st, sy, cs, cs), count=40 if itm.startswith("BOLT") else None)
 
-# --- paperdoll: PTEE oval reduced, body slots around it like LeUI
+# --- paperdoll: PSTEE oval reduced, body slots around it like LeUI
 s = 0.56
 ox, oy = L(372, 196)[0] + 4, L(0, 196)[1]
 ov = bg_piece("Paperdoll oval")
@@ -866,7 +866,7 @@ dt = doll.copy()
 dt.thumbnail((round(pa[2] * s), round(pa[3] * s)), Image.LANCZOS)
 dx = ox + round((pa[0] - 154) * s) + (round(pa[2] * s) - dt.width) // 2
 dy = oy + round((pa[1] - 78) * s) + (round(pa[3] * s) - dt.height) // 2
-E_doll = group("E paperdoll (PTEE oval reduced x0.56)", [
+E_doll = group("E paperdoll (PSTEE oval reduced x0.56)", [
     layer("E oval frame (INVBG cut-out)", ov.resize((ovw, ovh), Image.LANCZOS), "ovalE", ox, oy),
     layer("E paperdoll IVPNOA", dt, "dollE", dx, dy),
 ])
@@ -970,7 +970,7 @@ E_right = [
     E_panel("E gold box", L(1092, 832, 135, 40), 8),
     E_text("E party gold", "1250", L(1092, 832, 135, 40), style="gold", point=16),
 ]
-varE = group("Variant E - LeUI layout with PTEE textures (John's pick)", [
+varE = group("Variant E - LeUI layout with PSTEE textures (John's pick)", [
     layer("E backdrop (INVBG darkened)", bdE, "E_backdrop", 0, 0),
     E_panel("E title bar", title, 14),
     E_text("E title", "Inventory", (title[0], title[1], title[2] - 260, title[3]), style="label", point=24,
@@ -985,7 +985,7 @@ varE = group("Variant E - LeUI layout with PTEE textures (John's pick)", [
 ], visible=True)
 varD["visible"] = False
 
-# ---- Variant F: art-direction guide (John, 2026-10-21): Variant E organisation, built only from PTEE pieces
+# ---- Variant F: art-direction guide (John, 2026-10-21): Variant E organisation, built only from PSTEE pieces
 # (WIRESBG cables, LOADBG frames, vanilla rails/frames/discs/plates), Lady of Pain (JRNLOP) as top keystone.
 def nine(src, w, h, l, t, r, b, k=1.0):
     """9-slice `src` (borders l,t,r,b in src px) into w x h; borders drawn at scale k."""
@@ -1220,7 +1220,7 @@ LAYOUT["buttons"] = {"close": (972, 4, 46, 46), "sort": (830, 85, 108, 28), "sto
                      "tabs": [(496 + i * 49, 122, 48, 22) for i in range(8)], "tab_names": TABS_SHORT}
 LAYOUT["menu"] = {"width": W, "height": H, "bg_offset": BG_OFF}
 
-varF = group("Variant F - Art guide: E layout built from PTEE pieces (WIRESBG, LOADBG, rails, frames)", [
+varF = group("Variant F - Art guide: E layout built from PSTEE pieces (WIRESBG, LOADBG, rails, frames)", [
     group("F background (cables)", F_bg),
     group("F left column", F_left),
     group("F paperdoll", F_doll),
@@ -1641,7 +1641,7 @@ varJ = group("Variant J - John's painted inventory, pieces detached (SwarmUI x2 
 ], visible=True)
 varH["visible"] = False
 
-mockups = group("Party Stash mockup (PTEE style)", [varC, varB, varA, varD, varE, varF, varG, varH, varJ])
+mockups = group("Party Stash mockup (PSTEE style)", [varC, varB, varA, varD, varE, varF, varG, varH, varJ])
 
 # ================================================================== 5. LIBRARY
 usage = {}
@@ -1755,7 +1755,7 @@ for n in g.names("ITM"):
         break
 lib_groups.append(group("Item icons (sample of 120)", icons, visible=False))
 lib_groups.append(group("Paperdolls (IVP*)", [dict(d, visible=True) for d in dolls], visible=False))
-library = group("Library (hidden - reusable PTEE art)", lib_groups, visible=False)
+library = group("Library (hidden - reusable PSTEE art)", lib_groups, visible=False)
 
 # ================================================================== 6. ANNOTATIONS
 annotations = group("Annotations (element names, sizes, coords)", [

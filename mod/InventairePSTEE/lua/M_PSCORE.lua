@@ -1,4 +1,4 @@
--- Inventaire PTEE, step 2a (John 2026-10-22): the stash core, ported from Party Stash BG (M_PSTASH.lua "Engine
+-- Inventaire PSTEE, step 2a (John 2026-10-22): the stash core, ported from Party Stash BG (M_PSTASH.lua "Engine
 -- functions" + "Store I/O"). The stash is a hidden bag store PSTASH.STO; items move with the engine's own store
 -- functions (CInfGame::AddItemToStore and friends), called through tiny lua_CFunction stubs wired to one whitelisted
 -- function each, prologue bytes checked first: on any other Torment.exe build the stash switches itself off.
@@ -23,7 +23,7 @@ local FUNCS = {
 }
 local PROBE = { 0x1402D1210, { 0x85, 0xD2, 0x0F, 0x84, 0x88, 0x00, 0x00, 0x00 } }  -- CInfGame::AddPartyGold
 
--- PTEE backpack = SLOT_MISC0..19 (SLOTS.IDS 15..34)
+-- PSTEE backpack = SLOT_MISC0..19 (SLOTS.IDS 15..34)
 P.BACKPACK_FIRST, P.BACKPACK_LAST = 15, 34
 
 local function bytesAt(addr, bytes)

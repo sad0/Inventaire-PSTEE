@@ -1,6 +1,6 @@
 """Build the in-game mod for variant J (John's painted inventory, detached animated pieces).
 
-Writes mod/InventairePTEE/ (same tp2 as tools/build_mod.py): PSIVBGJ.MOS (2x background), PSJ*.BAM (detached pieces,
+Writes mod/InventairePSTEE/ (same tp2 as tools/build_mod.py): PSIVBGJ.MOS (2x background), PSJ*.BAM (detached pieces,
 4 frames: normal / pressed / selected (hover) / disabled), menu/inventory.menu, lua/M_PSINV.lua.
 The stash grid, tabs, sort and store-all are drawn but inactive until the EEex stash (step 2).
 Usage: python tools/build_mod_j.py  (after tools/variant_j.py layout).
@@ -132,7 +132,7 @@ def part_frames(name, rect):
 
 
 HI = 3840 / 1366   # 4K art for the 1366x768 background area (MOS V2 is scaled to its area by the engine)
-PVRZ_BASE = 9100   # our PVRZ page numbers (vanilla PTEE uses MOS0000-MOS2011)
+PVRZ_BASE = 9100   # our PVRZ page numbers (vanilla PSTEE uses MOS0000-MOS2011)
 
 
 def write_pvrz(img, path):
@@ -343,7 +343,7 @@ menu
     return "".join(m)
 
 
-LUA_J = r'''-- Inventaire PTEE (Party Stash for Planescape: Torment EE), step 1: redesigned inventory page (art J).
+LUA_J = r'''-- Inventaire PSTEE (Party Stash for Planescape: Torment EE), step 1: redesigned inventory page (art J).
 psInvTexts = {
 	Quiver = 'Quiver', ['Quick Weapons'] = 'Quick Weapons', ['Quick Items'] = 'Quick Items',
 	AC = 'AC', THAC0 = 'THAC0', HP = 'HP', Damage = 'Damage', Sort = 'Sort: Auto', ['Store all'] = 'Store all',
@@ -494,7 +494,7 @@ local function psInvEquippedNames()
 	table.sort(out, function(a, b) return #a[1] > #b[1] end)
 	return out
 end
--- PTEE's AC breakdown also lists AC items carried in the backpack, then a "Bonus" line that cancels them
+-- PSTEE's AC breakdown also lists AC items carried in the backpack, then a "Bonus" line that cancels them
 -- (John 2026-10-22: "my character has none of that"). Keep the base line and the equipped items only (grouped by
 -- slot), and show what is left as "Other" = current AC - base - equipped items.
 function psInvGroupBySlot(text)
@@ -568,7 +568,7 @@ function psInvAPR()
 end
 
 -- HP block (John 2026-10-22): level-up hit die, Constitution bonus per level, "Other" = flat sum of every other
--- bonus the engine lists. PTEE has no HPCLASS/HPCONBON tables: AD&D 2e rules as in PST, hard-coded.
+-- bonus the engine lists. PSTEE has no HPCLASS/HPCONBON tables: AD&D 2e rules as in PST, hard-coded.
 -- Fighter 1d10 up to level 9 then +3; thief 1d6 up to 10 then +2; mage 1d4 up to 10 then +1.
 local PSINV_DIE = {[2] = {10, 9, 3}, [4] = {6, 10, 2}, [1] = {4, 10, 1}}
 local function psInvSprite()
@@ -674,9 +674,9 @@ def main():
         f.write(menu)
     with open(os.path.join(MOD, "lua", "M_PSINV.lua"), "w", encoding="utf-8", newline="\n") as f:
         f.write(LUA_J.replace("@MOVABLE@", ", ".join("'" + k + "'" for k in MOVABLE)))
-    tp2 = bm.TP2.replace("// The \"Art\" button swaps the two background styles (F = PTEE pieces, G = generated art).",
+    tp2 = bm.TP2.replace("// The \"Art\" button swaps the two background styles (F = PSTEE pieces, G = generated art).",
                          "// Art: John's painted inventory; tabs, bag, face, gauges and tubes are separate animated BAMs.")
-    with open(os.path.join(MOD, "InventairePTEE.tp2"), "w", encoding="utf-8", newline="\n") as f:
+    with open(os.path.join(MOD, "InventairePSTEE.tp2"), "w", encoding="utf-8", newline="\n") as f:
         f.write(tp2)
     print("mod J written:", MOD)
 
