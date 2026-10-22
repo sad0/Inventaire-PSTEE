@@ -103,6 +103,20 @@ local function resRef(res, offset)
 	return buf
 end
 
+-- Torment: CItemList m_items is a CItem** (EEex-PTEE note in B3AttackInfo.lua), not BG's array accessor.
+local function itemPtrAt(sp, slot)
+	return EEex_ReadPtr(EEex_UDToPtr(sp.m_equipment.m_items) + EEex_PtrSize * slot)
+end
+local function itemRes(ptr)
+	local t = {}
+	for i = 0, 7 do
+		local b = EEex_ReadU8(ptr + 8 + i)  -- CItem: CResHelper first, resref at +8
+		if b == 0 then break end
+		t[#t + 1] = string.char(b)
+	end
+	return string.upper(table.concat(t))
+end
+
 local function gamePtr() return EEex_UDToPtr(EEex_EngineGlobal_CBaldurChitin.m_pObjectGame) end
 
 -- Stash contents: { {res, count, uses, identified}, ... } in store order.
@@ -131,9 +145,9 @@ function PSC_Add(portrait, slot)
 	local ok, res, why = pcall(function()
 		local sp = EEex_Sprite_GetInPortrait(portrait)
 		if not sp then return false, 'no such portrait' end
-		local item = sp.m_equipment.m_items:get(slot)
-		if not item then return false, 'empty slot' end
-		local itemPtr, game, buf = EEex_UDToPtr(item), gamePtr(), P.scratch
+		local itemPtr = itemPtrAt(sp, slot)
+		if itemPtr == 0 then return false, 'empty slot' end
+		local game, buf = gamePtr(), P.scratch
 		EEex_Write32(buf + 24, -1)
 		if PSC_Eng_AddItemToStore(game, resRef(P.RES), itemPtr, buf + 24) % 256 == 0 then
 			return false, string.format('refused (0x%x)', EEex_ReadU32(buf + 24))
@@ -150,7 +164,7 @@ function PSC_Add(portrait, slot)
 end
 
 local function freeSlot(sp)
-	for i = P.BACKPACK_FIRST, P.BACKPACK_LAST do if not sp.m_equipment.m_items:get(i) then return i end end
+	for i = P.BACKPACK_FIRST, P.BACKPACK_LAST do if itemPtrAt(sp, i) == 0 then return i end end
 end
 
 -- Takes `itemRes` out of the stash into `portrait`'s backpack (a whole pile for stackable items).
@@ -172,6 +186,26 @@ function PSC_Take(portrait, itemRes)
 	return true
 end
 
+-- Console helpers (results in EEex.log): what each slot holds, add, take.
+function PSC_Slots(portrait)
+	local sp = EEex_Sprite_GetInPortrait(portrait or 0)
+	if not sp then print('PSC no portrait') return end
+	for i = 0, 38 do
+		local p = itemPtrAt(sp, i)
+		if p ~= 0 then print('PSC slot ' .. i .. ' ' .. itemRes(p)) end
+	end
+end
+
+function PSC_AddP(portrait, slot)
+	local ok, why = PSC_Add(portrait, slot)
+	print('PSC add ' .. tostring(ok) .. ' ' .. tostring(why))
+end
+
+function PSC_TakeP(portrait, res)
+	local ok, why = PSC_Take(portrait, res)
+	print('PSC take ' .. tostring(ok) .. ' ' .. tostring(why))
+end
+
 -- Console helper: prints readiness and the stash contents in the message log.
 function PSC_Test()
 	local ok = PSC_Ready()
@@ -181,6 +215,6 @@ function PSC_Test()
 	end
 	if P.lastError then lines[#lines + 1] = 'error: ' .. P.lastError end
 	local text = table.concat(lines, '\n')
-	Infinity_DisplayString(text)
+	print(text)  -- EEex.log (LPRINT)
 	return text
 end
