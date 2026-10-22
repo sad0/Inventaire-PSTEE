@@ -190,6 +190,16 @@ function psInvStatDetail(key)
 	local text = psInvShorten(key, tostring(psInvField(f[key]) or ''))
 	if key == 'AC' then text = psInvGroupBySlot(text) end
 	if key == 'Damage' then
+		local out = {}
+		for line in string.gmatch(text, '[^\n]+') do
+			for _, n in ipairs(psInvEquippedNames()) do
+				if string.sub(line, 1, #n[1]) == n[1] then line = n[2] .. string.sub(line, #n[1] + 1) break end
+			end
+			out[#out + 1] = line
+		end
+		text = table.concat(out, '\n')
+	end
+	if key == 'Damage' then
 		local apr = psInvAPR()
 		if apr then
 			text = text .. (text ~= '' and '\n' or '') .. psInvAPRLabel() .. string.format('%g', apr)

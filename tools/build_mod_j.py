@@ -64,6 +64,59 @@ def write_bam_v1(frames, path):
         f.write(out)
 
 
+def write_bam_cycles(cycles, path):
+    """BAM V1 with several cycles (lists of same-size RGBA frames)."""
+    frames = [f for cy in cycles for f in cy]
+    w, h = frames[0].size
+    sheet = Image.new("RGBA", (w, h * len(frames)))
+    for i, f in enumerate(frames):
+        sheet.paste(f, (0, i * h))
+    q = sheet.quantize(colors=255, method=Image.Quantize.FASTOCTREE)
+    pal = q.getpalette("RGBA")[:255 * 4]
+    pal += [0] * (255 * 4 - len(pal))
+    alpha = sheet.getchannel("A").tobytes()
+    raw = q.tobytes()
+    px = bytes(0 if alpha[i] < 12 else raw[i] + 1 for i in range(len(raw)))
+    entries = [struct.pack("<BBBB", 0, 255, 0, 0)]
+    for i in range(255):
+        r, g, b, a = pal[i * 4:i * 4 + 4]
+        entries.append(struct.pack("<BBBB", b, 254 if (r, g, b) == (0, 255, 0) else g, r, max(1, a)))
+    nfr, ncy = len(frames), len(cycles)
+    foff = 24
+    coff = foff + nfr * 12
+    poff = coff + ncy * 4
+    loff = poff + 1024
+    doff = loff + nfr * 2
+    out = bytearray(b"BAM V1  " + struct.pack("<HBBIII", nfr, ncy, 0, foff, poff, loff))
+    for i in range(nfr):
+        out += struct.pack("<HHhhI", w, h, 0, 0, (doff + i * w * h) | 0x80000000)
+    k = 0
+    for cy in cycles:
+        out += struct.pack("<HH", len(cy), k)
+        k += len(cy)
+    out += b"".join(entries) + b"".join(struct.pack("<H", i) for i in range(nfr)) + px
+    with open(path, "wb") as f:
+        f.write(out)
+
+
+def dark_copy(res, out_name, size, k=0.45):
+    """Darkened copy of a vanilla slot BAM (all cycles/frames) at `size` px (John 2026-10-22: no light grey squares)."""
+    import ie
+    g = ie.Game(r"E:\Enhanced Edition\Environnement de test\Planescape Torment Enhanced Edition")
+    cycles = []
+    for cy in ie.bam(g, res) or []:
+        frs = []
+        for im, _, _ in cy:
+            a = im.getchannel("A").resize((size, size), Image.LANCZOS)
+            rgb = ImageEnhance.Brightness(im.convert("RGB").resize((size, size), Image.LANCZOS)).enhance(k)
+            f = rgb.convert("RGBA")
+            f.putalpha(a)
+            frs.append(f)
+        if frs:
+            cycles.append(frs)
+    write_bam_cycles(cycles, os.path.join(MOD, "art", f"{out_name}.BAM"))
+
+
 def part_frames(name, rect):
     w, h = rect[2] * UP, rect[3] * UP
     base = Image.open(os.path.join(JD, "parts", f"{name}.png")).convert("RGBA").resize((w, h), Image.LANCZOS)
@@ -242,15 +295,15 @@ menu
     m.append("\ttext\n\t{\n\t\tarea 501 512 420 24\n\t\ttext lua \"psInvMessage()\"\n\t\ttext style normal\n"
              "\t\ttext point 12\n\t\ttext align left center\n\t}\n")
     for i, a in enumerate(L["quick weapons"]):
-        m.append(bm.slot(f"slot_inv_{1 + i}", a, "SLOTSWRD", i, f"weapon{i}"))
+        m.append(bm.slot(f"slot_inv_{1 + i}", a, "PSJSWRD", i, f"weapon{i}"))
     for i, a in enumerate(L["quick items"]):
-        m.append(bm.slot(f"slot_inv_{5 + i}", a, "SLOTITM", i, f"personal{i}"))
+        m.append(bm.slot(f"slot_inv_{5 + i}", a, "PSJITM", i, f"personal{i}"))
     for i, a in enumerate(L["quiver"]):
-        m.append(bm.slot(f"slot_inv_{15 + i}", a, "SLOTARW", i, f"quiver{i}"))
+        m.append(bm.slot(f"slot_inv_{15 + i}", a, "PSJARW", i, f"quiver{i}"))
     body_ids = {"chest0": 11, "wrist0": 12, "earringleft0": 13, "earringright0": 14, "tattoo0": 21, "ring0": 22,
                 "ring1": 23, "tattoo1": 24, "hand0": 25, "tattoo2": 26}
     for i, (nm, a) in enumerate(L["body"].items()):
-        m.append(bm.slot(f"slot_inv_{body_ids[nm]}", a, "IVSLOT", i % 10, nm))
+        m.append(bm.slot(f"slot_inv_{body_ids[nm]}", a, "PSJIVSL", i % 10, nm))
     for n, a in enumerate(L["backpack"]):
         m.append(bm.slot(f"slot_inv_{30 + n}", a, "PSJSLOT", 0, f"group{n}"))
     for n, a in enumerate(L["ground"]):
@@ -470,6 +523,16 @@ function psInvStatDetail(key)
 	local text = psInvShorten(key, tostring(psInvField(f[key]) or ''))
 	if key == 'AC' then text = psInvGroupBySlot(text) end
 	if key == 'Damage' then
+		local out = {}
+		for line in string.gmatch(text, '[^\n]+') do
+			for _, n in ipairs(psInvEquippedNames()) do
+				if string.sub(line, 1, #n[1]) == n[1] then line = n[2] .. string.sub(line, #n[1] + 1) break end
+			end
+			out[#out + 1] = line
+		end
+		text = table.concat(out, '\n')
+	end
+	if key == 'Damage' then
 		local apr = psInvAPR()
 		if apr then
 			text = text .. (text ~= '' and '\n' or '') .. psInvAPRLabel() .. string.format('%g', apr)
@@ -579,6 +642,15 @@ def main():
         os.remove(os.path.join(art, f))
     background()
     slot_bam()
+    q = L["quiver"][0][2]
+    b = list(L["body"].values())[0][2]
+    for res, out_name, size in (("SLOTSWRD", "PSJSWRD", q), ("SLOTITM", "PSJITM", q), ("SLOTARW", "PSJARW", q),
+                                ("IVSLOT", "PSJIVSL", b)):
+        dark_copy(res, out_name, size)
+    # body slot silhouettes (engine placeholders, inventory only): darkened in place
+    for res in ("IVPIEYER", "IVPIEARL", "IVPIEARR", "IVPICHST", "IVPIWRST", "IVPIHNDL", "IVPIHNDR", "IVPIRING",
+                "IVPITATT", "IVPILENS", "IVPITETH", "IVPIBOW"):
+        dark_copy(res, res, b, 0.55)
     for nm, res in BAMS.items():
         write_bam_v1(part_frames(nm, L["parts"][nm]), os.path.join(art, f"{res}.BAM"))
     menu = build_menu()
