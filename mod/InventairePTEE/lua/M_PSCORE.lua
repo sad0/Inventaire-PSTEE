@@ -110,7 +110,7 @@ end
 local function itemRes(ptr)
 	local t = {}
 	for i = 0, 7 do
-		local b = EEex_ReadU8(ptr + 8 + i)  -- CItem: CResHelper first, resref at +8
+		local b = EEex_ReadU8(ptr + 0x10 + i)  -- Torment CItem: vtable, pRes, then the resref at +0x10
 		if b == 0 then break end
 		t[#t + 1] = string.char(b)
 	end
@@ -131,7 +131,7 @@ function PSC_List()
 			local fi = type(data) == 'number' and EEex_PtrToUD(data, 'CStoreFileItem') or data
 			local ptr = type(data) == 'number' and data or EEex_UDToPtr(data)
 			out[#out + 1] = { res = string.upper(fi.m_itemId:get()), count = fi.m_nInStock,
-				uses = fi.m_usageCount:get(0), identified = EEex_BAnd(EEex_ReadU32(ptr + 0x10), 1) ~= 0 }
+				uses = fi.m_usageCount:get(0), identified = bit32.band(EEex_ReadU32(ptr + 0x10), 1) ~= 0 }
 		end)
 	end)
 	PSC_Eng_ReleaseServerStore(game, resRef(P.RES))
