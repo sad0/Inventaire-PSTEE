@@ -43,6 +43,14 @@ PROMPTS = {
     "disc_port": ("single round riveted copper porthole frame, organic corroded edges, empty very dark centre, "
                   "steampunk UI frame, centered, isolated on a plain pure black background"),
 }
+_BUB = (", steampunk biomechanical, dark corroded copper and rusted iron with brass rivets, organic, empty very dark "
+        "centre for a number, game UI stat frame, front view, centered, isolated on a plain pure black background")
+PROMPTS.update({
+    "bub_ac": "single heraldic shield-shaped frame" + _BUB,
+    "bub_thac0": "single four-pointed spiked star frame with a square centre" + _BUB,
+    "bub_hp": "single round ring frame covered with sharp spikes and thorns" + _BUB,
+    "bub_dmg": "single plain round ring frame, thick and worn" + _BUB,
+})
 WORN = (", worn and grimy: scratched tarnished dull dark purple glass, oxidized corroded copper with verdigris and rust "
         "stains, dark, low key light, aged game asset")
 for _k in ("btn_pill", "btn_round", "btn_wide", "disc_port"):

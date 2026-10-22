@@ -22,8 +22,7 @@ UP = 1  # MOS/BAM V1 are drawn 1:1 by the engine (no scaling to the area): keep 
 BAMS = {"tab1": "PSJTAB1", "tab2": "PSJTAB2", "tab3": "PSJTAB3", "tab4": "PSJTAB4", "tab5": "PSJTAB5",
         "tab6": "PSJTAB6", "tab7": "PSJTAB7", "tab8": "PSJTAB8", "tab_more": "PSJTABM", "close": "PSJCLOSE",
         "store_all": "PSJSTORE", "page_prev": "PSJPREV", "page_next": "PSJNEXT", "bag": "PSJBAG", "face": "PSJFACE",
-        "gauge_top": "PSJGTOP", "gauge_left": "PSJGLEFT", "gauge_right": "PSJGRGHT", "tube_left": "PSJTUBEL",
-        "tube_right": "PSJTUBER", "tube_mid": "PSJTUBEM"}
+}  # gauges and tubes are static art in bg_final_2x.png (John 2026-10-22: no animated pieces)
 
 
 def write_bam_v1(frames, path):
@@ -126,7 +125,7 @@ def background():
     bw, bh = L["menu"]["bg_size"]
     W4, H4 = 3840, 2160
     img = Image.new("RGB", (W4, H4), (0, 0, 0))
-    bg = Image.open(os.path.join(JD, "bg_dressed_2x.png")).convert("RGB").resize((round(bw * HI), round(bh * HI)),
+    bg = Image.open(os.path.join(JD, "bg_final_2x.png")).convert("RGB").resize((round(bw * HI), round(bh * HI)),
                                                                                  Image.LANCZOS)
     img.paste(bg, (round((171 + L["menu"]["bg_offset"]) * HI), 0))
     d = ImageDraw.Draw(img, "RGBA")
@@ -149,7 +148,23 @@ def slot_bam():
     write_bam_v1(frames, os.path.join(MOD, "art", "PSJSLOT.BAM"))
 
 
-def piece(name, kind="button", action=None, text_lua=None, point=None, tooltip_lua=None, seq=0, frame_lua=None):
+MOVABLE, HANDLES = [], []
+
+
+def movable(key, rect, **kw):
+    """Text label John can drag in placement mode (right-click on the face); its position is saved in the ini."""
+    MOVABLE.append(key)
+    s = bm.label(rect, **kw).replace("\tlabel\n\t{\n", f'\tlabel\n\t{{\n\t\tname "psinv_{key}"\n', 1)
+    a = bm.area(rect)
+    HANDLES.append(f'\tlabel\n\t{{\n\t\tname "psinvr_{key}"\n\t\tenabled "psInvEdit"\n\t\t{a}\n'
+                   f'\t\trectangle 1\n\t\trectangle opacity 90\n\t}}\n')
+    HANDLES.append(f'\thandle\n\t{{\n\t\tname "psinvh_{key}"\n\t\tenabled "psInvEdit"\n\t\t{a}\n'
+                   f'\t\tactionDrag "psInvDrag(\'{key}\', motionX, motionY)"\n\t}}\n')
+    return s
+
+
+def piece(name, kind="button", action=None, text_lua=None, point=None, tooltip_lua=None, seq=0, frame_lua=None,
+          font=None, action_alt=None):
     r = L["parts"][name]
     s = f"\t{kind}\n\t{{\n\t\t{bm.area(r)}\n\t\tbam \"{BAMS[name]}\"\n\t\tsequence {seq}\n"
     if frame_lua:
@@ -158,6 +173,10 @@ def piece(name, kind="button", action=None, text_lua=None, point=None, tooltip_l
         s += f'\t\ttext lua "{text_lua}"\n\t\ttext style "button"\n'
         if point:
             s += f"\t\ttext point {point}\n"
+        if font:
+            s += f'\t\ttext font "{font}"\n'
+    if action_alt:
+        s += f'\t\tactionAlt "{action_alt}"\n'
     if tooltip_lua:
         s += f'\t\ttooltip lua "{tooltip_lua}"\n'
     if action:
@@ -181,6 +200,7 @@ menu
 		pushSidebars()
 		doubleClickEventScheduled = nil
 		Infinity_SetBackground('BACKGROUND_INVENTORY')
+		psInvApplyPositions()
 	"
 	onClose
 	"
@@ -188,27 +208,26 @@ menu
 		Infinity_SetBackground(nil)
 	"
 """]
-    # decorative animated pieces (gauges flicker, tubes pulse): labels cycling frames 0/2
-    for nm in ("gauge_top", "gauge_left", "gauge_right", "tube_left", "tube_right", "tube_mid"):
-        m.append(piece(nm, "label", frame_lua=f"psInvPulse('{nm}')"))
     pd = L["paperdoll"]
     m.append(f'\tbutton\n\t{{\n\t\t{bm.area(pd)}\n\t\tpaperdoll 1\n\t\tactiondrag "Infinity_SwapWithAppearance()"\n\t}}\n')
     t = L["text"]
-    m.append(bm.label(t["name"], text_lua="characters[id].name", point=14))
-    m.append(bm.label(t["class"], text_lua="characters[id].class", point=14))
-    m.append(bm.label(t["weight"], text_lua="psInvWeight()", style="normal", point=15, align="left center",
-                      color_lua="getEncumbranceColor()"))
-    m.append(bm.label(t["gold"], text_lua="characters[id].gold", style="gold", point=16))
+    m.append(movable("name", t["name"], text_lua="characters[id].name", point=13, font="EXOCET"))
+    m.append(movable("class", t["class"], text_lua="characters[id].class", point=13, font="EXOCET"))
+    m.append(movable("weight", t["weight"], text_lua="psInvWeight()", style="normal", point=15, align="left center",
+                     color_lua="getEncumbranceColor()"))
+    m.append(movable("gold", t["gold"], text_lua="characters[id].gold", style="gold", point=16))
     for nm, r in L["titles"].items():
-        m.append(bm.label(r, text_lua=f"psInvText('{nm}')", point=14))
+        m.append(movable("title_" + nm.lower().replace(" ", "_"), r, text_lua=f"psInvText('{nm}')", point=13,
+                         font="EXOCET"))
     for nm, st in L["stats"].items():
         d = st["disc"]
-        m.append(bm.label((d[0], d[1] - 16, d[2], 14), text_lua=f"psInvText('{nm}')", style="normal", point=11,
-                          align="center top", color_lua="psInvYellow()"))
-        m.append(bm.label((d[0], d[1] + 14, d[2], 34), text_lua=f"psInvStat('{nm}')", point=15))
+        k = nm.lower()
+        m.append(movable(f"cap_{k}", (d[0] - 10, d[1] - 24, d[2] + 20, 16), text_lua=f"psInvText('{nm}')",
+                         style="normal", point=11, align="center center", color_lua="psInvYellow()", font="EXOCET"))
+        m.append(movable(f"val_{k}", d, text_lua=f"psInvStat('{nm}')", point=15, align="center center"))
         p = st["plate"]
-        m.append(bm.label((p[0] + 10, p[1] + 10, p[2] - 16, p[3] - 16), text_lua=f"psInvStatDetail('{nm}')",
-                          style="normal", point=12, align="left top"))
+        m.append(movable(f"det_{k}", (p[0] + 10, p[1] + 10, p[2] - 16, p[3] - 16),
+                         text_lua=f"psInvStatDetail('{nm}')", style="normal", point=11, align="left top"))
     m.append("\ttext\n\t{\n\t\tarea 501 512 420 24\n\t\ttext lua \"TEXT_inventoryError\"\n\t\ttext style normal\n"
              "\t\ttext point 12\n\t\ttext align left center\n\t}\n")
     for i, a in enumerate(L["quick weapons"]):
@@ -227,16 +246,21 @@ menu
         m.append(bm.slot(f"slot_inv_{68 + n}", a, "PSJSLOT", 0, f"ground{n}"))
     m.append(piece("page_prev", action="Infinity_OnGroundPage(-1)"))
     m.append(piece("page_next", action="Infinity_OnGroundPage(1)"))
-    m.append(bm.label(L["ground_page"],
-                      text_lua="Infinity_GetCurrentGroundPage()+1 .. '/' .. Infinity_GetMaxGroundPage()+1", point=13))
+    m.append(movable("ground_page", L["ground_page"],
+                     text_lua="Infinity_GetCurrentGroundPage()+1 .. '/' .. Infinity_GetMaxGroundPage()+1", point=13))
     for i in range(8):
-        m.append(piece(f"tab{i + 1}", text_lua=f"psInvTab({i + 1})", point=12, action=f"psInvSelectTab({i + 1})",
-                       frame_lua=f"psInvTabFrame({i + 1})"))
+        m.append(piece(f"tab{i + 1}", text_lua=f"psInvTab({i + 1})", point=11, action=f"psInvSelectTab({i + 1})",
+                       frame_lua=f"psInvTabFrame({i + 1})", font="EXOCET"))
     m.append(piece("tab_more"))
-    m.append(bm.label(L["buttons"]["sort"], text_lua="psInvText('Sort')", point=14, align="right center"))
+    m.append(movable("sort", L["buttons"]["sort"], text_lua="psInvText('Sort')", point=14, align="right center"))
     m.append(piece("store_all", text_lua="psInvText('Store all')", point=15))
     m.append(piece("bag", tooltip_lua="psInvWeight()"))
-    m.append(piece("face", action="Infinity_PushMenu('INVENTORY_HELP')", tooltip_lua="psInvText('Help')"))
+    m.append(piece("face", action="Infinity_PushMenu('INVENTORY_HELP')", tooltip_lua="psInvText('Help')",
+                   action_alt="psInvToggleEdit()"))
+    # placement mode banner + drag handles (drawn last, on top)
+    m.append(bm.label((300, 4, 420, 20), text_lua="psInvText('Edit')", style="normal", point=12,
+                      align="center center", enabled="psInvEdit", color_lua="psInvYellow()"))
+    m += HANDLES
     m.append(piece("close", action="e:GetActiveEngine():SelectEngine(worldScreen)"))
     m.append("}\n")
     return "".join(m)
@@ -246,7 +270,8 @@ LUA_J = r'''-- Inventaire PTEE (Party Stash for Planescape: Torment EE), step 1:
 psInvTexts = {
 	Quiver = 'Quiver', ['Quick Weapons'] = 'Quick Weapons', ['Quick Items'] = 'Quick Items',
 	AC = 'AC', THAC0 = 'THAC0', HP = 'HP', Damage = 'Damage', Sort = 'Sort: Auto', ['Store all'] = 'Store all',
-	Help = 'Help',
+	Help = 'Help (right-click: move the texts)',
+	Edit = 'Placement mode: drag the texts, right-click the face to finish',
 }
 psInvTabs = {'All', 'Weap.', 'Tatt.', 'Jewel', 'Eyes', 'Charm', 'Quest', 'Misc'}
 psInvActiveTab = 1
@@ -258,12 +283,27 @@ function psInvSelectTab(i) psInvActiveTab = i end
 -- selected tab shows the "selected" frame (2)
 function psInvTabFrame(i) if psInvActiveTab == i then return 2 end return 0 end
 
--- gauges and glass tubes: slow pulse between the normal (0) and lit (2) frames, each piece with its own phase
-psInvPhase = {gauge_top = 0, gauge_left = 7, gauge_right = 13, tube_left = 3, tube_right = 9, tube_mid = 5}
-function psInvPulse(name)
-	local t = math.floor(Infinity_GetClockTicks() / 400) + (psInvPhase[name] or 0)
-	if t % 6 == 0 then return 2 end
-	return 0
+-- Placement mode (John 2026-10-22): right-click on the face, drag the texts, right-click again to finish.
+-- Positions are saved in the game ini, section [Party Stash], keys pos_<text>.
+psInvEdit = false
+psInvMovable = {@MOVABLE@}
+local PARTS = {'psinv_', 'psinvh_', 'psinvr_'}
+function psInvToggleEdit() psInvEdit = not psInvEdit end
+local function psInvMove(key, x, y)
+	for _, p in ipairs(PARTS) do Infinity_SetArea(p .. key, x, y, nil, nil) end
+end
+function psInvDrag(key, dx, dy)
+	local x, y = Infinity_GetArea('psinv_' .. key)
+	x, y = x + dx, y + dy
+	psInvMove(key, x, y)
+	Infinity_SetINIValue('Party Stash', 'pos_' .. key, x .. ',' .. y)
+end
+function psInvApplyPositions()
+	for _, key in ipairs(psInvMovable) do
+		local v = Infinity_GetINIString('Party Stash', 'pos_' .. key, '')
+		local x, y = string.match(v or '', '(-?%d+),(-?%d+)')
+		if x then psInvMove(key, tonumber(x), tonumber(y)) end
+	end
 end
 
 function psInvYellow()
@@ -291,9 +331,12 @@ function psInvStat(key)
 	return ''
 end
 
--- detail lines come with EEex (step 2)
+-- Detail lines: the engine's own breakdown when the inventory table provides it (AC/HP/THAC0/damage .details).
 function psInvStatDetail(key)
-	return ''
+	local c = characters[id]
+	local f = {AC = function() return c.AC.details end, HP = function() return c.HP.details end,
+		THAC0 = function() return c.THAC0.details end, Damage = function() return c.damage.details end}
+	return tostring(psInvField(f[key]) or '')
 end
 '''
 
@@ -312,7 +355,7 @@ def main():
     with open(os.path.join(MOD, "menu", "inventory.menu"), "w", encoding="utf-8", newline="\n") as f:
         f.write(menu)
     with open(os.path.join(MOD, "lua", "M_PSINV.lua"), "w", encoding="utf-8", newline="\n") as f:
-        f.write(LUA_J)
+        f.write(LUA_J.replace("@MOVABLE@", ", ".join("'" + k + "'" for k in MOVABLE)))
     tp2 = bm.TP2.replace("// The \"Art\" button swaps the two background styles (F = PTEE pieces, G = generated art).",
                          "// Art: John's painted inventory; tabs, bag, face, gauges and tubes are separate animated BAMs.")
     with open(os.path.join(MOD, "InventairePTEE.tp2"), "w", encoding="utf-8", newline="\n") as f:

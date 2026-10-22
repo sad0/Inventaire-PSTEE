@@ -13,54 +13,13 @@ menu
 		pushSidebars()
 		doubleClickEventScheduled = nil
 		Infinity_SetBackground('BACKGROUND_INVENTORY')
+		psInvApplyPositions()
 	"
 	onClose
 	"
 		popSidebars()
 		Infinity_SetBackground(nil)
 	"
-	label
-	{
-		area 425 32 27 29
-		bam "PSJGTOP"
-		sequence 0
-		frame lua "psInvPulse('gauge_top')"
-	}
-	label
-	{
-		area -29 167 39 43
-		bam "PSJGLEFT"
-		sequence 0
-		frame lua "psInvPulse('gauge_left')"
-	}
-	label
-	{
-		area 1012 332 37 39
-		bam "PSJGRGHT"
-		sequence 0
-		frame lua "psInvPulse('gauge_right')"
-	}
-	label
-	{
-		area -25 245 28 86
-		bam "PSJTUBEL"
-		sequence 0
-		frame lua "psInvPulse('tube_left')"
-	}
-	label
-	{
-		area 1016 191 30 92
-		bam "PSJTUBER"
-		sequence 0
-		frame lua "psInvPulse('tube_right')"
-	}
-	label
-	{
-		area 425 122 26 102
-		bam "PSJTUBEM"
-		sequence 0
-		frame lua "psInvPulse('tube_mid')"
-	}
 	button
 	{
 		area 263 163 121 172
@@ -69,20 +28,25 @@ menu
 	}
 	label
 	{
+		name "psinv_name"
 		area 92 69 104 24
 		text lua "characters[id].name"
 		text style "label"
-		text point 14
+		text font "EXOCET"
+		text point 13
 	}
 	label
 	{
+		name "psinv_class"
 		area 196 69 95 24
 		text lua "characters[id].class"
 		text style "label"
-		text point 14
+		text font "EXOCET"
+		text point 13
 	}
 	label
 	{
+		name "psinv_weight"
 		area 567 71 171 22
 		text lua "psInvWeight()"
 		text style "normal"
@@ -92,6 +56,7 @@ menu
 	}
 	label
 	{
+		name "psinv_gold"
 		area 765 624 100 26
 		text lua "characters[id].gold"
 		text style "gold"
@@ -99,119 +64,145 @@ menu
 	}
 	label
 	{
+		name "psinv_title_quiver"
 		area 8 113 192 23
 		text lua "psInvText('Quiver')"
 		text style "label"
-		text point 14
+		text font "EXOCET"
+		text point 13
 	}
 	label
 	{
+		name "psinv_title_quick_weapons"
 		area 8 207 192 25
 		text lua "psInvText('Quick Weapons')"
 		text style "label"
-		text point 14
+		text font "EXOCET"
+		text point 13
 	}
 	label
 	{
+		name "psinv_title_quick_items"
 		area 8 303 192 25
 		text lua "psInvText('Quick Items')"
 		text style "label"
-		text point 14
+		text font "EXOCET"
+		text point 13
 	}
 	label
 	{
-		area 21 426 62 14
+		name "psinv_cap_ac"
+		area 11 418 82 16
 		text lua "psInvText('AC')"
 		text style "normal"
+		text font "EXOCET"
 		text point 11
 		text color lua "psInvYellow()"
-		text align center top
+		text align center center
 	}
 	label
 	{
-		area 21 456 62 34
+		name "psinv_val_ac"
+		area 21 442 62 62
 		text lua "psInvStat('AC')"
 		text style "label"
 		text point 15
+		text align center center
 	}
 	label
 	{
+		name "psinv_det_ac"
 		area 117 432 90 85
 		text lua "psInvStatDetail('AC')"
 		text style "normal"
-		text point 12
+		text point 11
 		text align left top
 	}
 	label
 	{
-		area 248 426 62 14
+		name "psinv_cap_thac0"
+		area 238 418 82 16
 		text lua "psInvText('THAC0')"
 		text style "normal"
+		text font "EXOCET"
 		text point 11
 		text color lua "psInvYellow()"
-		text align center top
+		text align center center
 	}
 	label
 	{
-		area 248 456 62 34
+		name "psinv_val_thac0"
+		area 248 442 62 62
 		text lua "psInvStat('THAC0')"
 		text style "label"
 		text point 15
+		text align center center
 	}
 	label
 	{
+		name "psinv_det_thac0"
 		area 326 432 118 85
 		text lua "psInvStatDetail('THAC0')"
 		text style "normal"
-		text point 12
+		text point 11
 		text align left top
 	}
 	label
 	{
-		area 21 536 62 14
+		name "psinv_cap_hp"
+		area 11 528 82 16
 		text lua "psInvText('HP')"
 		text style "normal"
+		text font "EXOCET"
 		text point 11
 		text color lua "psInvYellow()"
-		text align center top
+		text align center center
 	}
 	label
 	{
-		area 21 566 62 34
+		name "psinv_val_hp"
+		area 21 552 62 62
 		text lua "psInvStat('HP')"
 		text style "label"
 		text point 15
+		text align center center
 	}
 	label
 	{
+		name "psinv_det_hp"
 		area 117 544 90 85
 		text lua "psInvStatDetail('HP')"
 		text style "normal"
-		text point 12
+		text point 11
 		text align left top
 	}
 	label
 	{
-		area 248 536 62 14
+		name "psinv_cap_damage"
+		area 238 528 82 16
 		text lua "psInvText('Damage')"
 		text style "normal"
+		text font "EXOCET"
 		text point 11
 		text color lua "psInvYellow()"
-		text align center top
+		text align center center
 	}
 	label
 	{
-		area 248 566 62 34
+		name "psinv_val_damage"
+		area 248 552 62 62
 		text lua "psInvStat('Damage')"
 		text style "label"
 		text point 15
+		text align center center
 	}
 	label
 	{
+		name "psinv_det_damage"
 		area 326 544 118 85
 		text lua "psInvStatDetail('Damage')"
 		text style "normal"
-		text point 12
+		text point 11
 		text align left top
 	}
 	text
@@ -292,6 +283,7 @@ menu
 	}
 	label
 	{
+		name "psinv_ground_page"
 		area 930 548 80 20
 		text lua "Infinity_GetCurrentGroundPage()+1 .. '/' .. Infinity_GetMaxGroundPage()+1"
 		text style "label"
@@ -305,7 +297,8 @@ menu
 		frame lua "psInvTabFrame(1)"
 		text lua "psInvTab(1)"
 		text style "button"
-		text point 12
+		text point 11
+		text font "EXOCET"
 		action "psInvSelectTab(1)"
 	}
 	button
@@ -316,7 +309,8 @@ menu
 		frame lua "psInvTabFrame(2)"
 		text lua "psInvTab(2)"
 		text style "button"
-		text point 12
+		text point 11
+		text font "EXOCET"
 		action "psInvSelectTab(2)"
 	}
 	button
@@ -327,7 +321,8 @@ menu
 		frame lua "psInvTabFrame(3)"
 		text lua "psInvTab(3)"
 		text style "button"
-		text point 12
+		text point 11
+		text font "EXOCET"
 		action "psInvSelectTab(3)"
 	}
 	button
@@ -338,7 +333,8 @@ menu
 		frame lua "psInvTabFrame(4)"
 		text lua "psInvTab(4)"
 		text style "button"
-		text point 12
+		text point 11
+		text font "EXOCET"
 		action "psInvSelectTab(4)"
 	}
 	button
@@ -349,7 +345,8 @@ menu
 		frame lua "psInvTabFrame(5)"
 		text lua "psInvTab(5)"
 		text style "button"
-		text point 12
+		text point 11
+		text font "EXOCET"
 		action "psInvSelectTab(5)"
 	}
 	button
@@ -360,7 +357,8 @@ menu
 		frame lua "psInvTabFrame(6)"
 		text lua "psInvTab(6)"
 		text style "button"
-		text point 12
+		text point 11
+		text font "EXOCET"
 		action "psInvSelectTab(6)"
 	}
 	button
@@ -371,7 +369,8 @@ menu
 		frame lua "psInvTabFrame(7)"
 		text lua "psInvTab(7)"
 		text style "button"
-		text point 12
+		text point 11
+		text font "EXOCET"
 		action "psInvSelectTab(7)"
 	}
 	button
@@ -382,7 +381,8 @@ menu
 		frame lua "psInvTabFrame(8)"
 		text lua "psInvTab(8)"
 		text style "button"
-		text point 12
+		text point 11
+		text font "EXOCET"
 		action "psInvSelectTab(8)"
 	}
 	button
@@ -393,6 +393,7 @@ menu
 	}
 	label
 	{
+		name "psinv_sort"
 		area 759 71 123 22
 		text lua "psInvText('Sort')"
 		text style "label"
@@ -420,8 +421,334 @@ menu
 		area -21 4 71 78
 		bam "PSJFACE"
 		sequence 0
+		actionAlt "psInvToggleEdit()"
 		tooltip lua "psInvText('Help')"
 		action "Infinity_PushMenu('INVENTORY_HELP')"
+	}
+	label
+	{
+		enabled "psInvEdit"
+		area 300 4 420 20
+		text lua "psInvText('Edit')"
+		text style "normal"
+		text point 12
+		text color lua "psInvYellow()"
+		text align center center
+	}
+	label
+	{
+		name "psinvr_name"
+		enabled "psInvEdit"
+		area 92 69 104 24
+		rectangle 1
+		rectangle opacity 90
+	}
+	handle
+	{
+		name "psinvh_name"
+		enabled "psInvEdit"
+		area 92 69 104 24
+		actionDrag "psInvDrag('name', motionX, motionY)"
+	}
+	label
+	{
+		name "psinvr_class"
+		enabled "psInvEdit"
+		area 196 69 95 24
+		rectangle 1
+		rectangle opacity 90
+	}
+	handle
+	{
+		name "psinvh_class"
+		enabled "psInvEdit"
+		area 196 69 95 24
+		actionDrag "psInvDrag('class', motionX, motionY)"
+	}
+	label
+	{
+		name "psinvr_weight"
+		enabled "psInvEdit"
+		area 567 71 171 22
+		rectangle 1
+		rectangle opacity 90
+	}
+	handle
+	{
+		name "psinvh_weight"
+		enabled "psInvEdit"
+		area 567 71 171 22
+		actionDrag "psInvDrag('weight', motionX, motionY)"
+	}
+	label
+	{
+		name "psinvr_gold"
+		enabled "psInvEdit"
+		area 765 624 100 26
+		rectangle 1
+		rectangle opacity 90
+	}
+	handle
+	{
+		name "psinvh_gold"
+		enabled "psInvEdit"
+		area 765 624 100 26
+		actionDrag "psInvDrag('gold', motionX, motionY)"
+	}
+	label
+	{
+		name "psinvr_title_quiver"
+		enabled "psInvEdit"
+		area 8 113 192 23
+		rectangle 1
+		rectangle opacity 90
+	}
+	handle
+	{
+		name "psinvh_title_quiver"
+		enabled "psInvEdit"
+		area 8 113 192 23
+		actionDrag "psInvDrag('title_quiver', motionX, motionY)"
+	}
+	label
+	{
+		name "psinvr_title_quick_weapons"
+		enabled "psInvEdit"
+		area 8 207 192 25
+		rectangle 1
+		rectangle opacity 90
+	}
+	handle
+	{
+		name "psinvh_title_quick_weapons"
+		enabled "psInvEdit"
+		area 8 207 192 25
+		actionDrag "psInvDrag('title_quick_weapons', motionX, motionY)"
+	}
+	label
+	{
+		name "psinvr_title_quick_items"
+		enabled "psInvEdit"
+		area 8 303 192 25
+		rectangle 1
+		rectangle opacity 90
+	}
+	handle
+	{
+		name "psinvh_title_quick_items"
+		enabled "psInvEdit"
+		area 8 303 192 25
+		actionDrag "psInvDrag('title_quick_items', motionX, motionY)"
+	}
+	label
+	{
+		name "psinvr_cap_ac"
+		enabled "psInvEdit"
+		area 11 418 82 16
+		rectangle 1
+		rectangle opacity 90
+	}
+	handle
+	{
+		name "psinvh_cap_ac"
+		enabled "psInvEdit"
+		area 11 418 82 16
+		actionDrag "psInvDrag('cap_ac', motionX, motionY)"
+	}
+	label
+	{
+		name "psinvr_val_ac"
+		enabled "psInvEdit"
+		area 21 442 62 62
+		rectangle 1
+		rectangle opacity 90
+	}
+	handle
+	{
+		name "psinvh_val_ac"
+		enabled "psInvEdit"
+		area 21 442 62 62
+		actionDrag "psInvDrag('val_ac', motionX, motionY)"
+	}
+	label
+	{
+		name "psinvr_det_ac"
+		enabled "psInvEdit"
+		area 117 432 90 85
+		rectangle 1
+		rectangle opacity 90
+	}
+	handle
+	{
+		name "psinvh_det_ac"
+		enabled "psInvEdit"
+		area 117 432 90 85
+		actionDrag "psInvDrag('det_ac', motionX, motionY)"
+	}
+	label
+	{
+		name "psinvr_cap_thac0"
+		enabled "psInvEdit"
+		area 238 418 82 16
+		rectangle 1
+		rectangle opacity 90
+	}
+	handle
+	{
+		name "psinvh_cap_thac0"
+		enabled "psInvEdit"
+		area 238 418 82 16
+		actionDrag "psInvDrag('cap_thac0', motionX, motionY)"
+	}
+	label
+	{
+		name "psinvr_val_thac0"
+		enabled "psInvEdit"
+		area 248 442 62 62
+		rectangle 1
+		rectangle opacity 90
+	}
+	handle
+	{
+		name "psinvh_val_thac0"
+		enabled "psInvEdit"
+		area 248 442 62 62
+		actionDrag "psInvDrag('val_thac0', motionX, motionY)"
+	}
+	label
+	{
+		name "psinvr_det_thac0"
+		enabled "psInvEdit"
+		area 326 432 118 85
+		rectangle 1
+		rectangle opacity 90
+	}
+	handle
+	{
+		name "psinvh_det_thac0"
+		enabled "psInvEdit"
+		area 326 432 118 85
+		actionDrag "psInvDrag('det_thac0', motionX, motionY)"
+	}
+	label
+	{
+		name "psinvr_cap_hp"
+		enabled "psInvEdit"
+		area 11 528 82 16
+		rectangle 1
+		rectangle opacity 90
+	}
+	handle
+	{
+		name "psinvh_cap_hp"
+		enabled "psInvEdit"
+		area 11 528 82 16
+		actionDrag "psInvDrag('cap_hp', motionX, motionY)"
+	}
+	label
+	{
+		name "psinvr_val_hp"
+		enabled "psInvEdit"
+		area 21 552 62 62
+		rectangle 1
+		rectangle opacity 90
+	}
+	handle
+	{
+		name "psinvh_val_hp"
+		enabled "psInvEdit"
+		area 21 552 62 62
+		actionDrag "psInvDrag('val_hp', motionX, motionY)"
+	}
+	label
+	{
+		name "psinvr_det_hp"
+		enabled "psInvEdit"
+		area 117 544 90 85
+		rectangle 1
+		rectangle opacity 90
+	}
+	handle
+	{
+		name "psinvh_det_hp"
+		enabled "psInvEdit"
+		area 117 544 90 85
+		actionDrag "psInvDrag('det_hp', motionX, motionY)"
+	}
+	label
+	{
+		name "psinvr_cap_damage"
+		enabled "psInvEdit"
+		area 238 528 82 16
+		rectangle 1
+		rectangle opacity 90
+	}
+	handle
+	{
+		name "psinvh_cap_damage"
+		enabled "psInvEdit"
+		area 238 528 82 16
+		actionDrag "psInvDrag('cap_damage', motionX, motionY)"
+	}
+	label
+	{
+		name "psinvr_val_damage"
+		enabled "psInvEdit"
+		area 248 552 62 62
+		rectangle 1
+		rectangle opacity 90
+	}
+	handle
+	{
+		name "psinvh_val_damage"
+		enabled "psInvEdit"
+		area 248 552 62 62
+		actionDrag "psInvDrag('val_damage', motionX, motionY)"
+	}
+	label
+	{
+		name "psinvr_det_damage"
+		enabled "psInvEdit"
+		area 326 544 118 85
+		rectangle 1
+		rectangle opacity 90
+	}
+	handle
+	{
+		name "psinvh_det_damage"
+		enabled "psInvEdit"
+		area 326 544 118 85
+		actionDrag "psInvDrag('det_damage', motionX, motionY)"
+	}
+	label
+	{
+		name "psinvr_ground_page"
+		enabled "psInvEdit"
+		area 930 548 80 20
+		rectangle 1
+		rectangle opacity 90
+	}
+	handle
+	{
+		name "psinvh_ground_page"
+		enabled "psInvEdit"
+		area 930 548 80 20
+		actionDrag "psInvDrag('ground_page', motionX, motionY)"
+	}
+	label
+	{
+		name "psinvr_sort"
+		enabled "psInvEdit"
+		area 759 71 123 22
+		rectangle 1
+		rectangle opacity 90
+	}
+	handle
+	{
+		name "psinvh_sort"
+		enabled "psInvEdit"
+		area 759 71 123 22
+		actionDrag "psInvDrag('sort', motionX, motionY)"
 	}
 	button
 	{

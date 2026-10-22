@@ -2,7 +2,8 @@
 psInvTexts = {
 	Quiver = 'Quiver', ['Quick Weapons'] = 'Quick Weapons', ['Quick Items'] = 'Quick Items',
 	AC = 'AC', THAC0 = 'THAC0', HP = 'HP', Damage = 'Damage', Sort = 'Sort: Auto', ['Store all'] = 'Store all',
-	Help = 'Help',
+	Help = 'Help (right-click: move the texts)',
+	Edit = 'Placement mode: drag the texts, right-click the face to finish',
 }
 psInvTabs = {'All', 'Weap.', 'Tatt.', 'Jewel', 'Eyes', 'Charm', 'Quest', 'Misc'}
 psInvActiveTab = 1
@@ -14,12 +15,27 @@ function psInvSelectTab(i) psInvActiveTab = i end
 -- selected tab shows the "selected" frame (2)
 function psInvTabFrame(i) if psInvActiveTab == i then return 2 end return 0 end
 
--- gauges and glass tubes: slow pulse between the normal (0) and lit (2) frames, each piece with its own phase
-psInvPhase = {gauge_top = 0, gauge_left = 7, gauge_right = 13, tube_left = 3, tube_right = 9, tube_mid = 5}
-function psInvPulse(name)
-	local t = math.floor(Infinity_GetClockTicks() / 400) + (psInvPhase[name] or 0)
-	if t % 6 == 0 then return 2 end
-	return 0
+-- Placement mode (John 2026-10-22): right-click on the face, drag the texts, right-click again to finish.
+-- Positions are saved in the game ini, section [Party Stash], keys pos_<text>.
+psInvEdit = false
+psInvMovable = {'name', 'class', 'weight', 'gold', 'title_quiver', 'title_quick_weapons', 'title_quick_items', 'cap_ac', 'val_ac', 'det_ac', 'cap_thac0', 'val_thac0', 'det_thac0', 'cap_hp', 'val_hp', 'det_hp', 'cap_damage', 'val_damage', 'det_damage', 'ground_page', 'sort'}
+local PARTS = {'psinv_', 'psinvh_', 'psinvr_'}
+function psInvToggleEdit() psInvEdit = not psInvEdit end
+local function psInvMove(key, x, y)
+	for _, p in ipairs(PARTS) do Infinity_SetArea(p .. key, x, y, nil, nil) end
+end
+function psInvDrag(key, dx, dy)
+	local x, y = Infinity_GetArea('psinv_' .. key)
+	x, y = x + dx, y + dy
+	psInvMove(key, x, y)
+	Infinity_SetINIValue('Party Stash', 'pos_' .. key, x .. ',' .. y)
+end
+function psInvApplyPositions()
+	for _, key in ipairs(psInvMovable) do
+		local v = Infinity_GetINIString('Party Stash', 'pos_' .. key, '')
+		local x, y = string.match(v or '', '(-?%d+),(-?%d+)')
+		if x then psInvMove(key, tonumber(x), tonumber(y)) end
+	end
 end
 
 function psInvYellow()
@@ -47,7 +63,10 @@ function psInvStat(key)
 	return ''
 end
 
--- detail lines come with EEex (step 2)
+-- Detail lines: the engine's own breakdown when the inventory table provides it (AC/HP/THAC0/damage .details).
 function psInvStatDetail(key)
-	return ''
+	local c = characters[id]
+	local f = {AC = function() return c.AC.details end, HP = function() return c.HP.details end,
+		THAC0 = function() return c.THAC0.details end, Damage = function() return c.damage.details end}
+	return tostring(psInvField(f[key]) or '')
 end

@@ -1543,7 +1543,7 @@ varG["visible"] = False
 # geometry in design/build/layout_j.json (tools/variant_j.py). Detached pieces get hover/pressed/disabled states.
 LJ = json.load(open(os.path.join(BUILD, "layout_j.json"), encoding="utf-8"))
 JD = os.path.join(ROOT, "design", "art", "j")
-j_bg = Image.open(os.path.join(JD, "bg_dressed_2x.png")).convert("RGBA").resize(tuple(LJ["menu"]["bg_size"]),
+j_bg = Image.open(os.path.join(JD, "bg_final_2x.png")).convert("RGBA").resize(tuple(LJ["menu"]["bg_size"]),
                                                                               Image.LANCZOS)
 
 
@@ -1628,7 +1628,7 @@ for i in range(55):
     J_icon(STASH_ITEMS[i % len(STASH_ITEMS)], LJ["stash"][i], tint=mk[1] if mk and mk[0] == "tint" else None,
            count=mk[1] if mk and mk[0] == "count" else None, plus=bool(mk and mk[0] == "plus"))
 J_icon("CLUB2", LJ["ground"][0])
-J_parts = [part_states(nm, LJ["parts"][nm]) for nm in LJ["parts"]]
+J_parts = [part_states(nm, LJ["parts"][nm]) for nm in LJ["parts"] if not nm.startswith(("gauge", "tube"))]
 varJ = group("Variant J - John's painted inventory, pieces detached (SwarmUI x2 + inpaint)", [
     layer("J background (bg_clean_2x, 1083x683 @ -30,0)", j_bg, "J_bg", LJ["menu"]["bg_offset"], 0),
     group("J paperdoll", [layer("J paperdoll IVPNOA", dollJ, "dollJ", pdJ[0] + (pdJ[2] - dollJ.width) // 2,
