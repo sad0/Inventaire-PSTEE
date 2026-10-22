@@ -29,7 +29,7 @@ menu
 	label
 	{
 		name "psinv_name"
-		area 92 69 104 24
+		area 104 73 104 24
 		text lua "characters[id].name"
 		text style "label"
 		text font "EXOCET"
@@ -38,7 +38,7 @@ menu
 	label
 	{
 		name "psinv_class"
-		area 196 69 95 24
+		area 276 74 95 24
 		text lua "characters[id].class"
 		text style "label"
 		text font "EXOCET"
@@ -47,7 +47,7 @@ menu
 	label
 	{
 		name "psinv_weight"
-		area 567 71 171 22
+		area 553 75 171 22
 		text lua "psInvWeight()"
 		text style "normal"
 		text point 15
@@ -65,7 +65,7 @@ menu
 	label
 	{
 		name "psinv_title_quiver"
-		area 8 113 192 23
+		area 8 117 192 23
 		text lua "psInvText('Quiver')"
 		text style "label"
 		text font "EXOCET"
@@ -74,7 +74,7 @@ menu
 	label
 	{
 		name "psinv_title_quick_weapons"
-		area 8 207 192 25
+		area 9 212 192 25
 		text lua "psInvText('Quick Weapons')"
 		text style "label"
 		text font "EXOCET"
@@ -83,7 +83,7 @@ menu
 	label
 	{
 		name "psinv_title_quick_items"
-		area 8 303 192 25
+		area 9 307 192 25
 		text lua "psInvText('Quick Items')"
 		text style "label"
 		text font "EXOCET"
@@ -103,7 +103,7 @@ menu
 	label
 	{
 		name "psinv_val_ac"
-		area 21 442 62 62
+		area 20 442 62 62
 		text lua "psInvStat('AC')"
 		text style "label"
 		text point 15
@@ -112,7 +112,7 @@ menu
 	label
 	{
 		name "psinv_det_ac"
-		area 117 432 90 85
+		area 122 418 90 85
 		text lua "psInvStatDetail('AC')"
 		text style "normal"
 		text point 10
@@ -142,7 +142,7 @@ menu
 	label
 	{
 		name "psinv_det_thac0"
-		area 326 432 118 85
+		area 347 425 118 85
 		text lua "psInvStatDetail('THAC0')"
 		text style "normal"
 		text point 10
@@ -172,7 +172,7 @@ menu
 	label
 	{
 		name "psinv_det_hp"
-		area 117 544 90 85
+		area 123 541 90 85
 		text lua "psInvStatDetail('HP')"
 		text style "normal"
 		text point 10
@@ -202,7 +202,7 @@ menu
 	label
 	{
 		name "psinv_det_damage"
-		area 326 544 118 85
+		area 349 540 118 85
 		text lua "psInvStatDetail('Damage')"
 		text style "normal"
 		text point 10
@@ -398,7 +398,7 @@ menu
 	label
 	{
 		name "psinv_sort"
-		area 759 71 123 22
+		area 751 74 123 22
 		text lua "psInvText('Sort')"
 		text style "label"
 		text point 14
@@ -443,7 +443,7 @@ menu
 	{
 		name "psinvr_name"
 		enabled "psInvEdit"
-		area 92 69 104 24
+		area 104 73 104 24
 		rectangle 1
 		rectangle opacity 90
 	}
@@ -451,14 +451,14 @@ menu
 	{
 		name "psinvh_name"
 		enabled "psInvEdit"
-		area 92 69 104 24
+		area 104 73 104 24
 		actionDrag "psInvDrag('name', motionX, motionY)"
 	}
 	label
 	{
 		name "psinvr_class"
 		enabled "psInvEdit"
-		area 196 69 95 24
+		area 276 74 95 24
 		rectangle 1
 		rectangle opacity 90
 	}
@@ -466,14 +466,14 @@ menu
 	{
 		name "psinvh_class"
 		enabled "psInvEdit"
-		area 196 69 95 24
+		area 276 74 95 24
 		actionDrag "psInvDrag('class', motionX, motionY)"
 	}
 	label
 	{
 		name "psinvr_weight"
 		enabled "psInvEdit"
-		area 567 71 171 22
+		area 553 75 171 22
 		rectangle 1
 		rectangle opacity 90
 	}
@@ -481,7 +481,7 @@ menu
 	{
 		name "psinvh_weight"
 		enabled "psInvEdit"
-		area 567 71 171 22
+		area 553 75 171 22
 		actionDrag "psInvDrag('weight', motionX, motionY)"
 	}
 	label
@@ -503,7 +503,7 @@ menu
 	{
 		name "psinvr_title_quiver"
 		enabled "psInvEdit"
-		area 8 113 192 23
+		area 8 117 192 23
 		rectangle 1
 		rectangle opacity 90
 	}
@@ -511,14 +511,14 @@ menu
 	{
 		name "psinvh_title_quiver"
 		enabled "psInvEdit"
-		area 8 113 192 23
+		area 8 117 192 23
 		actionDrag "psInvDrag('title_quiver', motionX, motionY)"
 	}
 	label
 	{
 		name "psinvr_title_quick_weapons"
 		enabled "psInvEdit"
-		area 8 207 192 25
+		area 9 212 192 25
 		rectangle 1
 		rectangle opacity 90
 	}
@@ -526,14 +526,14 @@ menu
 	{
 		name "psinvh_title_quick_weapons"
 		enabled "psInvEdit"
-		area 8 207 192 25
+		area 9 212 192 25
 		actionDrag "psInvDrag('title_quick_weapons', motionX, motionY)"
 	}
 	label
 	{
 		name "psinvr_title_quick_items"
 		enabled "psInvEdit"
-		area 8 303 192 25
+		area 9 307 192 25
 		rectangle 1
 		rectangle opacity 90
 	}
@@ -541,7 +541,7 @@ menu
 	{
 		name "psinvh_title_quick_items"
 		enabled "psInvEdit"
-		area 8 303 192 25
+		area 9 307 192 25
 		actionDrag "psInvDrag('title_quick_items', motionX, motionY)"
 	}
 	label
@@ -563,7 +563,7 @@ menu
 	{
 		name "psinvr_val_ac"
 		enabled "psInvEdit"
-		area 21 442 62 62
+		area 20 442 62 62
 		rectangle 1
 		rectangle opacity 90
 	}
@@ -571,14 +571,14 @@ menu
 	{
 		name "psinvh_val_ac"
 		enabled "psInvEdit"
-		area 21 442 62 62
+		area 20 442 62 62
 		actionDrag "psInvDrag('val_ac', motionX, motionY)"
 	}
 	label
 	{
 		name "psinvr_det_ac"
 		enabled "psInvEdit"
-		area 117 432 90 85
+		area 122 418 90 85
 		rectangle 1
 		rectangle opacity 90
 	}
@@ -586,7 +586,7 @@ menu
 	{
 		name "psinvh_det_ac"
 		enabled "psInvEdit"
-		area 117 432 90 85
+		area 122 418 90 85
 		actionDrag "psInvDrag('det_ac', motionX, motionY)"
 	}
 	label
@@ -623,7 +623,7 @@ menu
 	{
 		name "psinvr_det_thac0"
 		enabled "psInvEdit"
-		area 326 432 118 85
+		area 347 425 118 85
 		rectangle 1
 		rectangle opacity 90
 	}
@@ -631,7 +631,7 @@ menu
 	{
 		name "psinvh_det_thac0"
 		enabled "psInvEdit"
-		area 326 432 118 85
+		area 347 425 118 85
 		actionDrag "psInvDrag('det_thac0', motionX, motionY)"
 	}
 	label
@@ -668,7 +668,7 @@ menu
 	{
 		name "psinvr_det_hp"
 		enabled "psInvEdit"
-		area 117 544 90 85
+		area 123 541 90 85
 		rectangle 1
 		rectangle opacity 90
 	}
@@ -676,7 +676,7 @@ menu
 	{
 		name "psinvh_det_hp"
 		enabled "psInvEdit"
-		area 117 544 90 85
+		area 123 541 90 85
 		actionDrag "psInvDrag('det_hp', motionX, motionY)"
 	}
 	label
@@ -713,7 +713,7 @@ menu
 	{
 		name "psinvr_det_damage"
 		enabled "psInvEdit"
-		area 326 544 118 85
+		area 349 540 118 85
 		rectangle 1
 		rectangle opacity 90
 	}
@@ -721,7 +721,7 @@ menu
 	{
 		name "psinvh_det_damage"
 		enabled "psInvEdit"
-		area 326 544 118 85
+		area 349 540 118 85
 		actionDrag "psInvDrag('det_damage', motionX, motionY)"
 	}
 	label
@@ -743,7 +743,7 @@ menu
 	{
 		name "psinvr_sort"
 		enabled "psInvEdit"
-		area 759 71 123 22
+		area 751 74 123 22
 		rectangle 1
 		rectangle opacity 90
 	}
@@ -751,7 +751,7 @@ menu
 	{
 		name "psinvh_sort"
 		enabled "psInvEdit"
-		area 759 71 123 22
+		area 751 74 123 22
 		actionDrag "psInvDrag('sort', motionX, motionY)"
 	}
 	button
