@@ -25,10 +25,10 @@ COPY_EXISTING ~BARSE.STO~ ~override/PSTASH.STO~
 	WRITE_LONG  0x38 0            // no starting stock
 	SET list_off = SOURCE_SIZE
 	WRITE_LONG  0x2c list_off
-	WRITE_LONG  0x30 73
-	INSERT_BYTES list_off (73 * 4)
+	WRITE_LONG  0x30 80           // PST item types go up to 77 (74 eyes, 75 earrings, 76 teeth, 77 charms)
+	INSERT_BYTES list_off (80 * 4)
 	SET n = 0
-	FOR (t = 0; t < 74; ++t) BEGIN
+	FOR (t = 0; t < 81; ++t) BEGIN
 		PATCH_IF (t != 36) BEGIN
 			WRITE_LONG (list_off + n * 4) t
 			SET n += 1
