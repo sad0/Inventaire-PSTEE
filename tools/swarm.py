@@ -51,6 +51,9 @@ PROMPTS.update({
     "bub_hp": "single round ring frame covered with sharp spikes and thorns" + _BUB,
     "bub_dmg": "single plain round ring frame, thick and worn" + _BUB,
 })
+PROMPTS["coins"] = ("low side view of a small mound of ancient hand-struck copper and bronze coins heaped high, some "
+                    "stacks leaning, corroded with verdigris, dark and grimy, warm copper glints, steampunk fantasy, "
+                    "painterly, centered, isolated on a plain pure black background, no frame, no logo")
 WORN = (", worn and grimy: scratched tarnished dull dark purple glass, oxidized corroded copper with verdigris and rust "
         "stains, dark, low key light, aged game asset")
 for _k in ("btn_pill", "btn_round", "btn_wide", "disc_port"):

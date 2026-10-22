@@ -138,7 +138,7 @@ def layout():
         top = 615 if ry < 800 else 778
         L["stats"][nm] = {"disc": (cx - 31, cy - 31, 62, 62), "plate": FB((px0, top, px1, top + 148))}
     # right column: backpack 2x10 above the rod (ref y 330), stash 6x10 under it, ground 1x10 row at the bottom
-    L["backpack"] = [(501 + c * 50, 137 + r * 43, 40, 40) for c in range(10) for r in range(2)]
+    L["backpack"] = [(501 + c * 50, 134 + r * 46, 40, 40) for c in range(10) for r in range(2)]  # stash spacing
     L["stash"] = [(501 + c * 50, 238 + r * 46, 40, 40) for r in range(6) for c in range(10)]
     L["ground"] = [(501 + c * 42, 540, 38, 38) for c in range(10)]
     L["ground_prev"], L["ground_next"] = L["parts"]["page_prev"], L["parts"]["page_next"]
@@ -150,6 +150,16 @@ def layout():
                     "tabs": [L["parts"][f"tab{i + 1}"] for i in range(8)], "tab_names":
                         ["All", "Weap.", "Tatt.", "Jewel", "Eyes", "Charm", "Quest", "Misc"],
                     "tab_more": L["parts"]["tab_more"], "bag": L["parts"]["bag"], "face": L["parts"]["face"]}
+    # tabs centred in the right panel, the round "more" button removed (John 2026-10-22)
+    tabs = [L["parts"][f"tab{i + 1}"] for i in range(8)]
+    zone_c = (F(750, 0)[0] + F(1515, 0)[0]) / 2
+    shift = round(zone_c - (tabs[0][0] + tabs[-1][0] + tabs[-1][2]) / 2)
+    for i in range(8):
+        x, y, w, h = L["parts"][f"tab{i + 1}"]
+        L["parts"][f"tab{i + 1}"] = (x + shift, y, w, h)
+    L["buttons"]["tabs"] = [L["parts"][f"tab{i + 1}"] for i in range(8)]
+    L["parts"].pop("tab_more", None)
+    L["buttons"].pop("tab_more", None)
     with open(os.path.join(ROOT, "design", "build", "layout_j.json"), "w", encoding="utf-8") as f:
         json.dump(L, f, indent=1)
     print("layout_j.json written")

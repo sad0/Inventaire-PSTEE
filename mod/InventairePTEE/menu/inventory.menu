@@ -34,6 +34,7 @@ menu
 		text style "label"
 		text font "EXOCET"
 		text point 13
+		text color lua "psInvYellow()"
 	}
 	label
 	{
@@ -43,6 +44,7 @@ menu
 		text style "label"
 		text font "EXOCET"
 		text point 13
+		text color lua "psInvYellow()"
 	}
 	label
 	{
@@ -51,7 +53,7 @@ menu
 		text lua "psInvWeight()"
 		text style "normal"
 		text point 15
-		text color lua "getEncumbranceColor()"
+		text color lua "psInvWeightColor()"
 		text align left center
 	}
 	label
@@ -61,6 +63,7 @@ menu
 		text lua "characters[id].gold"
 		text style "gold"
 		text point 16
+		text color lua "psInvYellow()"
 	}
 	label
 	{
@@ -70,6 +73,7 @@ menu
 		text style "label"
 		text font "EXOCET"
 		text point 13
+		text color lua "psInvYellow()"
 	}
 	label
 	{
@@ -79,6 +83,7 @@ menu
 		text style "label"
 		text font "EXOCET"
 		text point 13
+		text color lua "psInvYellow()"
 	}
 	label
 	{
@@ -88,6 +93,7 @@ menu
 		text style "label"
 		text font "EXOCET"
 		text point 13
+		text color lua "psInvYellow()"
 	}
 	label
 	{
@@ -107,6 +113,7 @@ menu
 		text lua "psInvStat('AC')"
 		text style "label"
 		text point 15
+		text color lua "psInvWhite()"
 		text align center center
 	}
 	label
@@ -116,7 +123,7 @@ menu
 		text lua "psInvStatDetail('AC')"
 		text style "normal"
 		text point 10
-		text color lua "psInvWhite()"
+		text color lua "psInvYellow()"
 		text align left top
 	}
 	label
@@ -137,6 +144,7 @@ menu
 		text lua "psInvStat('THAC0')"
 		text style "label"
 		text point 15
+		text color lua "psInvWhite()"
 		text align center center
 	}
 	label
@@ -146,7 +154,7 @@ menu
 		text lua "psInvStatDetail('THAC0')"
 		text style "normal"
 		text point 10
-		text color lua "psInvWhite()"
+		text color lua "psInvYellow()"
 		text align left top
 	}
 	label
@@ -167,6 +175,7 @@ menu
 		text lua "psInvStat('HP')"
 		text style "label"
 		text point 15
+		text color lua "psInvWhite()"
 		text align center center
 	}
 	label
@@ -176,7 +185,7 @@ menu
 		text lua "psInvStatDetail('HP')"
 		text style "normal"
 		text point 10
-		text color lua "psInvWhite()"
+		text color lua "psInvYellow()"
 		text align left top
 	}
 	label
@@ -197,6 +206,7 @@ menu
 		text lua "psInvStat('Damage')"
 		text style "label"
 		text point 15
+		text color lua "psInvWhite()"
 		text align center center
 	}
 	label
@@ -206,7 +216,7 @@ menu
 		text lua "psInvStatDetail('Damage')"
 		text style "normal"
 		text point 10
-		text color lua "psInvWhite()"
+		text color lua "psInvYellow()"
 		text align left top
 	}
 	text
@@ -241,25 +251,25 @@ menu
 	slot {name "slot_inv_21"	area 270 350 36 36	bam "IVSLOT"	sequence 7	slotinfo "characters[id].equipment.tattoo0"	highlight selected 1}
 	slot {name "slot_inv_24"	area 310 350 36 36	bam "IVSLOT"	sequence 8	slotinfo "characters[id].equipment.tattoo1"	highlight selected 1}
 	slot {name "slot_inv_26"	area 350 350 36 36	bam "IVSLOT"	sequence 9	slotinfo "characters[id].equipment.tattoo2"	highlight selected 1}
-	slot {name "slot_inv_30"	area 501 137 40 40	bam "PSJSLOT"	sequence 0	slotinfo "characters[id].equipment.group0"	highlight selected 1}
+	slot {name "slot_inv_30"	area 501 134 40 40	bam "PSJSLOT"	sequence 0	slotinfo "characters[id].equipment.group0"	highlight selected 1}
 	slot {name "slot_inv_31"	area 501 180 40 40	bam "PSJSLOT"	sequence 0	slotinfo "characters[id].equipment.group1"	highlight selected 1}
-	slot {name "slot_inv_32"	area 551 137 40 40	bam "PSJSLOT"	sequence 0	slotinfo "characters[id].equipment.group2"	highlight selected 1}
+	slot {name "slot_inv_32"	area 551 134 40 40	bam "PSJSLOT"	sequence 0	slotinfo "characters[id].equipment.group2"	highlight selected 1}
 	slot {name "slot_inv_33"	area 551 180 40 40	bam "PSJSLOT"	sequence 0	slotinfo "characters[id].equipment.group3"	highlight selected 1}
-	slot {name "slot_inv_34"	area 601 137 40 40	bam "PSJSLOT"	sequence 0	slotinfo "characters[id].equipment.group4"	highlight selected 1}
+	slot {name "slot_inv_34"	area 601 134 40 40	bam "PSJSLOT"	sequence 0	slotinfo "characters[id].equipment.group4"	highlight selected 1}
 	slot {name "slot_inv_35"	area 601 180 40 40	bam "PSJSLOT"	sequence 0	slotinfo "characters[id].equipment.group5"	highlight selected 1}
-	slot {name "slot_inv_36"	area 651 137 40 40	bam "PSJSLOT"	sequence 0	slotinfo "characters[id].equipment.group6"	highlight selected 1}
+	slot {name "slot_inv_36"	area 651 134 40 40	bam "PSJSLOT"	sequence 0	slotinfo "characters[id].equipment.group6"	highlight selected 1}
 	slot {name "slot_inv_37"	area 651 180 40 40	bam "PSJSLOT"	sequence 0	slotinfo "characters[id].equipment.group7"	highlight selected 1}
-	slot {name "slot_inv_38"	area 701 137 40 40	bam "PSJSLOT"	sequence 0	slotinfo "characters[id].equipment.group8"	highlight selected 1}
+	slot {name "slot_inv_38"	area 701 134 40 40	bam "PSJSLOT"	sequence 0	slotinfo "characters[id].equipment.group8"	highlight selected 1}
 	slot {name "slot_inv_39"	area 701 180 40 40	bam "PSJSLOT"	sequence 0	slotinfo "characters[id].equipment.group9"	highlight selected 1}
-	slot {name "slot_inv_40"	area 751 137 40 40	bam "PSJSLOT"	sequence 0	slotinfo "characters[id].equipment.group10"	highlight selected 1}
+	slot {name "slot_inv_40"	area 751 134 40 40	bam "PSJSLOT"	sequence 0	slotinfo "characters[id].equipment.group10"	highlight selected 1}
 	slot {name "slot_inv_41"	area 751 180 40 40	bam "PSJSLOT"	sequence 0	slotinfo "characters[id].equipment.group11"	highlight selected 1}
-	slot {name "slot_inv_42"	area 801 137 40 40	bam "PSJSLOT"	sequence 0	slotinfo "characters[id].equipment.group12"	highlight selected 1}
+	slot {name "slot_inv_42"	area 801 134 40 40	bam "PSJSLOT"	sequence 0	slotinfo "characters[id].equipment.group12"	highlight selected 1}
 	slot {name "slot_inv_43"	area 801 180 40 40	bam "PSJSLOT"	sequence 0	slotinfo "characters[id].equipment.group13"	highlight selected 1}
-	slot {name "slot_inv_44"	area 851 137 40 40	bam "PSJSLOT"	sequence 0	slotinfo "characters[id].equipment.group14"	highlight selected 1}
+	slot {name "slot_inv_44"	area 851 134 40 40	bam "PSJSLOT"	sequence 0	slotinfo "characters[id].equipment.group14"	highlight selected 1}
 	slot {name "slot_inv_45"	area 851 180 40 40	bam "PSJSLOT"	sequence 0	slotinfo "characters[id].equipment.group15"	highlight selected 1}
-	slot {name "slot_inv_46"	area 901 137 40 40	bam "PSJSLOT"	sequence 0	slotinfo "characters[id].equipment.group16"	highlight selected 1}
+	slot {name "slot_inv_46"	area 901 134 40 40	bam "PSJSLOT"	sequence 0	slotinfo "characters[id].equipment.group16"	highlight selected 1}
 	slot {name "slot_inv_47"	area 901 180 40 40	bam "PSJSLOT"	sequence 0	slotinfo "characters[id].equipment.group17"	highlight selected 1}
-	slot {name "slot_inv_48"	area 951 137 40 40	bam "PSJSLOT"	sequence 0	slotinfo "characters[id].equipment.group18"	highlight selected 1}
+	slot {name "slot_inv_48"	area 951 134 40 40	bam "PSJSLOT"	sequence 0	slotinfo "characters[id].equipment.group18"	highlight selected 1}
 	slot {name "slot_inv_49"	area 951 180 40 40	bam "PSJSLOT"	sequence 0	slotinfo "characters[id].equipment.group19"	highlight selected 1}
 	slot {name "slot_inv_68"	area 501 540 38 38	bam "PSJSLOT"	sequence 0	slotinfo "characters[id].equipment.ground0"	highlight selected 1}
 	slot {name "slot_inv_69"	area 543 540 38 38	bam "PSJSLOT"	sequence 0	slotinfo "characters[id].equipment.ground1"	highlight selected 1}
@@ -292,10 +302,11 @@ menu
 		text lua "Infinity_GetCurrentGroundPage()+1 .. '/' .. Infinity_GetMaxGroundPage()+1"
 		text style "label"
 		text point 13
+		text color lua "psInvYellow()"
 	}
 	button
 	{
-		area 490 99 46 26
+		area 550 99 46 26
 		bam "PSJTAB1"
 		sequence 0
 		frame lua "psInvTabFrame(1)"
@@ -303,11 +314,12 @@ menu
 		text style "button"
 		text point 11
 		text font "EXOCET"
+		text color lua "psInvYellow()"
 		action "psInvSelectTab(1)"
 	}
 	button
 	{
-		area 539 99 47 26
+		area 599 99 47 26
 		bam "PSJTAB2"
 		sequence 0
 		frame lua "psInvTabFrame(2)"
@@ -315,11 +327,12 @@ menu
 		text style "button"
 		text point 11
 		text font "EXOCET"
+		text color lua "psInvYellow()"
 		action "psInvSelectTab(2)"
 	}
 	button
 	{
-		area 589 99 47 26
+		area 649 99 47 26
 		bam "PSJTAB3"
 		sequence 0
 		frame lua "psInvTabFrame(3)"
@@ -327,11 +340,12 @@ menu
 		text style "button"
 		text point 11
 		text font "EXOCET"
+		text color lua "psInvYellow()"
 		action "psInvSelectTab(3)"
 	}
 	button
 	{
-		area 639 99 46 26
+		area 699 99 46 26
 		bam "PSJTAB4"
 		sequence 0
 		frame lua "psInvTabFrame(4)"
@@ -339,11 +353,12 @@ menu
 		text style "button"
 		text point 11
 		text font "EXOCET"
+		text color lua "psInvYellow()"
 		action "psInvSelectTab(4)"
 	}
 	button
 	{
-		area 688 99 47 26
+		area 748 99 47 26
 		bam "PSJTAB5"
 		sequence 0
 		frame lua "psInvTabFrame(5)"
@@ -351,11 +366,12 @@ menu
 		text style "button"
 		text point 11
 		text font "EXOCET"
+		text color lua "psInvYellow()"
 		action "psInvSelectTab(5)"
 	}
 	button
 	{
-		area 738 99 47 26
+		area 798 99 47 26
 		bam "PSJTAB6"
 		sequence 0
 		frame lua "psInvTabFrame(6)"
@@ -363,11 +379,12 @@ menu
 		text style "button"
 		text point 11
 		text font "EXOCET"
+		text color lua "psInvYellow()"
 		action "psInvSelectTab(6)"
 	}
 	button
 	{
-		area 787 99 47 26
+		area 847 99 47 26
 		bam "PSJTAB7"
 		sequence 0
 		frame lua "psInvTabFrame(7)"
@@ -375,11 +392,12 @@ menu
 		text style "button"
 		text point 11
 		text font "EXOCET"
+		text color lua "psInvYellow()"
 		action "psInvSelectTab(7)"
 	}
 	button
 	{
-		area 837 99 46 26
+		area 897 99 46 26
 		bam "PSJTAB8"
 		sequence 0
 		frame lua "psInvTabFrame(8)"
@@ -387,13 +405,8 @@ menu
 		text style "button"
 		text point 11
 		text font "EXOCET"
+		text color lua "psInvYellow()"
 		action "psInvSelectTab(8)"
-	}
-	button
-	{
-		area 895 99 29 27
-		bam "PSJTABM"
-		sequence 0
 	}
 	label
 	{
@@ -402,6 +415,7 @@ menu
 		text lua "psInvText('Sort')"
 		text style "label"
 		text point 14
+		text color lua "psInvYellow()"
 		text align right center
 	}
 	button
@@ -412,6 +426,7 @@ menu
 		text lua "psInvText('Store all')"
 		text style "button"
 		text point 15
+		text color lua "psInvYellow()"
 	}
 	button
 	{

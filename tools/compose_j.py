@@ -63,6 +63,13 @@ def main():
         size = round(d[2] / K * 2 * 1.25)
         b2.thumbnail((size, size), Image.LANCZOS)
         out.alpha_composite(b2, (round(cx - b2.width / 2), round(cy - b2.height / 2)))
+    # 4) a dark copper coin heap over the painted rosette (John 2026-10-22), ref box 1060-1150 x 893-965
+    heap = cutout(Image.open(os.path.join(J, "gen", "coins_c0_s131.png")), thr=34)
+    rgb = ImageEnhance.Brightness(heap.convert("RGB")).enhance(0.8)
+    h2 = rgb.convert("RGBA")
+    h2.putalpha(heap.getchannel("A"))
+    h2.thumbnail((300, 300), Image.LANCZOS)
+    out.alpha_composite(h2, (round(1105 * 2 - h2.width / 2), round(965 * 2 - h2.height)))
     out.convert("RGB").save(os.path.join(J, "bg_final_2x.png"))
     print("bg_final_2x.png written")
 

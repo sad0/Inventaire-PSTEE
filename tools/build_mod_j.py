@@ -20,7 +20,7 @@ MOD = bm.MOD
 UP = 1  # MOS/BAM V1 are drawn 1:1 by the engine (no scaling to the area): keep menu-pixel size
 
 BAMS = {"tab1": "PSJTAB1", "tab2": "PSJTAB2", "tab3": "PSJTAB3", "tab4": "PSJTAB4", "tab5": "PSJTAB5",
-        "tab6": "PSJTAB6", "tab7": "PSJTAB7", "tab8": "PSJTAB8", "tab_more": "PSJTABM", "close": "PSJCLOSE",
+        "tab6": "PSJTAB6", "tab7": "PSJTAB7", "tab8": "PSJTAB8", "close": "PSJCLOSE",
         "store_all": "PSJSTORE", "page_prev": "PSJPREV", "page_next": "PSJNEXT", "bag": "PSJBAG", "face": "PSJFACE",
 }  # gauges and tubes are static art in bg_final_2x.png (John 2026-10-22: no animated pieces)
 
@@ -168,7 +168,7 @@ def movable(key, rect, **kw):
 
 
 def piece(name, kind="button", action=None, text_lua=None, point=None, tooltip_lua=None, seq=0, frame_lua=None,
-          font=None, action_alt=None):
+          font=None, action_alt=None, color_lua=None):
     r = L["parts"][name]
     s = f"\t{kind}\n\t{{\n\t\t{bm.area(r)}\n\t\tbam \"{BAMS[name]}\"\n\t\tsequence {seq}\n"
     if frame_lua:
@@ -179,6 +179,8 @@ def piece(name, kind="button", action=None, text_lua=None, point=None, tooltip_l
             s += f"\t\ttext point {point}\n"
         if font:
             s += f'\t\ttext font "{font}"\n'
+        if color_lua:
+            s += f'\t\ttext color lua "{color_lua}"\n'
     if action_alt:
         s += f'\t\tactionAlt "{action_alt}"\n'
     if tooltip_lua:
@@ -215,24 +217,28 @@ menu
     pd = L["paperdoll"]
     m.append(f'\tbutton\n\t{{\n\t\t{bm.area(pd)}\n\t\tpaperdoll 1\n\t\tactiondrag "Infinity_SwapWithAppearance()"\n\t}}\n')
     t = L["text"]
-    m.append(movable("name", t["name"], text_lua="characters[id].name", point=13, font="EXOCET"))
-    m.append(movable("class", t["class"], text_lua="characters[id].class", point=13, font="EXOCET"))
+    m.append(movable("name", t["name"], text_lua="characters[id].name", point=13, font="EXOCET",
+                     color_lua="psInvYellow()"))
+    m.append(movable("class", t["class"], text_lua="characters[id].class", point=13, font="EXOCET",
+                     color_lua="psInvYellow()"))
     m.append(movable("weight", t["weight"], text_lua="psInvWeight()", style="normal", point=15, align="left center",
-                     color_lua="getEncumbranceColor()"))
-    m.append(movable("gold", t["gold"], text_lua="characters[id].gold", style="gold", point=16))
+                     color_lua="psInvWeightColor()"))
+    m.append(movable("gold", t["gold"], text_lua="characters[id].gold", style="gold", point=16,
+                     color_lua="psInvYellow()"))
     for nm, r in L["titles"].items():
         m.append(movable("title_" + nm.lower().replace(" ", "_"), r, text_lua=f"psInvText('{nm}')", point=13,
-                         font="EXOCET"))
+                         font="EXOCET", color_lua="psInvYellow()"))
     for nm, st in L["stats"].items():
         d = st["disc"]
         k = nm.lower()
         m.append(movable(f"cap_{k}", (d[0] - 10, d[1] - 24, d[2] + 20, 16), text_lua=f"psInvText('{nm}')",
                          style="normal", point=11, align="center center", color_lua="psInvYellow()", font="EXOCET"))
-        m.append(movable(f"val_{k}", d, text_lua=f"psInvStat('{nm}')", point=15, align="center center"))
+        m.append(movable(f"val_{k}", d, text_lua=f"psInvStat('{nm}')", point=15, align="center center",
+                         color_lua="psInvWhite()"))
         p = st["plate"]
         m.append(movable(f"det_{k}", (p[0] + 10, p[1] + 10, p[2] - 16, p[3] - 16),
                          text_lua=f"psInvStatDetail('{nm}')", style="normal", point=10, align="left top",
-                         color_lua="psInvWhite()"))
+                         color_lua="psInvYellow()"))
     m.append("\ttext\n\t{\n\t\tarea 501 512 420 24\n\t\ttext lua \"TEXT_inventoryError\"\n\t\ttext style normal\n"
              "\t\ttext point 12\n\t\ttext align left center\n\t}\n")
     for i, a in enumerate(L["quick weapons"]):
@@ -252,13 +258,14 @@ menu
     m.append(piece("page_prev", action="Infinity_OnGroundPage(-1)"))
     m.append(piece("page_next", action="Infinity_OnGroundPage(1)"))
     m.append(movable("ground_page", L["ground_page"],
-                     text_lua="Infinity_GetCurrentGroundPage()+1 .. '/' .. Infinity_GetMaxGroundPage()+1", point=13))
+                     text_lua="Infinity_GetCurrentGroundPage()+1 .. '/' .. Infinity_GetMaxGroundPage()+1", point=13,
+                     color_lua="psInvYellow()"))
     for i in range(8):
         m.append(piece(f"tab{i + 1}", text_lua=f"psInvTab({i + 1})", point=11, action=f"psInvSelectTab({i + 1})",
-                       frame_lua=f"psInvTabFrame({i + 1})", font="EXOCET"))
-    m.append(piece("tab_more"))
-    m.append(movable("sort", L["buttons"]["sort"], text_lua="psInvText('Sort')", point=14, align="right center"))
-    m.append(piece("store_all", text_lua="psInvText('Store all')", point=15))
+                       frame_lua=f"psInvTabFrame({i + 1})", font="EXOCET", color_lua="psInvYellow()"))
+    m.append(movable("sort", L["buttons"]["sort"], text_lua="psInvText('Sort')", point=14, align="right center",
+                     color_lua="psInvYellow()"))
+    m.append(piece("store_all", text_lua="psInvText('Store all')", point=15, color_lua="psInvYellow()"))
     m.append(piece("bag", tooltip_lua="psInvWeight()"))
     m.append(piece("face", action="Infinity_PushMenu('INVENTORY_HELP')", tooltip_lua="psInvText('Help')",
                    action_alt="psInvToggleEdit()"))
@@ -336,6 +343,13 @@ function psInvStat(key)
 	return ''
 end
 
+-- weight: yellow like the game's texts, the engine's warning colours past 80 % / 100 % of the limit
+function psInvWeightColor()
+	local c = getEncumbranceColor()
+	if c == bit32.band(tonumber(fontcolors['B'], 16), 0x00FFFFFF) then return psInvYellow() end
+	return c
+end
+
 function psInvWhite()
 	return bit32.band(tonumber(fontcolors['B'], 16), 0x00FFFFFF)
 end
@@ -366,7 +380,14 @@ function psInvShorten(key, text)
 		line = string.gsub(line, ':%s+([%+%-]?%d)', ': %1')
 		line = string.gsub(line, '%s%s+', ' ')
 		line = psInvTrim(line)
-		if line ~= '' and line ~= ':' then out[#out + 1] = line end
+		-- the engine sometimes repeats a line glued to itself ("TAC0 de base : 18TAC0 de base : 18")
+		local half = math.floor(#line / 2)
+		if #line % 2 == 0 and half > 0 and string.sub(line, 1, half) == string.sub(line, half + 1) then
+			line = string.sub(line, 1, half)
+		end
+		local seen = false
+		for _, o in ipairs(out) do if o == line then seen = true end end
+		if line ~= '' and line ~= ':' and not seen then out[#out + 1] = line end
 	end
 	return table.concat(out, '\n')
 end

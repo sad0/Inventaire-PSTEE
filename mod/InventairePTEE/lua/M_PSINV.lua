@@ -63,6 +63,13 @@ function psInvStat(key)
 	return ''
 end
 
+-- weight: yellow like the game's texts, the engine's warning colours past 80 % / 100 % of the limit
+function psInvWeightColor()
+	local c = getEncumbranceColor()
+	if c == bit32.band(tonumber(fontcolors['B'], 16), 0x00FFFFFF) then return psInvYellow() end
+	return c
+end
+
 function psInvWhite()
 	return bit32.band(tonumber(fontcolors['B'], 16), 0x00FFFFFF)
 end
@@ -93,7 +100,14 @@ function psInvShorten(key, text)
 		line = string.gsub(line, ':%s+([%+%-]?%d)', ': %1')
 		line = string.gsub(line, '%s%s+', ' ')
 		line = psInvTrim(line)
-		if line ~= '' and line ~= ':' then out[#out + 1] = line end
+		-- the engine sometimes repeats a line glued to itself ("TAC0 de base : 18TAC0 de base : 18")
+		local half = math.floor(#line / 2)
+		if #line % 2 == 0 and half > 0 and string.sub(line, 1, half) == string.sub(line, half + 1) then
+			line = string.sub(line, 1, half)
+		end
+		local seen = false
+		for _, o in ipairs(out) do if o == line then seen = true end end
+		if line ~= '' and line ~= ':' and not seen then out[#out + 1] = line end
 	end
 	return table.concat(out, '\n')
 end
