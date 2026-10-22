@@ -11,7 +11,7 @@ psInvActiveTab = 1
 function psInvBackground() return 'PSIVBGJ' end
 function psInvText(key) return psInvTexts[key] or key end
 function psInvTab(i) return psInvTabs[i] end
-function psInvSelectTab(i) psInvActiveTab = i end
+function psInvSelectTab(i) psInvActiveTab = i if PSUI_Refresh then PSUI_Refresh() end end
 -- selected tab shows the "selected" frame (2)
 function psInvTabFrame(i) if psInvActiveTab == i then return 2 end return 0 end
 

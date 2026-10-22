@@ -261,6 +261,7 @@ menu
 		Infinity_SetBackground('BACKGROUND_INVENTORY')
 		psInvApplyPositions()
 		if PSC_AutoTest then PSC_AutoTest() end
+		if PSUI_Refresh then PSUI_Refresh() end
 	"
 	onClose
 	"
@@ -319,7 +320,17 @@ menu
                        frame_lua=f"psInvTabFrame({i + 1})", font="EXOCET", color_lua="psInvYellow()"))
     m.append(movable("sort", L["buttons"]["sort"], text_lua="psInvText('Sort')", point=14, align="right center",
                      color_lua="psInvYellow()"))
-    m.append(piece("store_all", text_lua="psInvText('Store all')", point=15, color_lua="psInvYellow()"))
+    m.append(piece("store_all", text_lua="psInvText('Store all')", point=15, color_lua="psInvYellow()",
+                   action="PSUI_StoreAll()"))
+    # stash grid (step 2b): icon + count + click-to-take button per cell
+    for i, (x, y, w, h) in enumerate(L["stash"], start=1):
+        m.append(f'\tlabel\n\t{{\n\t\tenabled "PSUI_Has({i})"\n\t\tarea {x + 2} {y + 2} {w - 4} {h - 4}\n'
+                 f'\t\ticon lua "PSUI_Icon({i})"\n\t}}\n')
+        m.append(f'\tlabel\n\t{{\n\t\tenabled "PSUI_Has({i})"\n\t\tarea {x} {y + h - 16} {w - 3} 15\n'
+                 f'\t\ttext lua "PSUI_Count({i})"\n\t\ttext style "normal"\n\t\ttext point 10\n'
+                 f'\t\ttext align right bottom\n\t}}\n')
+        m.append(f'\tbutton\n\t{{\n\t\tenabled "PSUI_Has({i})"\n\t\tarea {x} {y} {w} {h}\n'
+                 f'\t\ttooltip lua "PSUI_Name({i})"\n\t\taction "PSUI_Take({i})"\n\t}}\n')
     m.append(piece("bag", tooltip_lua="psInvWeight()"))
     m.append(piece("face", action="Infinity_PushMenu('INVENTORY_HELP')", tooltip_lua="psInvText('Help')",
                    action_alt="psInvToggleEdit()"))
@@ -345,7 +356,7 @@ psInvActiveTab = 1
 function psInvBackground() return 'PSIVBGJ' end
 function psInvText(key) return psInvTexts[key] or key end
 function psInvTab(i) return psInvTabs[i] end
-function psInvSelectTab(i) psInvActiveTab = i end
+function psInvSelectTab(i) psInvActiveTab = i if PSUI_Refresh then PSUI_Refresh() end end
 -- selected tab shows the "selected" frame (2)
 function psInvTabFrame(i) if psInvActiveTab == i then return 2 end return 0 end
 

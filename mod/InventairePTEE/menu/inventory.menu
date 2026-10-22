@@ -15,6 +15,7 @@ menu
 		Infinity_SetBackground('BACKGROUND_INVENTORY')
 		psInvApplyPositions()
 		if PSC_AutoTest then PSC_AutoTest() end
+		if PSUI_Refresh then PSUI_Refresh() end
 	"
 	onClose
 	"
@@ -428,6 +429,1327 @@ menu
 		text style "button"
 		text point 15
 		text color lua "psInvYellow()"
+		action "PSUI_StoreAll()"
+	}
+	label
+	{
+		enabled "PSUI_Has(1)"
+		area 503 240 36 36
+		icon lua "PSUI_Icon(1)"
+	}
+	label
+	{
+		enabled "PSUI_Has(1)"
+		area 501 262 37 15
+		text lua "PSUI_Count(1)"
+		text style "normal"
+		text point 10
+		text align right bottom
+	}
+	button
+	{
+		enabled "PSUI_Has(1)"
+		area 501 238 40 40
+		tooltip lua "PSUI_Name(1)"
+		action "PSUI_Take(1)"
+	}
+	label
+	{
+		enabled "PSUI_Has(2)"
+		area 553 240 36 36
+		icon lua "PSUI_Icon(2)"
+	}
+	label
+	{
+		enabled "PSUI_Has(2)"
+		area 551 262 37 15
+		text lua "PSUI_Count(2)"
+		text style "normal"
+		text point 10
+		text align right bottom
+	}
+	button
+	{
+		enabled "PSUI_Has(2)"
+		area 551 238 40 40
+		tooltip lua "PSUI_Name(2)"
+		action "PSUI_Take(2)"
+	}
+	label
+	{
+		enabled "PSUI_Has(3)"
+		area 603 240 36 36
+		icon lua "PSUI_Icon(3)"
+	}
+	label
+	{
+		enabled "PSUI_Has(3)"
+		area 601 262 37 15
+		text lua "PSUI_Count(3)"
+		text style "normal"
+		text point 10
+		text align right bottom
+	}
+	button
+	{
+		enabled "PSUI_Has(3)"
+		area 601 238 40 40
+		tooltip lua "PSUI_Name(3)"
+		action "PSUI_Take(3)"
+	}
+	label
+	{
+		enabled "PSUI_Has(4)"
+		area 653 240 36 36
+		icon lua "PSUI_Icon(4)"
+	}
+	label
+	{
+		enabled "PSUI_Has(4)"
+		area 651 262 37 15
+		text lua "PSUI_Count(4)"
+		text style "normal"
+		text point 10
+		text align right bottom
+	}
+	button
+	{
+		enabled "PSUI_Has(4)"
+		area 651 238 40 40
+		tooltip lua "PSUI_Name(4)"
+		action "PSUI_Take(4)"
+	}
+	label
+	{
+		enabled "PSUI_Has(5)"
+		area 703 240 36 36
+		icon lua "PSUI_Icon(5)"
+	}
+	label
+	{
+		enabled "PSUI_Has(5)"
+		area 701 262 37 15
+		text lua "PSUI_Count(5)"
+		text style "normal"
+		text point 10
+		text align right bottom
+	}
+	button
+	{
+		enabled "PSUI_Has(5)"
+		area 701 238 40 40
+		tooltip lua "PSUI_Name(5)"
+		action "PSUI_Take(5)"
+	}
+	label
+	{
+		enabled "PSUI_Has(6)"
+		area 753 240 36 36
+		icon lua "PSUI_Icon(6)"
+	}
+	label
+	{
+		enabled "PSUI_Has(6)"
+		area 751 262 37 15
+		text lua "PSUI_Count(6)"
+		text style "normal"
+		text point 10
+		text align right bottom
+	}
+	button
+	{
+		enabled "PSUI_Has(6)"
+		area 751 238 40 40
+		tooltip lua "PSUI_Name(6)"
+		action "PSUI_Take(6)"
+	}
+	label
+	{
+		enabled "PSUI_Has(7)"
+		area 803 240 36 36
+		icon lua "PSUI_Icon(7)"
+	}
+	label
+	{
+		enabled "PSUI_Has(7)"
+		area 801 262 37 15
+		text lua "PSUI_Count(7)"
+		text style "normal"
+		text point 10
+		text align right bottom
+	}
+	button
+	{
+		enabled "PSUI_Has(7)"
+		area 801 238 40 40
+		tooltip lua "PSUI_Name(7)"
+		action "PSUI_Take(7)"
+	}
+	label
+	{
+		enabled "PSUI_Has(8)"
+		area 853 240 36 36
+		icon lua "PSUI_Icon(8)"
+	}
+	label
+	{
+		enabled "PSUI_Has(8)"
+		area 851 262 37 15
+		text lua "PSUI_Count(8)"
+		text style "normal"
+		text point 10
+		text align right bottom
+	}
+	button
+	{
+		enabled "PSUI_Has(8)"
+		area 851 238 40 40
+		tooltip lua "PSUI_Name(8)"
+		action "PSUI_Take(8)"
+	}
+	label
+	{
+		enabled "PSUI_Has(9)"
+		area 903 240 36 36
+		icon lua "PSUI_Icon(9)"
+	}
+	label
+	{
+		enabled "PSUI_Has(9)"
+		area 901 262 37 15
+		text lua "PSUI_Count(9)"
+		text style "normal"
+		text point 10
+		text align right bottom
+	}
+	button
+	{
+		enabled "PSUI_Has(9)"
+		area 901 238 40 40
+		tooltip lua "PSUI_Name(9)"
+		action "PSUI_Take(9)"
+	}
+	label
+	{
+		enabled "PSUI_Has(10)"
+		area 953 240 36 36
+		icon lua "PSUI_Icon(10)"
+	}
+	label
+	{
+		enabled "PSUI_Has(10)"
+		area 951 262 37 15
+		text lua "PSUI_Count(10)"
+		text style "normal"
+		text point 10
+		text align right bottom
+	}
+	button
+	{
+		enabled "PSUI_Has(10)"
+		area 951 238 40 40
+		tooltip lua "PSUI_Name(10)"
+		action "PSUI_Take(10)"
+	}
+	label
+	{
+		enabled "PSUI_Has(11)"
+		area 503 286 36 36
+		icon lua "PSUI_Icon(11)"
+	}
+	label
+	{
+		enabled "PSUI_Has(11)"
+		area 501 308 37 15
+		text lua "PSUI_Count(11)"
+		text style "normal"
+		text point 10
+		text align right bottom
+	}
+	button
+	{
+		enabled "PSUI_Has(11)"
+		area 501 284 40 40
+		tooltip lua "PSUI_Name(11)"
+		action "PSUI_Take(11)"
+	}
+	label
+	{
+		enabled "PSUI_Has(12)"
+		area 553 286 36 36
+		icon lua "PSUI_Icon(12)"
+	}
+	label
+	{
+		enabled "PSUI_Has(12)"
+		area 551 308 37 15
+		text lua "PSUI_Count(12)"
+		text style "normal"
+		text point 10
+		text align right bottom
+	}
+	button
+	{
+		enabled "PSUI_Has(12)"
+		area 551 284 40 40
+		tooltip lua "PSUI_Name(12)"
+		action "PSUI_Take(12)"
+	}
+	label
+	{
+		enabled "PSUI_Has(13)"
+		area 603 286 36 36
+		icon lua "PSUI_Icon(13)"
+	}
+	label
+	{
+		enabled "PSUI_Has(13)"
+		area 601 308 37 15
+		text lua "PSUI_Count(13)"
+		text style "normal"
+		text point 10
+		text align right bottom
+	}
+	button
+	{
+		enabled "PSUI_Has(13)"
+		area 601 284 40 40
+		tooltip lua "PSUI_Name(13)"
+		action "PSUI_Take(13)"
+	}
+	label
+	{
+		enabled "PSUI_Has(14)"
+		area 653 286 36 36
+		icon lua "PSUI_Icon(14)"
+	}
+	label
+	{
+		enabled "PSUI_Has(14)"
+		area 651 308 37 15
+		text lua "PSUI_Count(14)"
+		text style "normal"
+		text point 10
+		text align right bottom
+	}
+	button
+	{
+		enabled "PSUI_Has(14)"
+		area 651 284 40 40
+		tooltip lua "PSUI_Name(14)"
+		action "PSUI_Take(14)"
+	}
+	label
+	{
+		enabled "PSUI_Has(15)"
+		area 703 286 36 36
+		icon lua "PSUI_Icon(15)"
+	}
+	label
+	{
+		enabled "PSUI_Has(15)"
+		area 701 308 37 15
+		text lua "PSUI_Count(15)"
+		text style "normal"
+		text point 10
+		text align right bottom
+	}
+	button
+	{
+		enabled "PSUI_Has(15)"
+		area 701 284 40 40
+		tooltip lua "PSUI_Name(15)"
+		action "PSUI_Take(15)"
+	}
+	label
+	{
+		enabled "PSUI_Has(16)"
+		area 753 286 36 36
+		icon lua "PSUI_Icon(16)"
+	}
+	label
+	{
+		enabled "PSUI_Has(16)"
+		area 751 308 37 15
+		text lua "PSUI_Count(16)"
+		text style "normal"
+		text point 10
+		text align right bottom
+	}
+	button
+	{
+		enabled "PSUI_Has(16)"
+		area 751 284 40 40
+		tooltip lua "PSUI_Name(16)"
+		action "PSUI_Take(16)"
+	}
+	label
+	{
+		enabled "PSUI_Has(17)"
+		area 803 286 36 36
+		icon lua "PSUI_Icon(17)"
+	}
+	label
+	{
+		enabled "PSUI_Has(17)"
+		area 801 308 37 15
+		text lua "PSUI_Count(17)"
+		text style "normal"
+		text point 10
+		text align right bottom
+	}
+	button
+	{
+		enabled "PSUI_Has(17)"
+		area 801 284 40 40
+		tooltip lua "PSUI_Name(17)"
+		action "PSUI_Take(17)"
+	}
+	label
+	{
+		enabled "PSUI_Has(18)"
+		area 853 286 36 36
+		icon lua "PSUI_Icon(18)"
+	}
+	label
+	{
+		enabled "PSUI_Has(18)"
+		area 851 308 37 15
+		text lua "PSUI_Count(18)"
+		text style "normal"
+		text point 10
+		text align right bottom
+	}
+	button
+	{
+		enabled "PSUI_Has(18)"
+		area 851 284 40 40
+		tooltip lua "PSUI_Name(18)"
+		action "PSUI_Take(18)"
+	}
+	label
+	{
+		enabled "PSUI_Has(19)"
+		area 903 286 36 36
+		icon lua "PSUI_Icon(19)"
+	}
+	label
+	{
+		enabled "PSUI_Has(19)"
+		area 901 308 37 15
+		text lua "PSUI_Count(19)"
+		text style "normal"
+		text point 10
+		text align right bottom
+	}
+	button
+	{
+		enabled "PSUI_Has(19)"
+		area 901 284 40 40
+		tooltip lua "PSUI_Name(19)"
+		action "PSUI_Take(19)"
+	}
+	label
+	{
+		enabled "PSUI_Has(20)"
+		area 953 286 36 36
+		icon lua "PSUI_Icon(20)"
+	}
+	label
+	{
+		enabled "PSUI_Has(20)"
+		area 951 308 37 15
+		text lua "PSUI_Count(20)"
+		text style "normal"
+		text point 10
+		text align right bottom
+	}
+	button
+	{
+		enabled "PSUI_Has(20)"
+		area 951 284 40 40
+		tooltip lua "PSUI_Name(20)"
+		action "PSUI_Take(20)"
+	}
+	label
+	{
+		enabled "PSUI_Has(21)"
+		area 503 332 36 36
+		icon lua "PSUI_Icon(21)"
+	}
+	label
+	{
+		enabled "PSUI_Has(21)"
+		area 501 354 37 15
+		text lua "PSUI_Count(21)"
+		text style "normal"
+		text point 10
+		text align right bottom
+	}
+	button
+	{
+		enabled "PSUI_Has(21)"
+		area 501 330 40 40
+		tooltip lua "PSUI_Name(21)"
+		action "PSUI_Take(21)"
+	}
+	label
+	{
+		enabled "PSUI_Has(22)"
+		area 553 332 36 36
+		icon lua "PSUI_Icon(22)"
+	}
+	label
+	{
+		enabled "PSUI_Has(22)"
+		area 551 354 37 15
+		text lua "PSUI_Count(22)"
+		text style "normal"
+		text point 10
+		text align right bottom
+	}
+	button
+	{
+		enabled "PSUI_Has(22)"
+		area 551 330 40 40
+		tooltip lua "PSUI_Name(22)"
+		action "PSUI_Take(22)"
+	}
+	label
+	{
+		enabled "PSUI_Has(23)"
+		area 603 332 36 36
+		icon lua "PSUI_Icon(23)"
+	}
+	label
+	{
+		enabled "PSUI_Has(23)"
+		area 601 354 37 15
+		text lua "PSUI_Count(23)"
+		text style "normal"
+		text point 10
+		text align right bottom
+	}
+	button
+	{
+		enabled "PSUI_Has(23)"
+		area 601 330 40 40
+		tooltip lua "PSUI_Name(23)"
+		action "PSUI_Take(23)"
+	}
+	label
+	{
+		enabled "PSUI_Has(24)"
+		area 653 332 36 36
+		icon lua "PSUI_Icon(24)"
+	}
+	label
+	{
+		enabled "PSUI_Has(24)"
+		area 651 354 37 15
+		text lua "PSUI_Count(24)"
+		text style "normal"
+		text point 10
+		text align right bottom
+	}
+	button
+	{
+		enabled "PSUI_Has(24)"
+		area 651 330 40 40
+		tooltip lua "PSUI_Name(24)"
+		action "PSUI_Take(24)"
+	}
+	label
+	{
+		enabled "PSUI_Has(25)"
+		area 703 332 36 36
+		icon lua "PSUI_Icon(25)"
+	}
+	label
+	{
+		enabled "PSUI_Has(25)"
+		area 701 354 37 15
+		text lua "PSUI_Count(25)"
+		text style "normal"
+		text point 10
+		text align right bottom
+	}
+	button
+	{
+		enabled "PSUI_Has(25)"
+		area 701 330 40 40
+		tooltip lua "PSUI_Name(25)"
+		action "PSUI_Take(25)"
+	}
+	label
+	{
+		enabled "PSUI_Has(26)"
+		area 753 332 36 36
+		icon lua "PSUI_Icon(26)"
+	}
+	label
+	{
+		enabled "PSUI_Has(26)"
+		area 751 354 37 15
+		text lua "PSUI_Count(26)"
+		text style "normal"
+		text point 10
+		text align right bottom
+	}
+	button
+	{
+		enabled "PSUI_Has(26)"
+		area 751 330 40 40
+		tooltip lua "PSUI_Name(26)"
+		action "PSUI_Take(26)"
+	}
+	label
+	{
+		enabled "PSUI_Has(27)"
+		area 803 332 36 36
+		icon lua "PSUI_Icon(27)"
+	}
+	label
+	{
+		enabled "PSUI_Has(27)"
+		area 801 354 37 15
+		text lua "PSUI_Count(27)"
+		text style "normal"
+		text point 10
+		text align right bottom
+	}
+	button
+	{
+		enabled "PSUI_Has(27)"
+		area 801 330 40 40
+		tooltip lua "PSUI_Name(27)"
+		action "PSUI_Take(27)"
+	}
+	label
+	{
+		enabled "PSUI_Has(28)"
+		area 853 332 36 36
+		icon lua "PSUI_Icon(28)"
+	}
+	label
+	{
+		enabled "PSUI_Has(28)"
+		area 851 354 37 15
+		text lua "PSUI_Count(28)"
+		text style "normal"
+		text point 10
+		text align right bottom
+	}
+	button
+	{
+		enabled "PSUI_Has(28)"
+		area 851 330 40 40
+		tooltip lua "PSUI_Name(28)"
+		action "PSUI_Take(28)"
+	}
+	label
+	{
+		enabled "PSUI_Has(29)"
+		area 903 332 36 36
+		icon lua "PSUI_Icon(29)"
+	}
+	label
+	{
+		enabled "PSUI_Has(29)"
+		area 901 354 37 15
+		text lua "PSUI_Count(29)"
+		text style "normal"
+		text point 10
+		text align right bottom
+	}
+	button
+	{
+		enabled "PSUI_Has(29)"
+		area 901 330 40 40
+		tooltip lua "PSUI_Name(29)"
+		action "PSUI_Take(29)"
+	}
+	label
+	{
+		enabled "PSUI_Has(30)"
+		area 953 332 36 36
+		icon lua "PSUI_Icon(30)"
+	}
+	label
+	{
+		enabled "PSUI_Has(30)"
+		area 951 354 37 15
+		text lua "PSUI_Count(30)"
+		text style "normal"
+		text point 10
+		text align right bottom
+	}
+	button
+	{
+		enabled "PSUI_Has(30)"
+		area 951 330 40 40
+		tooltip lua "PSUI_Name(30)"
+		action "PSUI_Take(30)"
+	}
+	label
+	{
+		enabled "PSUI_Has(31)"
+		area 503 378 36 36
+		icon lua "PSUI_Icon(31)"
+	}
+	label
+	{
+		enabled "PSUI_Has(31)"
+		area 501 400 37 15
+		text lua "PSUI_Count(31)"
+		text style "normal"
+		text point 10
+		text align right bottom
+	}
+	button
+	{
+		enabled "PSUI_Has(31)"
+		area 501 376 40 40
+		tooltip lua "PSUI_Name(31)"
+		action "PSUI_Take(31)"
+	}
+	label
+	{
+		enabled "PSUI_Has(32)"
+		area 553 378 36 36
+		icon lua "PSUI_Icon(32)"
+	}
+	label
+	{
+		enabled "PSUI_Has(32)"
+		area 551 400 37 15
+		text lua "PSUI_Count(32)"
+		text style "normal"
+		text point 10
+		text align right bottom
+	}
+	button
+	{
+		enabled "PSUI_Has(32)"
+		area 551 376 40 40
+		tooltip lua "PSUI_Name(32)"
+		action "PSUI_Take(32)"
+	}
+	label
+	{
+		enabled "PSUI_Has(33)"
+		area 603 378 36 36
+		icon lua "PSUI_Icon(33)"
+	}
+	label
+	{
+		enabled "PSUI_Has(33)"
+		area 601 400 37 15
+		text lua "PSUI_Count(33)"
+		text style "normal"
+		text point 10
+		text align right bottom
+	}
+	button
+	{
+		enabled "PSUI_Has(33)"
+		area 601 376 40 40
+		tooltip lua "PSUI_Name(33)"
+		action "PSUI_Take(33)"
+	}
+	label
+	{
+		enabled "PSUI_Has(34)"
+		area 653 378 36 36
+		icon lua "PSUI_Icon(34)"
+	}
+	label
+	{
+		enabled "PSUI_Has(34)"
+		area 651 400 37 15
+		text lua "PSUI_Count(34)"
+		text style "normal"
+		text point 10
+		text align right bottom
+	}
+	button
+	{
+		enabled "PSUI_Has(34)"
+		area 651 376 40 40
+		tooltip lua "PSUI_Name(34)"
+		action "PSUI_Take(34)"
+	}
+	label
+	{
+		enabled "PSUI_Has(35)"
+		area 703 378 36 36
+		icon lua "PSUI_Icon(35)"
+	}
+	label
+	{
+		enabled "PSUI_Has(35)"
+		area 701 400 37 15
+		text lua "PSUI_Count(35)"
+		text style "normal"
+		text point 10
+		text align right bottom
+	}
+	button
+	{
+		enabled "PSUI_Has(35)"
+		area 701 376 40 40
+		tooltip lua "PSUI_Name(35)"
+		action "PSUI_Take(35)"
+	}
+	label
+	{
+		enabled "PSUI_Has(36)"
+		area 753 378 36 36
+		icon lua "PSUI_Icon(36)"
+	}
+	label
+	{
+		enabled "PSUI_Has(36)"
+		area 751 400 37 15
+		text lua "PSUI_Count(36)"
+		text style "normal"
+		text point 10
+		text align right bottom
+	}
+	button
+	{
+		enabled "PSUI_Has(36)"
+		area 751 376 40 40
+		tooltip lua "PSUI_Name(36)"
+		action "PSUI_Take(36)"
+	}
+	label
+	{
+		enabled "PSUI_Has(37)"
+		area 803 378 36 36
+		icon lua "PSUI_Icon(37)"
+	}
+	label
+	{
+		enabled "PSUI_Has(37)"
+		area 801 400 37 15
+		text lua "PSUI_Count(37)"
+		text style "normal"
+		text point 10
+		text align right bottom
+	}
+	button
+	{
+		enabled "PSUI_Has(37)"
+		area 801 376 40 40
+		tooltip lua "PSUI_Name(37)"
+		action "PSUI_Take(37)"
+	}
+	label
+	{
+		enabled "PSUI_Has(38)"
+		area 853 378 36 36
+		icon lua "PSUI_Icon(38)"
+	}
+	label
+	{
+		enabled "PSUI_Has(38)"
+		area 851 400 37 15
+		text lua "PSUI_Count(38)"
+		text style "normal"
+		text point 10
+		text align right bottom
+	}
+	button
+	{
+		enabled "PSUI_Has(38)"
+		area 851 376 40 40
+		tooltip lua "PSUI_Name(38)"
+		action "PSUI_Take(38)"
+	}
+	label
+	{
+		enabled "PSUI_Has(39)"
+		area 903 378 36 36
+		icon lua "PSUI_Icon(39)"
+	}
+	label
+	{
+		enabled "PSUI_Has(39)"
+		area 901 400 37 15
+		text lua "PSUI_Count(39)"
+		text style "normal"
+		text point 10
+		text align right bottom
+	}
+	button
+	{
+		enabled "PSUI_Has(39)"
+		area 901 376 40 40
+		tooltip lua "PSUI_Name(39)"
+		action "PSUI_Take(39)"
+	}
+	label
+	{
+		enabled "PSUI_Has(40)"
+		area 953 378 36 36
+		icon lua "PSUI_Icon(40)"
+	}
+	label
+	{
+		enabled "PSUI_Has(40)"
+		area 951 400 37 15
+		text lua "PSUI_Count(40)"
+		text style "normal"
+		text point 10
+		text align right bottom
+	}
+	button
+	{
+		enabled "PSUI_Has(40)"
+		area 951 376 40 40
+		tooltip lua "PSUI_Name(40)"
+		action "PSUI_Take(40)"
+	}
+	label
+	{
+		enabled "PSUI_Has(41)"
+		area 503 424 36 36
+		icon lua "PSUI_Icon(41)"
+	}
+	label
+	{
+		enabled "PSUI_Has(41)"
+		area 501 446 37 15
+		text lua "PSUI_Count(41)"
+		text style "normal"
+		text point 10
+		text align right bottom
+	}
+	button
+	{
+		enabled "PSUI_Has(41)"
+		area 501 422 40 40
+		tooltip lua "PSUI_Name(41)"
+		action "PSUI_Take(41)"
+	}
+	label
+	{
+		enabled "PSUI_Has(42)"
+		area 553 424 36 36
+		icon lua "PSUI_Icon(42)"
+	}
+	label
+	{
+		enabled "PSUI_Has(42)"
+		area 551 446 37 15
+		text lua "PSUI_Count(42)"
+		text style "normal"
+		text point 10
+		text align right bottom
+	}
+	button
+	{
+		enabled "PSUI_Has(42)"
+		area 551 422 40 40
+		tooltip lua "PSUI_Name(42)"
+		action "PSUI_Take(42)"
+	}
+	label
+	{
+		enabled "PSUI_Has(43)"
+		area 603 424 36 36
+		icon lua "PSUI_Icon(43)"
+	}
+	label
+	{
+		enabled "PSUI_Has(43)"
+		area 601 446 37 15
+		text lua "PSUI_Count(43)"
+		text style "normal"
+		text point 10
+		text align right bottom
+	}
+	button
+	{
+		enabled "PSUI_Has(43)"
+		area 601 422 40 40
+		tooltip lua "PSUI_Name(43)"
+		action "PSUI_Take(43)"
+	}
+	label
+	{
+		enabled "PSUI_Has(44)"
+		area 653 424 36 36
+		icon lua "PSUI_Icon(44)"
+	}
+	label
+	{
+		enabled "PSUI_Has(44)"
+		area 651 446 37 15
+		text lua "PSUI_Count(44)"
+		text style "normal"
+		text point 10
+		text align right bottom
+	}
+	button
+	{
+		enabled "PSUI_Has(44)"
+		area 651 422 40 40
+		tooltip lua "PSUI_Name(44)"
+		action "PSUI_Take(44)"
+	}
+	label
+	{
+		enabled "PSUI_Has(45)"
+		area 703 424 36 36
+		icon lua "PSUI_Icon(45)"
+	}
+	label
+	{
+		enabled "PSUI_Has(45)"
+		area 701 446 37 15
+		text lua "PSUI_Count(45)"
+		text style "normal"
+		text point 10
+		text align right bottom
+	}
+	button
+	{
+		enabled "PSUI_Has(45)"
+		area 701 422 40 40
+		tooltip lua "PSUI_Name(45)"
+		action "PSUI_Take(45)"
+	}
+	label
+	{
+		enabled "PSUI_Has(46)"
+		area 753 424 36 36
+		icon lua "PSUI_Icon(46)"
+	}
+	label
+	{
+		enabled "PSUI_Has(46)"
+		area 751 446 37 15
+		text lua "PSUI_Count(46)"
+		text style "normal"
+		text point 10
+		text align right bottom
+	}
+	button
+	{
+		enabled "PSUI_Has(46)"
+		area 751 422 40 40
+		tooltip lua "PSUI_Name(46)"
+		action "PSUI_Take(46)"
+	}
+	label
+	{
+		enabled "PSUI_Has(47)"
+		area 803 424 36 36
+		icon lua "PSUI_Icon(47)"
+	}
+	label
+	{
+		enabled "PSUI_Has(47)"
+		area 801 446 37 15
+		text lua "PSUI_Count(47)"
+		text style "normal"
+		text point 10
+		text align right bottom
+	}
+	button
+	{
+		enabled "PSUI_Has(47)"
+		area 801 422 40 40
+		tooltip lua "PSUI_Name(47)"
+		action "PSUI_Take(47)"
+	}
+	label
+	{
+		enabled "PSUI_Has(48)"
+		area 853 424 36 36
+		icon lua "PSUI_Icon(48)"
+	}
+	label
+	{
+		enabled "PSUI_Has(48)"
+		area 851 446 37 15
+		text lua "PSUI_Count(48)"
+		text style "normal"
+		text point 10
+		text align right bottom
+	}
+	button
+	{
+		enabled "PSUI_Has(48)"
+		area 851 422 40 40
+		tooltip lua "PSUI_Name(48)"
+		action "PSUI_Take(48)"
+	}
+	label
+	{
+		enabled "PSUI_Has(49)"
+		area 903 424 36 36
+		icon lua "PSUI_Icon(49)"
+	}
+	label
+	{
+		enabled "PSUI_Has(49)"
+		area 901 446 37 15
+		text lua "PSUI_Count(49)"
+		text style "normal"
+		text point 10
+		text align right bottom
+	}
+	button
+	{
+		enabled "PSUI_Has(49)"
+		area 901 422 40 40
+		tooltip lua "PSUI_Name(49)"
+		action "PSUI_Take(49)"
+	}
+	label
+	{
+		enabled "PSUI_Has(50)"
+		area 953 424 36 36
+		icon lua "PSUI_Icon(50)"
+	}
+	label
+	{
+		enabled "PSUI_Has(50)"
+		area 951 446 37 15
+		text lua "PSUI_Count(50)"
+		text style "normal"
+		text point 10
+		text align right bottom
+	}
+	button
+	{
+		enabled "PSUI_Has(50)"
+		area 951 422 40 40
+		tooltip lua "PSUI_Name(50)"
+		action "PSUI_Take(50)"
+	}
+	label
+	{
+		enabled "PSUI_Has(51)"
+		area 503 470 36 36
+		icon lua "PSUI_Icon(51)"
+	}
+	label
+	{
+		enabled "PSUI_Has(51)"
+		area 501 492 37 15
+		text lua "PSUI_Count(51)"
+		text style "normal"
+		text point 10
+		text align right bottom
+	}
+	button
+	{
+		enabled "PSUI_Has(51)"
+		area 501 468 40 40
+		tooltip lua "PSUI_Name(51)"
+		action "PSUI_Take(51)"
+	}
+	label
+	{
+		enabled "PSUI_Has(52)"
+		area 553 470 36 36
+		icon lua "PSUI_Icon(52)"
+	}
+	label
+	{
+		enabled "PSUI_Has(52)"
+		area 551 492 37 15
+		text lua "PSUI_Count(52)"
+		text style "normal"
+		text point 10
+		text align right bottom
+	}
+	button
+	{
+		enabled "PSUI_Has(52)"
+		area 551 468 40 40
+		tooltip lua "PSUI_Name(52)"
+		action "PSUI_Take(52)"
+	}
+	label
+	{
+		enabled "PSUI_Has(53)"
+		area 603 470 36 36
+		icon lua "PSUI_Icon(53)"
+	}
+	label
+	{
+		enabled "PSUI_Has(53)"
+		area 601 492 37 15
+		text lua "PSUI_Count(53)"
+		text style "normal"
+		text point 10
+		text align right bottom
+	}
+	button
+	{
+		enabled "PSUI_Has(53)"
+		area 601 468 40 40
+		tooltip lua "PSUI_Name(53)"
+		action "PSUI_Take(53)"
+	}
+	label
+	{
+		enabled "PSUI_Has(54)"
+		area 653 470 36 36
+		icon lua "PSUI_Icon(54)"
+	}
+	label
+	{
+		enabled "PSUI_Has(54)"
+		area 651 492 37 15
+		text lua "PSUI_Count(54)"
+		text style "normal"
+		text point 10
+		text align right bottom
+	}
+	button
+	{
+		enabled "PSUI_Has(54)"
+		area 651 468 40 40
+		tooltip lua "PSUI_Name(54)"
+		action "PSUI_Take(54)"
+	}
+	label
+	{
+		enabled "PSUI_Has(55)"
+		area 703 470 36 36
+		icon lua "PSUI_Icon(55)"
+	}
+	label
+	{
+		enabled "PSUI_Has(55)"
+		area 701 492 37 15
+		text lua "PSUI_Count(55)"
+		text style "normal"
+		text point 10
+		text align right bottom
+	}
+	button
+	{
+		enabled "PSUI_Has(55)"
+		area 701 468 40 40
+		tooltip lua "PSUI_Name(55)"
+		action "PSUI_Take(55)"
+	}
+	label
+	{
+		enabled "PSUI_Has(56)"
+		area 753 470 36 36
+		icon lua "PSUI_Icon(56)"
+	}
+	label
+	{
+		enabled "PSUI_Has(56)"
+		area 751 492 37 15
+		text lua "PSUI_Count(56)"
+		text style "normal"
+		text point 10
+		text align right bottom
+	}
+	button
+	{
+		enabled "PSUI_Has(56)"
+		area 751 468 40 40
+		tooltip lua "PSUI_Name(56)"
+		action "PSUI_Take(56)"
+	}
+	label
+	{
+		enabled "PSUI_Has(57)"
+		area 803 470 36 36
+		icon lua "PSUI_Icon(57)"
+	}
+	label
+	{
+		enabled "PSUI_Has(57)"
+		area 801 492 37 15
+		text lua "PSUI_Count(57)"
+		text style "normal"
+		text point 10
+		text align right bottom
+	}
+	button
+	{
+		enabled "PSUI_Has(57)"
+		area 801 468 40 40
+		tooltip lua "PSUI_Name(57)"
+		action "PSUI_Take(57)"
+	}
+	label
+	{
+		enabled "PSUI_Has(58)"
+		area 853 470 36 36
+		icon lua "PSUI_Icon(58)"
+	}
+	label
+	{
+		enabled "PSUI_Has(58)"
+		area 851 492 37 15
+		text lua "PSUI_Count(58)"
+		text style "normal"
+		text point 10
+		text align right bottom
+	}
+	button
+	{
+		enabled "PSUI_Has(58)"
+		area 851 468 40 40
+		tooltip lua "PSUI_Name(58)"
+		action "PSUI_Take(58)"
+	}
+	label
+	{
+		enabled "PSUI_Has(59)"
+		area 903 470 36 36
+		icon lua "PSUI_Icon(59)"
+	}
+	label
+	{
+		enabled "PSUI_Has(59)"
+		area 901 492 37 15
+		text lua "PSUI_Count(59)"
+		text style "normal"
+		text point 10
+		text align right bottom
+	}
+	button
+	{
+		enabled "PSUI_Has(59)"
+		area 901 468 40 40
+		tooltip lua "PSUI_Name(59)"
+		action "PSUI_Take(59)"
+	}
+	label
+	{
+		enabled "PSUI_Has(60)"
+		area 953 470 36 36
+		icon lua "PSUI_Icon(60)"
+	}
+	label
+	{
+		enabled "PSUI_Has(60)"
+		area 951 492 37 15
+		text lua "PSUI_Count(60)"
+		text style "normal"
+		text point 10
+		text align right bottom
+	}
+	button
+	{
+		enabled "PSUI_Has(60)"
+		area 951 468 40 40
+		tooltip lua "PSUI_Name(60)"
+		action "PSUI_Take(60)"
 	}
 	button
 	{

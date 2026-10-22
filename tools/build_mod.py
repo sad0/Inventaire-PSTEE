@@ -281,6 +281,7 @@ REQUIRE_PREDICATE GAME_IS ~pstee~ ~Planescape: Torment EE only.~
 COPY ~InventairePTEE/art~ ~override~
 COPY ~InventairePTEE/lua/M_PSINV.lua~ ~override~
 COPY ~InventairePTEE/lua/M_PSCORE.lua~ ~override~   // step 2a: stash core (EEex), console-tested
+COPY ~InventairePTEE/lua/M_PSUI.lua~ ~override~     // step 2b: stash grid on the inventory page
 
 // The stash store (step 2a): a hidden bag store (type 5) built from a vanilla STORV1.1 store, no stock, buys every
 // item type, practically unlimited capacity.
