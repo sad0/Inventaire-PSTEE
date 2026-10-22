@@ -239,7 +239,7 @@ menu
         m.append(movable(f"det_{k}", (p[0] + 10, p[1] + 10, p[2] - 16, p[3] - 16),
                          text_lua=f"psInvStatDetail('{nm}')", style="normal", point=10, align="left top",
                          color_lua="psInvYellow()"))
-    m.append("\ttext\n\t{\n\t\tarea 501 512 420 24\n\t\ttext lua \"TEXT_inventoryError\"\n\t\ttext style normal\n"
+    m.append("\ttext\n\t{\n\t\tarea 501 512 420 24\n\t\ttext lua \"psInvMessage()\"\n\t\ttext style normal\n"
              "\t\ttext point 12\n\t\ttext align left center\n\t}\n")
     for i, a in enumerate(L["quick weapons"]):
         m.append(bm.slot(f"slot_inv_{1 + i}", a, "SLOTSWRD", i, f"weapon{i}"))
@@ -261,7 +261,7 @@ menu
                      text_lua="Infinity_GetCurrentGroundPage()+1 .. '/' .. Infinity_GetMaxGroundPage()+1", point=13,
                      color_lua="psInvYellow()"))
     for i in range(8):
-        m.append(piece(f"tab{i + 1}", text_lua=f"psInvTab({i + 1})", point=11, action=f"psInvSelectTab({i + 1})",
+        m.append(piece(f"tab{i + 1}", text_lua=f"psInvTab({i + 1})", point=12, action=f"psInvSelectTab({i + 1})",
                        frame_lua=f"psInvTabFrame({i + 1})", font="EXOCET", color_lua="psInvYellow()"))
     m.append(movable("sort", L["buttons"]["sort"], text_lua="psInvText('Sort')", point=14, align="right center",
                      color_lua="psInvYellow()"))
@@ -350,6 +350,12 @@ function psInvWeightColor()
 	return c
 end
 
+function psInvMessage()
+	local t = tostring(TEXT_inventoryError or '')
+	if string.find(string.lower(t), 'pause', 1, true) then return '' end
+	return t
+end
+
 function psInvWhite()
 	return bit32.band(tonumber(fontcolors['B'], 16), 0x00FFFFFF)
 end
@@ -371,6 +377,13 @@ end
 
 function psInvShorten(key, text)
 	local out = {}
+	local n = #text
+	for cut = math.floor(n / 2) - 2, math.floor(n / 2) + 2 do
+		if cut > 0 and string.sub(text, 1, cut) == string.sub(text, cut + 1, cut * 2) and cut * 2 >= n - 1 then
+			text = string.sub(text, 1, cut)
+			break
+		end
+	end
 	text = string.gsub(text, '"[^"]*"', '')            -- quoted dialogue lines
 	text = string.gsub(text, '\226\128\156[^\226]*\226\128\157', '')  -- curly quotes
 	for line in string.gmatch(text, '[^\n]+') do
@@ -379,6 +392,7 @@ function psInvShorten(key, text)
 		line = string.gsub(line, '%s*:%s*:', ' :')
 		line = string.gsub(line, ':%s+([%+%-]?%d)', ': %1')
 		line = string.gsub(line, '%s%s+', ' ')
+		line = string.gsub(line, '%+%-', '-')                -- engine prints "+-1"
 		line = psInvTrim(line)
 		-- the engine sometimes repeats a line glued to itself ("TAC0 de base : 18TAC0 de base : 18")
 		local half = math.floor(#line / 2)

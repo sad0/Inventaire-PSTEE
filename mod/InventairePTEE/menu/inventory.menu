@@ -222,7 +222,7 @@ menu
 	text
 	{
 		area 501 512 420 24
-		text lua "TEXT_inventoryError"
+		text lua "psInvMessage()"
 		text style normal
 		text point 12
 		text align left center
@@ -312,7 +312,7 @@ menu
 		frame lua "psInvTabFrame(1)"
 		text lua "psInvTab(1)"
 		text style "button"
-		text point 11
+		text point 12
 		text font "EXOCET"
 		text color lua "psInvYellow()"
 		action "psInvSelectTab(1)"
@@ -325,7 +325,7 @@ menu
 		frame lua "psInvTabFrame(2)"
 		text lua "psInvTab(2)"
 		text style "button"
-		text point 11
+		text point 12
 		text font "EXOCET"
 		text color lua "psInvYellow()"
 		action "psInvSelectTab(2)"
@@ -338,7 +338,7 @@ menu
 		frame lua "psInvTabFrame(3)"
 		text lua "psInvTab(3)"
 		text style "button"
-		text point 11
+		text point 12
 		text font "EXOCET"
 		text color lua "psInvYellow()"
 		action "psInvSelectTab(3)"
@@ -351,7 +351,7 @@ menu
 		frame lua "psInvTabFrame(4)"
 		text lua "psInvTab(4)"
 		text style "button"
-		text point 11
+		text point 12
 		text font "EXOCET"
 		text color lua "psInvYellow()"
 		action "psInvSelectTab(4)"
@@ -364,7 +364,7 @@ menu
 		frame lua "psInvTabFrame(5)"
 		text lua "psInvTab(5)"
 		text style "button"
-		text point 11
+		text point 12
 		text font "EXOCET"
 		text color lua "psInvYellow()"
 		action "psInvSelectTab(5)"
@@ -377,7 +377,7 @@ menu
 		frame lua "psInvTabFrame(6)"
 		text lua "psInvTab(6)"
 		text style "button"
-		text point 11
+		text point 12
 		text font "EXOCET"
 		text color lua "psInvYellow()"
 		action "psInvSelectTab(6)"
@@ -390,7 +390,7 @@ menu
 		frame lua "psInvTabFrame(7)"
 		text lua "psInvTab(7)"
 		text style "button"
-		text point 11
+		text point 12
 		text font "EXOCET"
 		text color lua "psInvYellow()"
 		action "psInvSelectTab(7)"
@@ -403,7 +403,7 @@ menu
 		frame lua "psInvTabFrame(8)"
 		text lua "psInvTab(8)"
 		text style "button"
-		text point 11
+		text point 12
 		text font "EXOCET"
 		text color lua "psInvYellow()"
 		action "psInvSelectTab(8)"

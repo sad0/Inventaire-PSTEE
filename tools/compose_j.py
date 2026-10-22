@@ -68,7 +68,7 @@ def main():
     rgb = ImageEnhance.Brightness(heap.convert("RGB")).enhance(0.8)
     h2 = rgb.convert("RGBA")
     h2.putalpha(heap.getchannel("A"))
-    h2.thumbnail((300, 300), Image.LANCZOS)
+    h2.thumbnail((400, 400), Image.LANCZOS)  # John: a bit bigger
     out.alpha_composite(h2, (round(1105 * 2 - h2.width / 2), round(965 * 2 - h2.height)))
     out.convert("RGB").save(os.path.join(J, "bg_final_2x.png"))
     print("bg_final_2x.png written")
