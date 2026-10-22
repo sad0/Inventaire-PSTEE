@@ -651,6 +651,9 @@ def main():
     for res in ("IVPIEYER", "IVPIEARL", "IVPIEARR", "IVPICHST", "IVPIWRST", "IVPIHNDL", "IVPIHNDR", "IVPIRING",
                 "IVPITATT", "IVPILENS", "IVPITETH", "IVPIBOW"):
         dark_copy(res, res, b, 0.55)
+    # quick-slot silhouettes are engine placeholders too (sword, potion, arrow)
+    for res in ("IVQIWEAP", "IVQIITM", "IVQIARRW", "IVIARW", "IVISWRD", "IVISHLD", "IVISCRL", "SLOTWEAP"):
+        dark_copy(res, res, q, 0.45)
     for nm, res in BAMS.items():
         write_bam_v1(part_frames(nm, L["parts"][nm]), os.path.join(art, f"{res}.BAM"))
     menu = build_menu()
