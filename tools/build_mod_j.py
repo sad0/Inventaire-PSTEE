@@ -227,7 +227,8 @@ menu
         m.append(movable(f"val_{k}", d, text_lua=f"psInvStat('{nm}')", point=15, align="center center"))
         p = st["plate"]
         m.append(movable(f"det_{k}", (p[0] + 10, p[1] + 10, p[2] - 16, p[3] - 16),
-                         text_lua=f"psInvStatDetail('{nm}')", style="normal", point=11, align="left top"))
+                         text_lua=f"psInvStatDetail('{nm}')", style="normal", point=10, align="left top",
+                         color_lua="psInvWhite()"))
     m.append("\ttext\n\t{\n\t\tarea 501 512 420 24\n\t\ttext lua \"TEXT_inventoryError\"\n\t\ttext style normal\n"
              "\t\ttext point 12\n\t\ttext align left center\n\t}\n")
     for i, a in enumerate(L["quick weapons"]):
@@ -331,12 +332,74 @@ function psInvStat(key)
 	return ''
 end
 
--- Detail lines: the engine's own breakdown when the inventory table provides it (AC/HP/THAC0/damage .details).
+function psInvWhite()
+	return bit32.band(tonumber(fontcolors['B'], 16), 0x00FFFFFF)
+end
+
+-- Short forms like Party Stash BG (John 2026-10-22): attribute and stat names abbreviated, quotes cut.
+psInvAbbr = {
+	{'Points de vie', 'PV'}, {'Hit Points', 'HP'}, {"Classe d'armure", 'CA'}, {'Armor Class', 'AC'},
+	{'Armour Class', 'AC'}, {'Force', 'For'}, {'Strength', 'Str'}, {'Dext\195\169rit\195\169', 'Dex'},
+	{'Dexterity', 'Dex'}, {'Constitution', 'Con'}, {'Intelligence', 'Int'}, {'Sagesse', 'Sag'}, {'Wisdom', 'Wis'},
+	{'Charisme', 'Cha'}, {'Charisma', 'Cha'}, {'Comp\195\169tence', 'Comp.'}, {'Proficiency', 'Prof.'},
+	{'Arme', 'Arme'}, {'Weapon', 'Weapon'},
+}
+-- the block's own stat name is dropped from its lines ("Adahn : +10" in the HP block, not "PV: +10")
+psInvOwn = {AC = {'CA', 'AC'}, HP = {'PV', 'HP'}, THAC0 = {'TAC0', 'THAC0'}, Damage = {}}
+
+local function psInvTrim(t)
+	return (string.gsub(string.gsub(t, '^%s+', ''), '%s+$', ''))
+end
+
+function psInvShorten(key, text)
+	local out = {}
+	text = string.gsub(text, '"[^"]*"', '')            -- quoted dialogue lines
+	text = string.gsub(text, '\226\128\156[^\226]*\226\128\157', '')  -- curly quotes
+	for line in string.gmatch(text, '[^\n]+') do
+		for _, a in ipairs(psInvAbbr) do line = string.gsub(line, a[1], a[2]) end
+		for _, own in ipairs(psInvOwn[key] or {}) do line = string.gsub(line, '%s' .. own .. '%s*:', ' ') end
+		line = string.gsub(line, '%s*:%s*:', ' :')
+		line = string.gsub(line, ':%s+([%+%-]?%d)', ': %1')
+		line = string.gsub(line, '%s%s+', ' ')
+		line = psInvTrim(line)
+		if line ~= '' and line ~= ':' then out[#out + 1] = line end
+	end
+	return table.concat(out, '\n')
+end
+
+-- Detail lines: the engine's own breakdown (AC/HP/THAC0/damage .details), shortened.
 function psInvStatDetail(key)
 	local c = characters[id]
 	local f = {AC = function() return c.AC.details end, HP = function() return c.HP.details end,
 		THAC0 = function() return c.THAC0.details end, Damage = function() return c.damage.details end}
-	return tostring(psInvField(f[key]) or '')
+	local text = psInvShorten(key, tostring(psInvField(f[key]) or ''))
+	if key == 'Damage' then
+		local apr = psInvAPR()
+		if apr then
+			text = text .. (text ~= '' and '\n' or '') .. psInvAPRLabel() .. string.format('%g', apr)
+		end
+	end
+	return text
+end
+
+-- Attacks per round of the shown character (John 2026-10-22), like Party Stash BG: EEex stat 8 NUMBEROFATTACKS,
+-- engine code 1-5 attacks, 6 = 1.5, 7 = 2.5, 8 = 3.5, 9 = 4.5. Nothing shown without EEex.
+function psInvAPR()
+	local ok, v = pcall(function()
+		for p = 0, 5 do
+			local sp = EEex_Sprite_GetInPortrait(p)
+			if sp and sp.m_id == id then return EEex_Sprite_GetStat(sp, 8) end
+		end
+	end)
+	if not ok or type(v) ~= 'number' then return nil end
+	if v >= 6 then return v - 4.5 end
+	return v
+end
+
+function psInvAPRLabel()
+	local lang = string.lower(Infinity_GetINIString('Language', 'Text', '') or '')
+	if string.sub(lang, 1, 2) == 'fr' then return 'Attaques/round : ' end
+	return 'Attacks/round: '
 end
 '''
 

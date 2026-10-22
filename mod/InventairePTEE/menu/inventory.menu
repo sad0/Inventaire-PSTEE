@@ -115,7 +115,8 @@ menu
 		area 117 432 90 85
 		text lua "psInvStatDetail('AC')"
 		text style "normal"
-		text point 11
+		text point 10
+		text color lua "psInvWhite()"
 		text align left top
 	}
 	label
@@ -144,7 +145,8 @@ menu
 		area 326 432 118 85
 		text lua "psInvStatDetail('THAC0')"
 		text style "normal"
-		text point 11
+		text point 10
+		text color lua "psInvWhite()"
 		text align left top
 	}
 	label
@@ -173,7 +175,8 @@ menu
 		area 117 544 90 85
 		text lua "psInvStatDetail('HP')"
 		text style "normal"
-		text point 11
+		text point 10
+		text color lua "psInvWhite()"
 		text align left top
 	}
 	label
@@ -202,7 +205,8 @@ menu
 		area 326 544 118 85
 		text lua "psInvStatDetail('Damage')"
 		text style "normal"
-		text point 11
+		text point 10
+		text color lua "psInvWhite()"
 		text align left top
 	}
 	text
