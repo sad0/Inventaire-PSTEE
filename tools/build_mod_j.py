@@ -260,6 +260,7 @@ menu
 		doubleClickEventScheduled = nil
 		Infinity_SetBackground('BACKGROUND_INVENTORY')
 		psInvApplyPositions()
+		if PSC_AutoTest then PSC_AutoTest() end
 	"
 	onClose
 	"

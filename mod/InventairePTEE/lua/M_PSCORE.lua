@@ -206,6 +206,30 @@ function PSC_TakeP(portrait, res)
 	print('PSC take ' .. tostring(ok) .. ' ' .. tostring(why))
 end
 
+-- Auto-test (tools/test_stash.ps1 sets [Party Stash] Autotest=1): runs once when the inventory opens,
+-- stores backpack slot 16 of portrait 0, lists the stash, takes it back; everything printed to EEex.log.
+function PSC_AutoTest()
+	if Infinity_GetINIValue('Party Stash', 'Autotest', 0) ~= 1 then return end
+	Infinity_SetINIValue('Party Stash', 'Autotest', 0)
+	local ok, err = pcall(function()
+		print('PSC autotest begin')
+		PSC_Test()
+		PSC_Slots(0)
+		local sp = EEex_Sprite_GetInPortrait(0)
+		local p = sp and itemPtrAt(sp, 16) or 0
+		local res = p ~= 0 and itemRes(p) or nil
+		print('PSC slot16 = ' .. tostring(res))
+		PSC_AddP(0, 16)
+		PSC_Test()
+		PSC_Slots(0)
+		if res then PSC_TakeP(0, res) end
+		PSC_Test()
+		PSC_Slots(0)
+		print('PSC autotest end')
+	end)
+	if not ok then print('PSC autotest error ' .. tostring(err)) end
+end
+
 -- Console helper: prints readiness and the stash contents in the message log.
 function PSC_Test()
 	local ok = PSC_Ready()
