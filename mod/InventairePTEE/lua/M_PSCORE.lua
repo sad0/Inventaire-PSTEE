@@ -182,7 +182,9 @@ function PSC_Take(portrait, itemRes)
 	if not entry then return nil, 'not in the stash' end
 	local taken = PSC_Eng_TakeItemFromStore(gamePtr(), resRef(P.RES), resRef(itemRes, 32), 1) % 65536
 	if taken == 0 then return nil, 'the stash kept it' end
-	EEex_Action_ExecuteResponseStringOnAIBaseInstantly(
+	-- Queued, not instant: EEex-PTEE's instant execution freed the action with the wrong destructor (heap
+	-- corruption, fixed in a later EEex-PTEE release). The item shows up on the next AI tick.
+	EEex_Action_QueueResponseStringOnAIBase(
 		string.format('CreateItem("%s",%d,0,0)', itemRes, math.max(0, entry.uses)), sp)
 	return true
 end
