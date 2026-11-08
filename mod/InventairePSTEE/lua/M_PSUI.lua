@@ -219,13 +219,13 @@ local function placeOverlay(n)
 	drop.area = n
 end
 
--- What an overlay shows: the real slot's data marked empty, nothing drawn over the grid. One table, refilled in place.
+-- What an overlay shows: no icon, no placeholder. One table, refilled in place.
 function PSUI_DropSlot(n)
 	local real = characters and characters[id] and characters[id].equipment['group' .. n]
 	local t = drop.slotInfo
 	for k in pairs(t) do t[k] = nil end
 	for k, v in pairs(real or {}) do t[k] = v end
-	t.empty, t.tooltip, t.highlight = 1, '', 0
+	t.empty, t.tooltip, t.highlight, t.placeholder = 0, '', 0, ''
 	t.item = { count = 0, usages = 0, icon = '', tint = '', name = '', identified = 1 }
 	return t
 end

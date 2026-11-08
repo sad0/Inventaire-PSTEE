@@ -267,7 +267,7 @@ end
 TP2 = r'''// Inventaire PSTEE: Party Stash inventory page for Planescape: Torment EE (step 1 preview).
 BACKUP ~weidu_external/backup/InventairePSTEE~
 AUTHOR ~sad0~
-VERSION ~v0.6~
+VERSION ~v0.7~
 
 LANGUAGE ~English~ ~english~
 

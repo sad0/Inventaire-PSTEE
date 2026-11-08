@@ -199,6 +199,11 @@ def slot_bam():
             d.rounded_rectangle((0, 0, 39, 39), radius=5, outline=rim, width=2)
         frames.append(im)
     write_bam_v1(frames, os.path.join(MOD, "art", "PSJSLOT.BAM"))
+    # A drop-ready slot paints stone over its whole area (engine): the drag and drop overlay hides the stash cells of the
+    # page's art, so they are drawn again from that art while an item is held.
+    x, y, w, h = L["stash"][0]
+    page = Image.open(os.path.join(ROOT, "design", "build", "ingame_bg_J.png")).convert("RGBA")
+    write_bam_v1([page.crop((x + 171 - 3, y - 3, x + 171 + w + 3, y + h + 3))], os.path.join(MOD, "art", "PSJCELL.BAM"))
 
 
 MOVABLE, HANDLES = [], []
@@ -333,6 +338,8 @@ menu
                    action="PSUI_StoreAll()"))
     # stash grid (step 2b): icon + count + click-to-take button per cell
     for i, (x, y, w, h) in enumerate(L["stash"], start=1):
+        m.append(f'\tlabel\n\t{{\n\t\tenabled "PSUI_Holding()"\n\t\tarea {x - 3} {y - 3} {w + 6} {h + 6}\n'
+                 f'\t\tbam "PSJCELL"\n\t}}\n')
         m.append(f'\tlabel\n\t{{\n\t\tenabled "PSUI_Has({i})"\n\t\tarea {x + 2} {y + 2} {w - 4} {h - 4}\n'
                  f'\t\ticon lua "PSUI_Icon({i})"\n\t}}\n')
         m.append(f'\tlabel\n\t{{\n\t\tenabled "PSUI_Has({i})"\n\t\tarea {x} {y + h - 16} {w - 3} 15\n'
