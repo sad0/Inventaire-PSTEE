@@ -173,6 +173,94 @@ function PSUI_StoreAll()
 	PSC_RefreshPage()
 end
 
+-- Drag and drop onto the stash grid (same idea as Party Stash BG): menu buttons get no clicks while an item is in hand,
+-- so while one is held a real slot widget bound to the first free backpack slot covers the grid. The game drops the item
+-- there itself (cursor and all), then PSUI_DropTick moves it into the stash. Slot widgets ignore "enabled", so the 20
+-- overlays stay at size 0 until needed. Infinity_SetArea would find the vanilla menu's widget of the same name: walk
+-- this menu's items instead (the size-0 slots, in declaration order).
+-- The cursor's place while the item was held says the drop was on the grid and not on the real backpack slot, which has
+-- the same name.
+local drop = { over = false, held = false, n = nil, portrait = nil, slotInfo = {}, area = nil }
+
+local function holding()
+	local inv = EEex_EngineGlobal_CBaldurChitin.m_pEngineInventory
+	return inv ~= nil and inv.m_pTempItem ~= nil
+end
+PSUI_Holding = holding
+
+local function firstFree(portrait)
+	for n, slot in ipairs(PSC.BACKPACK) do
+		if not PSC_SlotRes(portrait, slot) then return n - 1 end
+	end
+	return nil
+end
+
+local function overGrid()
+	local x, y = EEex_Menu_GetArea('INVENTORY')
+	return EEex_Menu_IsCursorWithinRect(x + PSUI_GRID[1], y + PSUI_GRID[2], PSUI_GRID[3], PSUI_GRID[4])
+end
+
+-- Puts the overlay on the grid for backpack group n, nil = none.
+local function placeOverlay(n)
+	if drop.area == n then return end
+	if not drop.area then
+		drop.list = {}
+		local menu = EEex_Menu_Find('INVENTORY')
+		local item = menu and menu.items
+		while item ~= nil do
+			if item.type == 9 and item.area.w == 0 and item.area.h == 0 then drop.list[#drop.list + 1] = item end
+			item = item.next
+		end
+	end
+	local old = drop.area and drop.list[drop.area + 1]
+	if old then old.area.x, old.area.y, old.area.w, old.area.h = 0, 0, 0, 0 end
+	local new = n and drop.list[n + 1]
+	if new then new.area.x, new.area.y, new.area.w, new.area.h = PSUI_GRID[1], PSUI_GRID[2], PSUI_GRID[3], PSUI_GRID[4] end
+	drop.area = n
+end
+
+-- What an overlay shows: the real slot's data marked empty, nothing drawn over the grid. One table, refilled in place.
+function PSUI_DropSlot(n)
+	local real = characters and characters[id] and characters[id].equipment['group' .. n]
+	local t = drop.slotInfo
+	for k in pairs(t) do t[k] = nil end
+	for k, v in pairs(real or {}) do t[k] = v end
+	t.empty, t.tooltip, t.highlight = 1, '', 0
+	t.item = { count = 0, usages = 0, icon = '', tint = '', name = '', identified = 1 }
+	return t
+end
+
+-- Called every frame by the inventory page.
+function PSUI_DropTick()
+	local now = holding()
+	if now then
+		drop.portrait = PSUI_Portrait()
+		drop.n = firstFree(drop.portrait)
+		placeOverlay(drop.n)
+		drop.over = overGrid()
+		drop.seen = Infinity_GetClockTicks()
+	elseif drop.held then
+		placeOverlay(nil)
+		local slot = drop.n and PSC.BACKPACK[drop.n + 1]
+		local res = slot and PSC_SlotRes(drop.portrait, slot)
+		-- the page closed with an item in hand: the game put it back, that was no drop
+		local fresh = Infinity_GetClockTicks() - drop.seen < 500
+		if drop.over and res and fresh then
+			if PSUI_IsQuest(res) then
+				TEXT_inventoryError = 'Quest items stay in the backpack'
+			else
+				local ok, why = PSC_Add(drop.portrait, slot)
+				if ok then TEXT_inventoryError = '' else print('PSC drop ' .. tostring(why)) end
+			end
+			PSUI_Refresh()
+			PSC_RefreshPage()
+		end
+		drop.over, drop.n = false, nil
+	end
+	drop.held = now
+	return false
+end
+
 -- Stash weight in LB (sum of item weights x count), for the header.
 function PSUI_Weight()
 	local w = 0

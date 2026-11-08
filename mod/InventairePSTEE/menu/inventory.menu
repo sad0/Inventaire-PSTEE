@@ -253,6 +253,26 @@ menu
 	slot {name "slot_inv_21"	area 270 350 36 36	bam "PSJIVSL"	sequence 7	slotinfo "characters[id].equipment.tattoo0"	highlight selected 1}
 	slot {name "slot_inv_24"	area 310 350 36 36	bam "PSJIVSL"	sequence 8	slotinfo "characters[id].equipment.tattoo1"	highlight selected 1}
 	slot {name "slot_inv_26"	area 350 350 36 36	bam "PSJIVSL"	sequence 9	slotinfo "characters[id].equipment.tattoo2"	highlight selected 1}
+	slot {name "slot_inv_30"	area 0 0 0 0	slotinfo "PSUI_DropSlot(0)"	}
+	slot {name "slot_inv_31"	area 0 0 0 0	slotinfo "PSUI_DropSlot(1)"	}
+	slot {name "slot_inv_32"	area 0 0 0 0	slotinfo "PSUI_DropSlot(2)"	}
+	slot {name "slot_inv_33"	area 0 0 0 0	slotinfo "PSUI_DropSlot(3)"	}
+	slot {name "slot_inv_34"	area 0 0 0 0	slotinfo "PSUI_DropSlot(4)"	}
+	slot {name "slot_inv_35"	area 0 0 0 0	slotinfo "PSUI_DropSlot(5)"	}
+	slot {name "slot_inv_36"	area 0 0 0 0	slotinfo "PSUI_DropSlot(6)"	}
+	slot {name "slot_inv_37"	area 0 0 0 0	slotinfo "PSUI_DropSlot(7)"	}
+	slot {name "slot_inv_38"	area 0 0 0 0	slotinfo "PSUI_DropSlot(8)"	}
+	slot {name "slot_inv_39"	area 0 0 0 0	slotinfo "PSUI_DropSlot(9)"	}
+	slot {name "slot_inv_40"	area 0 0 0 0	slotinfo "PSUI_DropSlot(10)"	}
+	slot {name "slot_inv_41"	area 0 0 0 0	slotinfo "PSUI_DropSlot(11)"	}
+	slot {name "slot_inv_42"	area 0 0 0 0	slotinfo "PSUI_DropSlot(12)"	}
+	slot {name "slot_inv_43"	area 0 0 0 0	slotinfo "PSUI_DropSlot(13)"	}
+	slot {name "slot_inv_44"	area 0 0 0 0	slotinfo "PSUI_DropSlot(14)"	}
+	slot {name "slot_inv_45"	area 0 0 0 0	slotinfo "PSUI_DropSlot(15)"	}
+	slot {name "slot_inv_46"	area 0 0 0 0	slotinfo "PSUI_DropSlot(16)"	}
+	slot {name "slot_inv_47"	area 0 0 0 0	slotinfo "PSUI_DropSlot(17)"	}
+	slot {name "slot_inv_48"	area 0 0 0 0	slotinfo "PSUI_DropSlot(18)"	}
+	slot {name "slot_inv_49"	area 0 0 0 0	slotinfo "PSUI_DropSlot(19)"	}
 	slot {name "slot_inv_30"	area 501 134 40 40	bam "PSJSLOT"	sequence 0	slotinfo "characters[id].equipment.group0"	highlight selected 1}
 	slot {name "slot_inv_31"	area 501 180 40 40	bam "PSJSLOT"	sequence 0	slotinfo "characters[id].equipment.group1"	highlight selected 1}
 	slot {name "slot_inv_32"	area 551 134 40 40	bam "PSJSLOT"	sequence 0	slotinfo "characters[id].equipment.group2"	highlight selected 1}
@@ -480,7 +500,7 @@ menu
 	}
 	button
 	{
-		enabled "PSUI_Has(1)"
+		enabled "PSUI_Has(1) and not PSUI_Holding()"
 		area 501 238 40 40
 		tooltip lua "PSUI_Name(1)"
 		action "PSUI_Take(1)"
@@ -502,7 +522,7 @@ menu
 	}
 	button
 	{
-		enabled "PSUI_Has(2)"
+		enabled "PSUI_Has(2) and not PSUI_Holding()"
 		area 551 238 40 40
 		tooltip lua "PSUI_Name(2)"
 		action "PSUI_Take(2)"
@@ -524,7 +544,7 @@ menu
 	}
 	button
 	{
-		enabled "PSUI_Has(3)"
+		enabled "PSUI_Has(3) and not PSUI_Holding()"
 		area 601 238 40 40
 		tooltip lua "PSUI_Name(3)"
 		action "PSUI_Take(3)"
@@ -546,7 +566,7 @@ menu
 	}
 	button
 	{
-		enabled "PSUI_Has(4)"
+		enabled "PSUI_Has(4) and not PSUI_Holding()"
 		area 651 238 40 40
 		tooltip lua "PSUI_Name(4)"
 		action "PSUI_Take(4)"
@@ -568,7 +588,7 @@ menu
 	}
 	button
 	{
-		enabled "PSUI_Has(5)"
+		enabled "PSUI_Has(5) and not PSUI_Holding()"
 		area 701 238 40 40
 		tooltip lua "PSUI_Name(5)"
 		action "PSUI_Take(5)"
@@ -590,7 +610,7 @@ menu
 	}
 	button
 	{
-		enabled "PSUI_Has(6)"
+		enabled "PSUI_Has(6) and not PSUI_Holding()"
 		area 751 238 40 40
 		tooltip lua "PSUI_Name(6)"
 		action "PSUI_Take(6)"
@@ -612,7 +632,7 @@ menu
 	}
 	button
 	{
-		enabled "PSUI_Has(7)"
+		enabled "PSUI_Has(7) and not PSUI_Holding()"
 		area 801 238 40 40
 		tooltip lua "PSUI_Name(7)"
 		action "PSUI_Take(7)"
@@ -634,7 +654,7 @@ menu
 	}
 	button
 	{
-		enabled "PSUI_Has(8)"
+		enabled "PSUI_Has(8) and not PSUI_Holding()"
 		area 851 238 40 40
 		tooltip lua "PSUI_Name(8)"
 		action "PSUI_Take(8)"
@@ -656,7 +676,7 @@ menu
 	}
 	button
 	{
-		enabled "PSUI_Has(9)"
+		enabled "PSUI_Has(9) and not PSUI_Holding()"
 		area 901 238 40 40
 		tooltip lua "PSUI_Name(9)"
 		action "PSUI_Take(9)"
@@ -678,7 +698,7 @@ menu
 	}
 	button
 	{
-		enabled "PSUI_Has(10)"
+		enabled "PSUI_Has(10) and not PSUI_Holding()"
 		area 951 238 40 40
 		tooltip lua "PSUI_Name(10)"
 		action "PSUI_Take(10)"
@@ -700,7 +720,7 @@ menu
 	}
 	button
 	{
-		enabled "PSUI_Has(11)"
+		enabled "PSUI_Has(11) and not PSUI_Holding()"
 		area 501 284 40 40
 		tooltip lua "PSUI_Name(11)"
 		action "PSUI_Take(11)"
@@ -722,7 +742,7 @@ menu
 	}
 	button
 	{
-		enabled "PSUI_Has(12)"
+		enabled "PSUI_Has(12) and not PSUI_Holding()"
 		area 551 284 40 40
 		tooltip lua "PSUI_Name(12)"
 		action "PSUI_Take(12)"
@@ -744,7 +764,7 @@ menu
 	}
 	button
 	{
-		enabled "PSUI_Has(13)"
+		enabled "PSUI_Has(13) and not PSUI_Holding()"
 		area 601 284 40 40
 		tooltip lua "PSUI_Name(13)"
 		action "PSUI_Take(13)"
@@ -766,7 +786,7 @@ menu
 	}
 	button
 	{
-		enabled "PSUI_Has(14)"
+		enabled "PSUI_Has(14) and not PSUI_Holding()"
 		area 651 284 40 40
 		tooltip lua "PSUI_Name(14)"
 		action "PSUI_Take(14)"
@@ -788,7 +808,7 @@ menu
 	}
 	button
 	{
-		enabled "PSUI_Has(15)"
+		enabled "PSUI_Has(15) and not PSUI_Holding()"
 		area 701 284 40 40
 		tooltip lua "PSUI_Name(15)"
 		action "PSUI_Take(15)"
@@ -810,7 +830,7 @@ menu
 	}
 	button
 	{
-		enabled "PSUI_Has(16)"
+		enabled "PSUI_Has(16) and not PSUI_Holding()"
 		area 751 284 40 40
 		tooltip lua "PSUI_Name(16)"
 		action "PSUI_Take(16)"
@@ -832,7 +852,7 @@ menu
 	}
 	button
 	{
-		enabled "PSUI_Has(17)"
+		enabled "PSUI_Has(17) and not PSUI_Holding()"
 		area 801 284 40 40
 		tooltip lua "PSUI_Name(17)"
 		action "PSUI_Take(17)"
@@ -854,7 +874,7 @@ menu
 	}
 	button
 	{
-		enabled "PSUI_Has(18)"
+		enabled "PSUI_Has(18) and not PSUI_Holding()"
 		area 851 284 40 40
 		tooltip lua "PSUI_Name(18)"
 		action "PSUI_Take(18)"
@@ -876,7 +896,7 @@ menu
 	}
 	button
 	{
-		enabled "PSUI_Has(19)"
+		enabled "PSUI_Has(19) and not PSUI_Holding()"
 		area 901 284 40 40
 		tooltip lua "PSUI_Name(19)"
 		action "PSUI_Take(19)"
@@ -898,7 +918,7 @@ menu
 	}
 	button
 	{
-		enabled "PSUI_Has(20)"
+		enabled "PSUI_Has(20) and not PSUI_Holding()"
 		area 951 284 40 40
 		tooltip lua "PSUI_Name(20)"
 		action "PSUI_Take(20)"
@@ -920,7 +940,7 @@ menu
 	}
 	button
 	{
-		enabled "PSUI_Has(21)"
+		enabled "PSUI_Has(21) and not PSUI_Holding()"
 		area 501 330 40 40
 		tooltip lua "PSUI_Name(21)"
 		action "PSUI_Take(21)"
@@ -942,7 +962,7 @@ menu
 	}
 	button
 	{
-		enabled "PSUI_Has(22)"
+		enabled "PSUI_Has(22) and not PSUI_Holding()"
 		area 551 330 40 40
 		tooltip lua "PSUI_Name(22)"
 		action "PSUI_Take(22)"
@@ -964,7 +984,7 @@ menu
 	}
 	button
 	{
-		enabled "PSUI_Has(23)"
+		enabled "PSUI_Has(23) and not PSUI_Holding()"
 		area 601 330 40 40
 		tooltip lua "PSUI_Name(23)"
 		action "PSUI_Take(23)"
@@ -986,7 +1006,7 @@ menu
 	}
 	button
 	{
-		enabled "PSUI_Has(24)"
+		enabled "PSUI_Has(24) and not PSUI_Holding()"
 		area 651 330 40 40
 		tooltip lua "PSUI_Name(24)"
 		action "PSUI_Take(24)"
@@ -1008,7 +1028,7 @@ menu
 	}
 	button
 	{
-		enabled "PSUI_Has(25)"
+		enabled "PSUI_Has(25) and not PSUI_Holding()"
 		area 701 330 40 40
 		tooltip lua "PSUI_Name(25)"
 		action "PSUI_Take(25)"
@@ -1030,7 +1050,7 @@ menu
 	}
 	button
 	{
-		enabled "PSUI_Has(26)"
+		enabled "PSUI_Has(26) and not PSUI_Holding()"
 		area 751 330 40 40
 		tooltip lua "PSUI_Name(26)"
 		action "PSUI_Take(26)"
@@ -1052,7 +1072,7 @@ menu
 	}
 	button
 	{
-		enabled "PSUI_Has(27)"
+		enabled "PSUI_Has(27) and not PSUI_Holding()"
 		area 801 330 40 40
 		tooltip lua "PSUI_Name(27)"
 		action "PSUI_Take(27)"
@@ -1074,7 +1094,7 @@ menu
 	}
 	button
 	{
-		enabled "PSUI_Has(28)"
+		enabled "PSUI_Has(28) and not PSUI_Holding()"
 		area 851 330 40 40
 		tooltip lua "PSUI_Name(28)"
 		action "PSUI_Take(28)"
@@ -1096,7 +1116,7 @@ menu
 	}
 	button
 	{
-		enabled "PSUI_Has(29)"
+		enabled "PSUI_Has(29) and not PSUI_Holding()"
 		area 901 330 40 40
 		tooltip lua "PSUI_Name(29)"
 		action "PSUI_Take(29)"
@@ -1118,7 +1138,7 @@ menu
 	}
 	button
 	{
-		enabled "PSUI_Has(30)"
+		enabled "PSUI_Has(30) and not PSUI_Holding()"
 		area 951 330 40 40
 		tooltip lua "PSUI_Name(30)"
 		action "PSUI_Take(30)"
@@ -1140,7 +1160,7 @@ menu
 	}
 	button
 	{
-		enabled "PSUI_Has(31)"
+		enabled "PSUI_Has(31) and not PSUI_Holding()"
 		area 501 376 40 40
 		tooltip lua "PSUI_Name(31)"
 		action "PSUI_Take(31)"
@@ -1162,7 +1182,7 @@ menu
 	}
 	button
 	{
-		enabled "PSUI_Has(32)"
+		enabled "PSUI_Has(32) and not PSUI_Holding()"
 		area 551 376 40 40
 		tooltip lua "PSUI_Name(32)"
 		action "PSUI_Take(32)"
@@ -1184,7 +1204,7 @@ menu
 	}
 	button
 	{
-		enabled "PSUI_Has(33)"
+		enabled "PSUI_Has(33) and not PSUI_Holding()"
 		area 601 376 40 40
 		tooltip lua "PSUI_Name(33)"
 		action "PSUI_Take(33)"
@@ -1206,7 +1226,7 @@ menu
 	}
 	button
 	{
-		enabled "PSUI_Has(34)"
+		enabled "PSUI_Has(34) and not PSUI_Holding()"
 		area 651 376 40 40
 		tooltip lua "PSUI_Name(34)"
 		action "PSUI_Take(34)"
@@ -1228,7 +1248,7 @@ menu
 	}
 	button
 	{
-		enabled "PSUI_Has(35)"
+		enabled "PSUI_Has(35) and not PSUI_Holding()"
 		area 701 376 40 40
 		tooltip lua "PSUI_Name(35)"
 		action "PSUI_Take(35)"
@@ -1250,7 +1270,7 @@ menu
 	}
 	button
 	{
-		enabled "PSUI_Has(36)"
+		enabled "PSUI_Has(36) and not PSUI_Holding()"
 		area 751 376 40 40
 		tooltip lua "PSUI_Name(36)"
 		action "PSUI_Take(36)"
@@ -1272,7 +1292,7 @@ menu
 	}
 	button
 	{
-		enabled "PSUI_Has(37)"
+		enabled "PSUI_Has(37) and not PSUI_Holding()"
 		area 801 376 40 40
 		tooltip lua "PSUI_Name(37)"
 		action "PSUI_Take(37)"
@@ -1294,7 +1314,7 @@ menu
 	}
 	button
 	{
-		enabled "PSUI_Has(38)"
+		enabled "PSUI_Has(38) and not PSUI_Holding()"
 		area 851 376 40 40
 		tooltip lua "PSUI_Name(38)"
 		action "PSUI_Take(38)"
@@ -1316,7 +1336,7 @@ menu
 	}
 	button
 	{
-		enabled "PSUI_Has(39)"
+		enabled "PSUI_Has(39) and not PSUI_Holding()"
 		area 901 376 40 40
 		tooltip lua "PSUI_Name(39)"
 		action "PSUI_Take(39)"
@@ -1338,7 +1358,7 @@ menu
 	}
 	button
 	{
-		enabled "PSUI_Has(40)"
+		enabled "PSUI_Has(40) and not PSUI_Holding()"
 		area 951 376 40 40
 		tooltip lua "PSUI_Name(40)"
 		action "PSUI_Take(40)"
@@ -1360,7 +1380,7 @@ menu
 	}
 	button
 	{
-		enabled "PSUI_Has(41)"
+		enabled "PSUI_Has(41) and not PSUI_Holding()"
 		area 501 422 40 40
 		tooltip lua "PSUI_Name(41)"
 		action "PSUI_Take(41)"
@@ -1382,7 +1402,7 @@ menu
 	}
 	button
 	{
-		enabled "PSUI_Has(42)"
+		enabled "PSUI_Has(42) and not PSUI_Holding()"
 		area 551 422 40 40
 		tooltip lua "PSUI_Name(42)"
 		action "PSUI_Take(42)"
@@ -1404,7 +1424,7 @@ menu
 	}
 	button
 	{
-		enabled "PSUI_Has(43)"
+		enabled "PSUI_Has(43) and not PSUI_Holding()"
 		area 601 422 40 40
 		tooltip lua "PSUI_Name(43)"
 		action "PSUI_Take(43)"
@@ -1426,7 +1446,7 @@ menu
 	}
 	button
 	{
-		enabled "PSUI_Has(44)"
+		enabled "PSUI_Has(44) and not PSUI_Holding()"
 		area 651 422 40 40
 		tooltip lua "PSUI_Name(44)"
 		action "PSUI_Take(44)"
@@ -1448,7 +1468,7 @@ menu
 	}
 	button
 	{
-		enabled "PSUI_Has(45)"
+		enabled "PSUI_Has(45) and not PSUI_Holding()"
 		area 701 422 40 40
 		tooltip lua "PSUI_Name(45)"
 		action "PSUI_Take(45)"
@@ -1470,7 +1490,7 @@ menu
 	}
 	button
 	{
-		enabled "PSUI_Has(46)"
+		enabled "PSUI_Has(46) and not PSUI_Holding()"
 		area 751 422 40 40
 		tooltip lua "PSUI_Name(46)"
 		action "PSUI_Take(46)"
@@ -1492,7 +1512,7 @@ menu
 	}
 	button
 	{
-		enabled "PSUI_Has(47)"
+		enabled "PSUI_Has(47) and not PSUI_Holding()"
 		area 801 422 40 40
 		tooltip lua "PSUI_Name(47)"
 		action "PSUI_Take(47)"
@@ -1514,7 +1534,7 @@ menu
 	}
 	button
 	{
-		enabled "PSUI_Has(48)"
+		enabled "PSUI_Has(48) and not PSUI_Holding()"
 		area 851 422 40 40
 		tooltip lua "PSUI_Name(48)"
 		action "PSUI_Take(48)"
@@ -1536,7 +1556,7 @@ menu
 	}
 	button
 	{
-		enabled "PSUI_Has(49)"
+		enabled "PSUI_Has(49) and not PSUI_Holding()"
 		area 901 422 40 40
 		tooltip lua "PSUI_Name(49)"
 		action "PSUI_Take(49)"
@@ -1558,7 +1578,7 @@ menu
 	}
 	button
 	{
-		enabled "PSUI_Has(50)"
+		enabled "PSUI_Has(50) and not PSUI_Holding()"
 		area 951 422 40 40
 		tooltip lua "PSUI_Name(50)"
 		action "PSUI_Take(50)"
@@ -1580,7 +1600,7 @@ menu
 	}
 	button
 	{
-		enabled "PSUI_Has(51)"
+		enabled "PSUI_Has(51) and not PSUI_Holding()"
 		area 501 468 40 40
 		tooltip lua "PSUI_Name(51)"
 		action "PSUI_Take(51)"
@@ -1602,7 +1622,7 @@ menu
 	}
 	button
 	{
-		enabled "PSUI_Has(52)"
+		enabled "PSUI_Has(52) and not PSUI_Holding()"
 		area 551 468 40 40
 		tooltip lua "PSUI_Name(52)"
 		action "PSUI_Take(52)"
@@ -1624,7 +1644,7 @@ menu
 	}
 	button
 	{
-		enabled "PSUI_Has(53)"
+		enabled "PSUI_Has(53) and not PSUI_Holding()"
 		area 601 468 40 40
 		tooltip lua "PSUI_Name(53)"
 		action "PSUI_Take(53)"
@@ -1646,7 +1666,7 @@ menu
 	}
 	button
 	{
-		enabled "PSUI_Has(54)"
+		enabled "PSUI_Has(54) and not PSUI_Holding()"
 		area 651 468 40 40
 		tooltip lua "PSUI_Name(54)"
 		action "PSUI_Take(54)"
@@ -1668,7 +1688,7 @@ menu
 	}
 	button
 	{
-		enabled "PSUI_Has(55)"
+		enabled "PSUI_Has(55) and not PSUI_Holding()"
 		area 701 468 40 40
 		tooltip lua "PSUI_Name(55)"
 		action "PSUI_Take(55)"
@@ -1690,7 +1710,7 @@ menu
 	}
 	button
 	{
-		enabled "PSUI_Has(56)"
+		enabled "PSUI_Has(56) and not PSUI_Holding()"
 		area 751 468 40 40
 		tooltip lua "PSUI_Name(56)"
 		action "PSUI_Take(56)"
@@ -1712,7 +1732,7 @@ menu
 	}
 	button
 	{
-		enabled "PSUI_Has(57)"
+		enabled "PSUI_Has(57) and not PSUI_Holding()"
 		area 801 468 40 40
 		tooltip lua "PSUI_Name(57)"
 		action "PSUI_Take(57)"
@@ -1734,7 +1754,7 @@ menu
 	}
 	button
 	{
-		enabled "PSUI_Has(58)"
+		enabled "PSUI_Has(58) and not PSUI_Holding()"
 		area 851 468 40 40
 		tooltip lua "PSUI_Name(58)"
 		action "PSUI_Take(58)"
@@ -1756,7 +1776,7 @@ menu
 	}
 	button
 	{
-		enabled "PSUI_Has(59)"
+		enabled "PSUI_Has(59) and not PSUI_Holding()"
 		area 901 468 40 40
 		tooltip lua "PSUI_Name(59)"
 		action "PSUI_Take(59)"
@@ -1778,10 +1798,15 @@ menu
 	}
 	button
 	{
-		enabled "PSUI_Has(60)"
+		enabled "PSUI_Has(60) and not PSUI_Holding()"
 		area 951 468 40 40
 		tooltip lua "PSUI_Name(60)"
 		action "PSUI_Take(60)"
+	}
+	label
+	{
+		area 0 0 0 0
+		enabled "PSUI_DropTick()"
 	}
 	button
 	{
