@@ -6,7 +6,7 @@ set "GAME=E:\Enhanced Edition\Environnement de test\PSTEE (EEex release test)"
 tasklist /fi "imagename eq Torment.exe" | find /i "Torment.exe" >nul
 if not errorlevel 1 goto running
 pushd "%GAME%"
-if exist setup-InventairePSTEE.exe .\setup-InventairePSTEE.exe InventairePSTEE/InventairePSTEE.tp2 --uninstall --no-exit-pause --noautoupdate --log setup-InventairePSTEE-uninstall.debug
+if exist setup-InventairePSTEE.exe .\setup-InventairePSTEE.exe InventairePSTEE/InventairePSTEE.tp2 --force-uninstall 0 --no-exit-pause --noautoupdate --log setup-InventairePSTEE-uninstall.debug
 popd
 robocopy "%REPO%\InventairePSTEE" "%GAME%\InventairePSTEE" /MIR /NFL /NDL /NJH /NJS /NP >nul
 copy /y "%REPO%\setup-InventairePSTEE.exe" "%GAME%\setup-InventairePSTEE.exe" >nul
