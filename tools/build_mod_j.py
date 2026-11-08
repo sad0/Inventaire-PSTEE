@@ -294,7 +294,7 @@ menu
         m.append(movable(f"det_{k}", (p[0] + 10, p[1] + 10, p[2] - 16, p[3] - 16),
                          text_lua=f"psInvStatDetail('{nm}')", style="normal", point=10, align="left top",
                          color_lua="psInvYellow()"))
-    m.append("\ttext\n\t{\n\t\tarea 501 512 420 24\n\t\ttext lua \"psInvMessage()\"\n\t\ttext style normal\n"
+    m.append("\ttext\n\t{\n\t\tarea 501 512 370 24\n\t\ttext lua \"psInvMessage()\"\n\t\ttext style normal\n"
              "\t\ttext point 12\n\t\ttext align left center\n\t}\n")
     for i, a in enumerate(L["quick weapons"]):
         m.append(bm.slot(f"slot_inv_{1 + i}", a, "PSJSWRD", i, f"weapon{i}"))
@@ -318,8 +318,14 @@ menu
     for i in range(8):
         m.append(piece(f"tab{i + 1}", text_lua=f"psInvTab({i + 1})", point=12, action=f"psInvSelectTab({i + 1})",
                        frame_lua=f"psInvTabFrame({i + 1})", font="EXOCET", color_lua="psInvYellow()"))
-    m.append(movable("sort", L["buttons"]["sort"], text_lua="psInvText('Sort')", point=14, align="right center",
+    m.append(movable("sort", L["buttons"]["sort"], text_lua="PSUI_SortText()", point=14, align="right center",
                      color_lua="psInvYellow()"))
+    m.append(f'\tbutton\n\t{{\n\t\t{bm.area(L["buttons"]["sort"])}\n\t\taction "PSUI_NextSort()"\n\t}}\n')
+    m.append('\tlabel\n\t{\n\t\tarea 0 0 0 0\n\t\tenabled "PSC_Tick and PSC_Tick()"\n\t}\n')
+    # stash pages (60 cells per page)
+    m.append(bm.label((930, 512, 60, 24), text_lua="PSUI_PageText()", point=13, color_lua="psInvYellow()"))
+    m.append(bm.button((878, 512, 24, 24), "ARROBUTT", 0, "PSUI_PageTurn(-1)"))
+    m.append(bm.button((904, 512, 24, 24), "ARROBUTT", 1, "PSUI_PageTurn(1)"))
     m.append(piece("store_all", text_lua="psInvText('Store all')", point=15, color_lua="psInvYellow()",
                    action="PSUI_StoreAll()"))
     # stash grid (step 2b): icon + count + click-to-take button per cell
@@ -331,7 +337,7 @@ menu
                  f'\t\ttext align right bottom\n\t}}\n')
         m.append(f'\tbutton\n\t{{\n\t\tenabled "PSUI_Has({i})"\n\t\tarea {x} {y} {w} {h}\n'
                  f'\t\ttooltip lua "PSUI_Name({i})"\n\t\taction "PSUI_Take({i})"\n\t}}\n')
-    m.append(piece("bag", tooltip_lua="psInvWeight()"))
+    m.append(piece("bag", tooltip_lua="PSUI_WeightText()"))
     m.append(piece("face", action="Infinity_PushMenu('INVENTORY_HELP')", tooltip_lua="psInvText('Help')",
                    action_alt="psInvToggleEdit()"))
     # placement mode banner + drag handles (drawn last, on top)

@@ -5,7 +5,10 @@
 PSUI = PSUI or {}
 local U = PSUI
 U.CELLS = 60
-U.view = {}       -- entries shown in the grid (filtered)
+U.view = {}       -- entries shown in the grid (filtered, sorted)
+U.page = U.page or 1
+U.sort = U.sort or 1
+U.SORTS = { 'Auto', 'Name', 'Type', 'Price', 'Weight' }
 U.itm = U.itm or {}
 
 -- Tabs (psInvTabs order): All, Weapons, Tattoos, Jewelry, Eyes & Teeth, Charms, Quest, Misc. PST item types (ITM 0x1C).
@@ -38,7 +41,7 @@ function PSUI_ItemInfo(res)
 		if not h then return nil end
 		local p = EEex_UDToPtr(h)
 		return { type = EEex_ReadU16(p + 0x1C), icon = readRes(p + 0x3A), unidName = EEex_ReadU32(p + 0x08),
-			idName = EEex_ReadU32(p + 0x0C), weight = EEex_ReadU32(p + 0x4C) }
+			idName = EEex_ReadU32(p + 0x0C), weight = EEex_ReadU32(p + 0x4C), price = EEex_ReadU32(p + 0x34) }
 	end)
 	U.itm[res] = ok and info or false
 	return ok and info or nil
@@ -62,7 +65,41 @@ function PSUI_Portrait()
 	return 0
 end
 
--- Rebuilds the grid view (called when the page opens, after each action and on tab change).
+local function entryName(e)
+	local info = PSUI_ItemInfo(e.res)
+	if not info then return e.res end
+	local first, second = info.unidName, info.idName
+	if e.identified then first, second = info.idName, info.unidName end
+	-- some PST items have only one of the two names (or an unset strref)
+	for _, ref in ipairs({ first, second }) do
+		if ref > 0 and ref < 0xFFFFFFFF then
+			local n = Infinity_FetchString(ref)
+			if n and n ~= '' then return n end
+		end
+	end
+	return e.res
+end
+
+local function byField(f, descending)
+	return function(a, b)
+		local x, y = PSUI_ItemInfo(a.res), PSUI_ItemInfo(b.res)
+		local vx, vy = x and x[f] or 0, y and y[f] or 0
+		if vx ~= vy then
+			if descending then return vx > vy end
+			return vx < vy
+		end
+		return entryName(a) < entryName(b)
+	end
+end
+local SORTERS = { Name = function(a, b) return entryName(a) < entryName(b) end, Type = byField('type'),
+	Price = byField('price', true), Weight = byField('weight', true) }
+SORTERS.Auto = SORTERS.Type
+
+function PSUI_Pages() return math.max(1, math.ceil(#U.view / U.CELLS)) end
+function PSUI_PageText() return U.page .. '/' .. PSUI_Pages() end
+function PSUI_PageTurn(d) U.page = math.max(1, math.min(PSUI_Pages(), U.page + d)) end
+
+-- Rebuilds the grid view (called when the page opens, after each action and on tab or sort change).
 function PSUI_Refresh()
 	U.view = {}
 	if not PSC_Ready or not PSC_Ready() then return end
@@ -70,46 +107,54 @@ function PSUI_Refresh()
 	for _, e in ipairs(PSC_List()) do
 		if inTab(PSUI_ItemInfo(e.res), tab) then U.view[#U.view + 1] = e end
 	end
+	table.sort(U.view, SORTERS[U.SORTS[U.sort]])
+	if U.page > PSUI_Pages() then U.page = PSUI_Pages() end
 end
 
+function PSUI_NextSort()
+	U.sort = U.sort % #U.SORTS + 1
+	PSUI_Refresh()
+end
+function PSUI_SortText() return 'Sort: ' .. U.SORTS[U.sort] end
+
+local function cell(i) return U.view[(U.page - 1) * U.CELLS + i] end
+
 function PSUI_Icon(i)
-	local e = U.view[i]
+	local e = cell(i)
 	local info = e and PSUI_ItemInfo(e.res)
 	return info and info.icon or ''
 end
 
 function PSUI_Count(i)
-	local e = U.view[i]
+	local e = cell(i)
 	if e and e.count > 1 then return tostring(e.count) end
 	return ''
 end
 
 function PSUI_Name(i)
-	local e = U.view[i]
-	if not e then return nil end
-	local info = PSUI_ItemInfo(e.res)
-	if not info then return e.res end
-	local ref = (e.identified and info.idName > 0) and info.idName or info.unidName
-	return Infinity_FetchString(ref)
+	local e = cell(i)
+	return e and entryName(e) or nil
 end
 
-function PSUI_Has(i) return U.view[i] ~= nil end
+function PSUI_Has(i) return cell(i) ~= nil end
 
 function PSUI_Take(i)
-	local e = U.view[i]
+	local e = cell(i)
 	if not e then return end
 	local ok, why = PSC_Take(PSUI_Portrait(), e.res)
 	if not ok then print('PSC take failed ' .. tostring(why)) end
 	PSUI_Refresh()
+	PSC_RefreshPage()
 end
 
 function PSUI_StoreAll()
 	local portrait = PSUI_Portrait()
-	for slot = PSC.BACKPACK_FIRST, PSC.BACKPACK_LAST do
+	for _, slot in ipairs(PSC.BACKPACK) do
 		local ok, why = PSC_Add(portrait, slot)
 		if not ok and why ~= 'empty slot' then print('PSC store slot ' .. slot .. ' ' .. tostring(why)) end
 	end
 	PSUI_Refresh()
+	PSC_RefreshPage()
 end
 
 -- Stash weight in LB (sum of item weights x count), for the header.
@@ -122,3 +167,5 @@ function PSUI_Weight()
 	end
 	return w
 end
+
+function PSUI_WeightText() return 'Stash: ' .. PSUI_Weight() .. ' LB' end

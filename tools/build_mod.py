@@ -277,6 +277,7 @@ LANGUAGE ~English~ ~english~
 BEGIN ~Party Stash inventory page (preview)~ DESIGNATED 0
 LABEL ~INVENTAIREPSTEE-PAGE~
 REQUIRE_PREDICATE GAME_IS ~pstee~ ~Planescape: Torment EE only.~
+REQUIRE_PREDICATE MOD_IS_INSTALLED ~EEex.tp2~ (ID_OF_LABEL ~EEex.tp2~ ~B3-EEex-Main~) ~Requires EEex (PSTEE build): install it first.~
 
 COPY ~InventairePSTEE/art~ ~override~
 COPY ~InventairePSTEE/lua/M_PSINV.lua~ ~override~
@@ -287,6 +288,7 @@ COPY ~InventairePSTEE/lua/M_PSUI.lua~ ~override~     // step 2b: stash grid on t
 // item type, practically unlimited capacity.
 COPY_EXISTING ~BARSE.STO~ ~override/PSTASH.STO~
 	WRITE_LONG  0x08 5
+	WRITE_LONG  0x18 0            // buy rate 0 %: AddItemToStore pays the sell value at this rate
 	WRITE_SHORT 0x22 65000
 	WRITE_LONG  0x38 0            // no starting stock
 	SET list_off = SOURCE_SIZE

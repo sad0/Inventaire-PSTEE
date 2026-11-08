@@ -4,7 +4,7 @@
 # Usage: tools/console_bg.sh "PSC_Test()" "PSC_Slots(0)"
 T="$(dirname "$0")/wininput.py"
 W="${PSTEE_WINDOW:-Torment}"
-CLR=$(python -c "print(' '.join(['backspace']*1500))")  # ctrl+a does not select in the console field
+CLR=$(python -c "print(' '.join(['backspace']*300))")  # ctrl+a does not select in the console field
 for c in "$@"; do
   python "$T" press_keys "{\"window\":\"$W\",\"keys\":\"ctrl+space end $CLR\",\"mode\":\"background\",\"hold_ms\":2,\"delay_ms\":2}" \
               type_text "{\"window\":\"$W\",\"text\":$(python -c 'import json,sys;print(json.dumps(sys.argv[1]))' "$c"),\"mode\":\"background\"}" \

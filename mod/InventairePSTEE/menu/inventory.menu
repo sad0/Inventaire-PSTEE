@@ -223,7 +223,7 @@ menu
 	}
 	text
 	{
-		area 501 512 420 24
+		area 501 512 370 24
 		text lua "psInvMessage()"
 		text style normal
 		text point 12
@@ -414,11 +414,43 @@ menu
 	{
 		name "psinv_sort"
 		area 751 74 123 22
-		text lua "psInvText('Sort')"
+		text lua "PSUI_SortText()"
 		text style "label"
 		text point 14
 		text color lua "psInvYellow()"
 		text align right center
+	}
+	button
+	{
+		area 759 71 123 22
+		action "PSUI_NextSort()"
+	}
+	label
+	{
+		area 0 0 0 0
+		enabled "PSC_Tick and PSC_Tick()"
+	}
+	label
+	{
+		area 930 512 60 24
+		text lua "PSUI_PageText()"
+		text style "label"
+		text point 13
+		text color lua "psInvYellow()"
+	}
+	button
+	{
+		area 878 512 24 24
+		bam "ARROBUTT"
+		sequence 0
+		action "PSUI_PageTurn(-1)"
+	}
+	button
+	{
+		area 904 512 24 24
+		bam "ARROBUTT"
+		sequence 1
+		action "PSUI_PageTurn(1)"
 	}
 	button
 	{
@@ -1756,7 +1788,7 @@ menu
 		area 493 11 65 64
 		bam "PSJBAG"
 		sequence 0
-		tooltip lua "psInvWeight()"
+		tooltip lua "PSUI_WeightText()"
 	}
 	button
 	{

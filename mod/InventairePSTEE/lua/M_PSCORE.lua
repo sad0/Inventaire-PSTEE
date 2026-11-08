@@ -22,9 +22,12 @@ local FUNCS = {
 	TakeItemFromStore = { 0x1402F9A30, { 0x40, 0x55, 0x53, 0x56, 0x57, 0x41, 0x55, 0x41 }, 4 },
 }
 local PROBE = { 0x1402D1210, { 0x85, 0xD2, 0x0F, 0x84, 0x88, 0x00, 0x00, 0x00 } }  -- CInfGame::AddPartyGold
+FUNCS.AddPartyGold = { PROBE[1], PROBE[2], 2 }
 
--- PSTEE backpack = SLOT_MISC0..19 (SLOTS.IDS 15..34)
-P.BACKPACK_FIRST, P.BACKPACK_LAST = 15, 34
+-- PSTEE backpack in the engine's item array (measured in game, SLOTS.IDS does not match): 18..33 then 44..47.
+P.BACKPACK = {}
+for i = 18, 33 do P.BACKPACK[#P.BACKPACK + 1] = i end
+for i = 44, 47 do P.BACKPACK[#P.BACKPACK + 1] = i end
 
 local function bytesAt(addr, bytes)
 	for i, b in ipairs(bytes) do
@@ -118,6 +121,8 @@ local function itemRes(ptr)
 	return string.upper(table.concat(t))
 end
 
+local function game_gold() return game:GetPartyGold() end
+
 local function gamePtr() return EEex_UDToPtr(EEex_EngineGlobal_CBaldurChitin.m_pObjectGame) end
 
 -- Stash contents: { {res, count, uses, identified}, ... } in store order.
@@ -150,9 +155,14 @@ function PSC_Add(portrait, slot)
 		if itemPtr == 0 then return false, 'empty slot' end
 		local game, buf = gamePtr(), P.scratch
 		EEex_Write32(buf + 24, -1)
+		local gold = game_gold()
 		if PSC_Eng_AddItemToStore(game, resRef(P.RES), itemPtr, buf + 24) % 256 == 0 then
 			return false, string.format('refused (0x%x)', EEex_ReadU32(buf + 24))
 		end
+		-- AddItemToStore pays the item's sell value at the store's buy rate. The shipped store buys at 0 %, but a
+		-- stash saved by v0.3 kept its 80 % rate in the save: never let the stash pay.
+		local paid = game_gold() - gold
+		if paid ~= 0 then PSC_Eng_AddPartyGold(game, -paid) end
 		EEex_Write64(buf + 16, 0)
 		PSC_Eng_SwapItemPersonal(game, portrait, buf + 16, slot, buf + 24, 0xFFFF, 0, 0)
 		local out = EEex_ReadU64(buf + 16)
@@ -165,10 +175,17 @@ function PSC_Add(portrait, slot)
 end
 
 local function freeSlot(sp)
-	for i = P.BACKPACK_FIRST, P.BACKPACK_LAST do if itemPtrAt(sp, i) == 0 then return i end end
+	for _, i in ipairs(P.BACKPACK) do if itemPtrAt(sp, i) == 0 then return i end end
 end
 
--- Takes `itemRes` out of the stash into `portrait`'s backpack (a whole pile for stackable items).
+-- Stack size of an item (ITM +0x38).
+local function stackOf(res)
+	local ok, v = pcall(function() return EEex_ReadU16(EEex_UDToPtr(EEex_Resource_Demand(res, 'ITM')) + 0x38) end)
+	return ok and math.max(1, v) or 1
+end
+
+-- Takes `itemRes` out of the stash into `portrait`'s backpack: a whole pile for stackable items (the store keeps
+-- stacks unit by unit), up to the item's max stack; one piece for the others (charges kept).
 function PSC_Take(portrait, itemRes)
 	if not PSC_Ready() then return nil, P.why end
 	local sp = EEex_Sprite_GetInPortrait(portrait)
@@ -180,20 +197,59 @@ function PSC_Take(portrait, itemRes)
 		if e.res == itemRes then entry = e break end
 	end
 	if not entry then return nil, 'not in the stash' end
-	local taken = PSC_Eng_TakeItemFromStore(gamePtr(), resRef(P.RES), resRef(itemRes, 32), 1) % 65536
+	local stack = stackOf(itemRes)
+	local want = stack > 1 and math.min(math.max(1, entry.count), stack) or 1
+	local taken = PSC_Eng_TakeItemFromStore(gamePtr(), resRef(P.RES), resRef(itemRes, 32), want) % 65536
 	if taken == 0 then return nil, 'the stash kept it' end
-	-- Queued, not instant: EEex-PTEE's instant execution freed the action with the wrong destructor (heap
-	-- corruption, fixed in a later EEex-PTEE release). The item shows up on the next AI tick.
-	EEex_Action_QueueResponseStringOnAIBase(
-		string.format('CreateItem("%s",%d,0,0)', itemRes, math.max(0, entry.uses)), sp)
+	local uses = stack > 1 and taken * math.max(1, entry.uses) or math.max(0, entry.uses)
+	-- Queued, not instant: older EEex-PTEE builds freed the instant action with the wrong destructor (heap
+	-- corruption). The item shows up on the next AI tick.
+	EEex_Action_QueueResponseStringOnAIBase(string.format('CreateItem("%s",%d,0,0)', itemRes, uses), sp)
+	if entry.identified then P.pendingId[#P.pendingId + 1] = { portrait = portrait, res = itemRes } end
 	return true
+end
+
+-- CreateItem makes the item unidentified when its header says so: restore the state it had in the stash once the
+-- queued action has run (CItem flags at +0x24, bit 0 = identified). Called every frame by the inventory page.
+P.pendingId = P.pendingId or {}
+function PSC_RefreshPage() P.refreshIn = 14 end
+function PSC_Tick()
+	if P.refreshIn then
+		-- the engine rebuilds the page's item tables only on this call; twice, for queued CreateItem actions
+		P.refreshIn = P.refreshIn - 1
+		if P.refreshIn == 12 or P.refreshIn == 0 then pcall(Infinity_ActivateInventory) end
+		if P.refreshIn <= 0 then P.refreshIn = nil end
+	end
+	if #P.pendingId == 0 then return false end
+	local keep = {}
+	for _, want in ipairs(P.pendingId) do
+		local sp = EEex_Sprite_GetInPortrait(want.portrait)
+		local done = sp == nil
+		if sp then
+			for _, i in ipairs(P.BACKPACK) do
+				local a = itemPtrAt(sp, i)
+				if a ~= 0 and itemRes(a) == want.res then
+					local f = EEex_ReadU32(a + 0x24)
+					if bit32.band(f, 1) == 0 then EEex_WriteU32(a + 0x24, bit32.bor(f, 1)) end
+					done = true
+					break
+				end
+			end
+		end
+		if not done then
+			want.tries = (want.tries or 0) + 1
+			if want.tries < 300 then keep[#keep + 1] = want end
+		end
+	end
+	P.pendingId = keep
+	return false
 end
 
 -- Console helpers (results in EEex.log): what each slot holds, add, take.
 function PSC_Slots(portrait)
 	local sp = EEex_Sprite_GetInPortrait(portrait or 0)
 	if not sp then print('PSC no portrait') return end
-	for i = 0, 38 do
+	for i = 0, 47 do
 		local p = itemPtrAt(sp, i)
 		if p ~= 0 then print('PSC slot ' .. i .. ' ' .. itemRes(p)) end
 	end
