@@ -174,6 +174,14 @@ function PSC_Add(portrait, slot)
 	return res, why
 end
 
+-- Resref of the item in a slot, nil when empty.
+function PSC_SlotRes(portrait, slot)
+	local sp = EEex_Sprite_GetInPortrait(portrait)
+	if not sp then return nil end
+	local a = itemPtrAt(sp, slot)
+	return a ~= 0 and itemRes(a) or nil
+end
+
 local function freeSlot(sp)
 	for _, i in ipairs(P.BACKPACK) do if itemPtrAt(sp, i) == 0 then return i end end
 end

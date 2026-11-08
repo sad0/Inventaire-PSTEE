@@ -1,7 +1,7 @@
 // Inventaire PSTEE: Party Stash inventory page for Planescape: Torment EE (step 1 preview).
 BACKUP ~weidu_external/backup/InventairePSTEE~
 AUTHOR ~sad0~
-VERSION ~v0.4~
+VERSION ~v0.5~
 
 LANGUAGE ~English~ ~english~
 
@@ -16,6 +16,7 @@ REQUIRE_PREDICATE MOD_IS_INSTALLED ~EEex.tp2~ (ID_OF_LABEL ~EEex.tp2~ ~B3-EEex-M
 COPY ~InventairePSTEE/art~ ~override~
 COPY ~InventairePSTEE/lua/M_PSINV.lua~ ~override~
 COPY ~InventairePSTEE/lua/M_PSCORE.lua~ ~override~   // step 2a: stash core (EEex), console-tested
+COPY ~InventairePSTEE/lua/M_PSQST.lua~ ~override~    // quest items (tools/build_quest_items.py)
 COPY ~InventairePSTEE/lua/M_PSUI.lua~ ~override~     // step 2b: stash grid on the inventory page
 
 // The stash store (step 2a): a hidden bag store (type 5) built from a vanilla STORV1.1 store, no stock, buys every

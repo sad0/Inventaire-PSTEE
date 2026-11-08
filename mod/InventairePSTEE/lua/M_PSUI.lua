@@ -22,6 +22,13 @@ local TAB_TYPES = {
 	[7] = { [8] = true },
 }
 
+-- Quest item: the game's dialogues or scripts look for it in the party (M_PSQST.lua), or it is a key (type 8).
+function PSUI_IsQuest(res)
+	if PSC_QUEST and PSC_QUEST[res] then return true end
+	local info = PSUI_ItemInfo(res)
+	return info ~= nil and info.type == 8
+end
+
 local function readRes(p)
 	local t = {}
 	for i = 0, 7 do
@@ -47,10 +54,12 @@ function PSUI_ItemInfo(res)
 	return ok and info or nil
 end
 
-local function inTab(info, tab)
+local function inTab(res, info, tab)
 	if tab == 1 or not info then return true end
+	if tab == 7 then return PSUI_IsQuest(res) end
 	if tab == 8 then
-		for t = 2, 7 do if TAB_TYPES[t][info.type] then return false end end
+		if PSUI_IsQuest(res) then return false end
+		for t = 2, 6 do if TAB_TYPES[t][info.type] then return false end end
 		return true
 	end
 	return TAB_TYPES[tab][info.type] == true
@@ -105,7 +114,7 @@ function PSUI_Refresh()
 	if not PSC_Ready or not PSC_Ready() then return end
 	local tab = psInvActiveTab or 1
 	for _, e in ipairs(PSC_List()) do
-		if inTab(PSUI_ItemInfo(e.res), tab) then U.view[#U.view + 1] = e end
+		if inTab(e.res, PSUI_ItemInfo(e.res), tab) then U.view[#U.view + 1] = e end
 	end
 	table.sort(U.view, SORTERS[U.SORTS[U.sort]])
 	if U.page > PSUI_Pages() then U.page = PSUI_Pages() end
@@ -149,10 +158,17 @@ end
 
 function PSUI_StoreAll()
 	local portrait = PSUI_Portrait()
+	local kept = 0
 	for _, slot in ipairs(PSC.BACKPACK) do
-		local ok, why = PSC_Add(portrait, slot)
-		if not ok and why ~= 'empty slot' then print('PSC store slot ' .. slot .. ' ' .. tostring(why)) end
+		local res = PSC_SlotRes(portrait, slot)
+		if res and PSUI_IsQuest(res) then
+			kept = kept + 1  -- stays in the backpack, or the game's quests could no longer see it
+		elseif res then
+			local ok, why = PSC_Add(portrait, slot)
+			if not ok then print('PSC store slot ' .. slot .. ' ' .. tostring(why)) end
+		end
 	end
+	TEXT_inventoryError = kept > 0 and (kept .. (kept > 1 and ' quest items stay' or ' quest item stays') .. ' in the backpack') or ''
 	PSUI_Refresh()
 	PSC_RefreshPage()
 end
