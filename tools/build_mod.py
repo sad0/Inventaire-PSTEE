@@ -264,7 +264,7 @@ function psInvStatDetail(key)
 end
 '''
 
-TP2 = r'''// Inventaire PSTEE: Party Stash inventory page for Planescape: Torment EE (step 1 preview).
+TP2 = r'''// Inventaire PSTEE: Party Stash inventory page for Planescape: Torment EE (preview).
 BACKUP ~weidu_external/backup/InventairePSTEE~
 AUTHOR ~sad0~
 VERSION ~v0.8~
@@ -272,7 +272,7 @@ VERSION ~v0.8~
 LANGUAGE ~English~ ~english~
 
 // #0 Redesigned inventory page (BG Party Stash / LeUI organisation, PSTEE art). Equipment, quick slots, backpack
-// and ground work; the stash grid, tabs, sort and store-all are drawn but wait for the EEex stash (step 2).
+// and ground work; the stash grid, tabs, sort and store-all use the EEex stash.
 // The "Art" button swaps the two background styles (F = PSTEE pieces, G = generated art).
 BEGIN ~Party Stash inventory page (preview)~ DESIGNATED 0
 LABEL ~INVENTAIREPSTEE-PAGE~

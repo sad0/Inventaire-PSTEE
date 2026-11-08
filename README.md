@@ -1,41 +1,51 @@
-# Inventaire-PSTEE
+# Inventaire PSTEE
 
-Party Stash (shared infinite party stash, see `../PartyStash-EE`) brought to **Planescape: Torment EE** (v3.2.2.0).
-Step 1: design mockup.
+A redesigned inventory page with a shared party stash for **Planescape: Torment Enhanced Edition** (v3.2.2.0). It brings
+[Party Stash](https://github.com/sad0/PartyStash-EE) from the Baldur's Gate games to Torment, with a new painted page.
 
-## Design file
+**Status: preview (v0.8).** It works in play tests, but it has not been tested through a full playthrough.
 
-`design/inventory_ptee.xcf` (GIMP 3.2, ~80 MB, not in git: rebuild it). Canvas = the `INVENTORY` menu frame,
-**1024x768**: GIMP pointer coordinates are UI.MENU `area` coordinates. Backgrounds (1366 wide) hang off-canvas
-at x = -171 (*Image > Fit Canvas to Layers* to see them).
+## Features
 
-Top-level groups:
+- **Shared stash:** one stash for the whole party, with 8 tabs, 5 sort orders and pages.
+- **Drag and drop:** drag an item onto the grid to store it, or use **Store all** for the backpack. Click a stash item to
+  take it back.
+- **Quests keep working:** every party member carries a stash bag in the last backpack slot, so the game sees what the
+  stash holds. This leaves 19 free backpack slots.
+- **New page:** details for AC, THAC0, HP and damage, including attacks per round.
 
-| Group | Contents |
-|---|---|
-| Background | `INVBG` + hidden cut-outs of every panel (rails, ground column, gold box, discs...) |
-| Inventory (vanilla INVENTORY menu) | Paperdolls (`IVP*`, one per companion), slots by category (one group per slot; frame 0 visible, other states hidden), labels/icons, sample items, text in game fonts, buttons with all states |
-| Action bar | `WORLD_ACTIONBAR` + `_LEFT`, drawn over the inventory: portraits, buttons with all states |
-| Party Stash mockup | **Variant E (John's pick: LeUI layout, PSTEE textures, visible)**; D (first redesign), A (rail toggle), B (stash window), C (ground column) hidden |
-| Library (hidden) | Buttons, tabs, slots/placeholders, scrollbars, BAM/MOS icons, panels/popups, bars, 120 item icons, paperdolls |
-| Annotations (hidden) | Box + name + size + coords for each element |
+## Requirements
 
-Guides: menu frame, action bar, slot rails, mockup grids.
-Previews: `design/inventory_ptee_preview.png` (default visibility) and `design/preview/*.png`.
+- Planescape: Torment Enhanced Edition v3.2.2.0
+- [EEex-Torment](https://github.com/sad0/EEex-Torment) v1.3.1-pstee2
 
-Decisions (2026-10-21): redesign like BG (D), 8 PST tabs (All, Weapons, Tattoos, Jewelry, Eyes & Teeth, Charms,
-Quest, Misc), weight like BG (sum of members' allowances), keep Store all, Sort, colour hints, Sell marked.
+The game must be started through `InfinityLoader.exe`, as EEex requires.
 
-Notes found in the vanilla UI.MENU: quiver slots ask for `SLOTARRW`, the game only has `SLOTARW`
-(the engine draws nothing there; the layers are kept hidden).
+## Install
 
-## Rebuild
+1. Close the game. Back up your saves if you care about them.
+2. Download `InventairePSTEE-v0.8.zip` from [Releases](https://github.com/sad0/Inventaire-PSTEE/releases).
+3. Extract it into the game folder, next to `Torment.exe`.
+4. Run `setup-InventairePSTEE.exe`.
 
-```powershell
-tools\build_xcf.ps1
-```
+The cloned repository cannot be installed as it is: the mod's art is built from your game and only ships in the zip.
 
-`tools/build_assets.py` reads the game **read-only** (KEY/BIFF, MOS v1/v2, BAM v1/v2, PVRZ, TLK via `tools/ie.py`,
-UI.MENU via `tools/menu.py`), writes `design/assets/` and `design/build/manifest.json`; then GIMP batch
-(`tools/gimp_build.py`) builds the .xcf and exports the previews. `tools/preview.py` composites the manifest
-with Pillow alone (quick check). Game path: `GAME` in `build_assets.py`.
+## Known limits
+
+- **Items that stay in the backpack:** door and container keys, and the Tail (a dialogue counts it, and counting does not
+  see the stash).
+- **Merchants:** avoid clicking the stash bag's row in the sell list. The protections from Party Stash are in place, but
+  this case is untested.
+- **Language:** English only.
+- **Not tested yet:** a party of 6, a member joining mid-game, opening a door with a key from the stash, uninstalling with
+  the bag in a save.
+
+## Not there yet
+
+Weight penalty, Sell Marked and translations.
+
+## Building from source
+
+`tools/build_mod_j.py` writes the page and the installer into `mod/`. `tools/build_quest_items.py` regenerates the quest
+item list from the game's dialogues and scripts. Both have local game paths at the top of the scripts: change them first.
+The other files in `tools/` and `design/` are working files from development and test tools. None of them ship in the mod.
