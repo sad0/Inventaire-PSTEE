@@ -7,6 +7,7 @@ Usage: python tools/build_mod_j.py  (after tools/variant_j.py layout).
 """
 import json
 import os
+import shutil
 import struct
 
 from PIL import Image, ImageDraw, ImageEnhance
@@ -311,9 +312,9 @@ menu
                 "ring1": 23, "tattoo1": 24, "hand0": 25, "tattoo2": 26}
     for i, (nm, a) in enumerate(L["body"].items()):
         m.append(bm.slot(f"slot_inv_{body_ids[nm]}", a, "PSJIVSL", i % 10, nm))
-    # drag and drop overlays, moved onto the stash grid while an item is held (see M_PSUI.lua); before the real slots
-    for n in range(len(L["backpack"])):
-        m.append(f'\tslot {{name "slot_inv_{30 + n}"\tarea 0 0 0 0\tslotinfo "PSUI_DropSlot({n})"\t}}\n')
+    # drag and drop overlay of the bag slot, moved onto the stash grid while an item is held (see M_PSUI.lua)
+    last = len(L["backpack"]) - 1
+    m.append(f'\tslot {{name "slot_inv_{30 + last}"\tarea 0 0 0 0\tslotinfo "PSUI_DropSlot({last})"\t}}\n')
     for n, a in enumerate(L["backpack"]):
         m.append(bm.slot(f"slot_inv_{30 + n}", a, "PSJSLOT", 0, f"group{n}"))
     for n, a in enumerate(L["ground"]):
@@ -671,6 +672,20 @@ end
 '''
 
 
+TICK_MENU = '''
+menu
+{
+	name 'PSC_TICK'
+	ignoreEsc
+	label
+	{
+		area 0 0 0 0
+		enabled "PSC_BagTick()"
+	}
+}
+'''
+
+
 def main():
     art = os.path.join(MOD, "art")
     os.makedirs(art, exist_ok=True)
@@ -678,6 +693,9 @@ def main():
         os.remove(os.path.join(art, f))
     background()
     slot_bam()
+    # the stash bag's icons (Party Stash BG: the game's chest)
+    for f in ("PSTASHIC.BAM", "PSTASHDP.BAM"):
+        shutil.copy(os.path.join(ROOT, "..", "PartyStash-EE", "PartyStash", "art", f), art)
     q = L["quiver"][0][2]
     b = list(L["body"].values())[0][2]
     for res, out_name, size in (("SLOTSWRD", "PSJSWRD", q), ("SLOTITM", "PSJITM", q), ("SLOTARW", "PSJARW", q),
@@ -692,7 +710,7 @@ def main():
         dark_copy(res, res, q, 0.45)
     for nm, res in BAMS.items():
         write_bam_v1(part_frames(nm, L["parts"][nm]), os.path.join(art, f"{res}.BAM"))
-    menu = build_menu()
+    menu = TICK_MENU + build_menu()
     assert "%" not in menu and "~" not in menu
     with open(os.path.join(MOD, "menu", "inventory.menu"), "w", encoding="utf-8", newline="\n") as f:
         f.write(menu)

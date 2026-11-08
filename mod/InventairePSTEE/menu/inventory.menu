@@ -1,6 +1,17 @@
 
 menu
 {
+	name 'PSC_TICK'
+	ignoreEsc
+	label
+	{
+		area 0 0 0 0
+		enabled "PSC_BagTick()"
+	}
+}
+
+menu
+{
 	name 'INVENTORY'
 	align center center
 	ignoreEsc
@@ -253,25 +264,6 @@ menu
 	slot {name "slot_inv_21"	area 270 350 36 36	bam "PSJIVSL"	sequence 7	slotinfo "characters[id].equipment.tattoo0"	highlight selected 1}
 	slot {name "slot_inv_24"	area 310 350 36 36	bam "PSJIVSL"	sequence 8	slotinfo "characters[id].equipment.tattoo1"	highlight selected 1}
 	slot {name "slot_inv_26"	area 350 350 36 36	bam "PSJIVSL"	sequence 9	slotinfo "characters[id].equipment.tattoo2"	highlight selected 1}
-	slot {name "slot_inv_30"	area 0 0 0 0	slotinfo "PSUI_DropSlot(0)"	}
-	slot {name "slot_inv_31"	area 0 0 0 0	slotinfo "PSUI_DropSlot(1)"	}
-	slot {name "slot_inv_32"	area 0 0 0 0	slotinfo "PSUI_DropSlot(2)"	}
-	slot {name "slot_inv_33"	area 0 0 0 0	slotinfo "PSUI_DropSlot(3)"	}
-	slot {name "slot_inv_34"	area 0 0 0 0	slotinfo "PSUI_DropSlot(4)"	}
-	slot {name "slot_inv_35"	area 0 0 0 0	slotinfo "PSUI_DropSlot(5)"	}
-	slot {name "slot_inv_36"	area 0 0 0 0	slotinfo "PSUI_DropSlot(6)"	}
-	slot {name "slot_inv_37"	area 0 0 0 0	slotinfo "PSUI_DropSlot(7)"	}
-	slot {name "slot_inv_38"	area 0 0 0 0	slotinfo "PSUI_DropSlot(8)"	}
-	slot {name "slot_inv_39"	area 0 0 0 0	slotinfo "PSUI_DropSlot(9)"	}
-	slot {name "slot_inv_40"	area 0 0 0 0	slotinfo "PSUI_DropSlot(10)"	}
-	slot {name "slot_inv_41"	area 0 0 0 0	slotinfo "PSUI_DropSlot(11)"	}
-	slot {name "slot_inv_42"	area 0 0 0 0	slotinfo "PSUI_DropSlot(12)"	}
-	slot {name "slot_inv_43"	area 0 0 0 0	slotinfo "PSUI_DropSlot(13)"	}
-	slot {name "slot_inv_44"	area 0 0 0 0	slotinfo "PSUI_DropSlot(14)"	}
-	slot {name "slot_inv_45"	area 0 0 0 0	slotinfo "PSUI_DropSlot(15)"	}
-	slot {name "slot_inv_46"	area 0 0 0 0	slotinfo "PSUI_DropSlot(16)"	}
-	slot {name "slot_inv_47"	area 0 0 0 0	slotinfo "PSUI_DropSlot(17)"	}
-	slot {name "slot_inv_48"	area 0 0 0 0	slotinfo "PSUI_DropSlot(18)"	}
 	slot {name "slot_inv_49"	area 0 0 0 0	slotinfo "PSUI_DropSlot(19)"	}
 	slot {name "slot_inv_30"	area 501 134 40 40	bam "PSJSLOT"	sequence 0	slotinfo "characters[id].equipment.group0"	highlight selected 1}
 	slot {name "slot_inv_31"	area 501 180 40 40	bam "PSJSLOT"	sequence 0	slotinfo "characters[id].equipment.group1"	highlight selected 1}

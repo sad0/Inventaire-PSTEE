@@ -267,7 +267,7 @@ end
 TP2 = r'''// Inventaire PSTEE: Party Stash inventory page for Planescape: Torment EE (step 1 preview).
 BACKUP ~weidu_external/backup/InventairePSTEE~
 AUTHOR ~sad0~
-VERSION ~v0.7~
+VERSION ~v0.8~
 
 LANGUAGE ~English~ ~english~
 
@@ -290,6 +290,7 @@ COPY ~InventairePSTEE/lua/M_PSUI.lua~ ~override~     // step 2b: stash grid on t
 // item type, practically unlimited capacity.
 COPY_EXISTING ~BARSE.STO~ ~override/PSTASH.STO~
 	WRITE_LONG  0x08 5
+	SAY 0x0c ~Party Stash~        // shown when the bag is opened (double click)
 	WRITE_LONG  0x18 0            // buy rate 0 %: AddItemToStore pays the sell value at this rate
 	WRITE_SHORT 0x22 65000
 	WRITE_LONG  0x38 0            // no starting stock
@@ -306,6 +307,22 @@ COPY_EXISTING ~BARSE.STO~ ~override/PSTASH.STO~
 	END
 BUT_ONLY
 
+// The stash bag every party member carries: weightless, worthless, never dropped. PST has no bag to copy.
+COPY_EXISTING ~GINGOT.ITM~ ~override/PSTASH.ITM~
+	SAY 0x08 ~Party Stash~
+	SAY 0x0c ~Party Stash~
+	SAY 0x50 ~The party's shared stash. Quests see what it holds. It stays in the last backpack slot.~
+	SAY 0x54 ~The party's shared stash. Quests see what it holds. It stays in the last backpack slot.~
+	WRITE_SHORT 0x1c 36                              // type: bag
+	WRITE_LONG  0x18 (THIS BAND (BNOT 0x4))          // not droppable
+	WRITE_LONG  0x34 0                               // price
+	WRITE_SHORT 0x38 1                               // no stack
+	WRITE_LONG  0x4c 0                               // weight
+	WRITE_ASCII 0x3a ~PSTASHIC~ #8                   // inventory icon
+	WRITE_ASCII 0x44 ~PSTASHIC~ #8                   // ground icon
+	WRITE_ASCII 0x58 ~PSTASHDP~ #8                   // description picture
+BUT_ONLY
+
 // read the menu text through a scratch copy (copying onto the mod's own file makes WeiDU restore an old copy on
 // uninstall)
 COPY ~InventairePSTEE/menu/inventory.menu~ ~weidu_external/InventairePSTEE/inventory.menu~
@@ -319,6 +336,12 @@ COPY_EXISTING ~UI.MENU~ ~override~
 	END
 	REPLACE_TEXTUALLY EXACT_MATCH ~name 'INVENTORY'~ ~name 'INVENTORY_VANILLA'~
 	REPLACE_TEXTUALLY EXACT_MATCH ~mosaic 'INVBG'~ ~mosaic lua "psInvBackground()"~
+	// A merchant must never open the stash as a bag (the game crashes on BG): no description or open from the sell list,
+	// no selection, and its row is greyed like an unsellable item (same patches as Party Stash BG).
+	REPLACE_TEXTUALLY EXACT_MATCH ~if(store.groupItems[storeGroupItemsVar].item.isBag == 1) then~ ~~~~~if(store.groupItems[storeGroupItemsVar].item.isBag == 1 and string.upper(store.groupItems[storeGroupItemsVar].item.res or '') ~= 'PSTASH') then~~~~~
+	REPLACE_TEXTUALLY EXACT_MATCH ~storeScreen:OpenBag(itemDesc.item.res)~ ~~~~~if string.upper(itemDesc.item.res or '') ~= 'PSTASH' then storeScreen:OpenBag(itemDesc.item.res) end~~~~~
+	REPLACE_TEXTUALLY EXACT_MATCH ~~~~~if store.groupItems[storeGroupItemsVar].valid ~= 0 then~~~~~ ~~~~~if string.upper(store.groupItems[storeGroupItemsVar].item.res or '') ~= 'PSTASH' and store.groupItems[storeGroupItemsVar].valid ~= 0 then~~~~~
+	REPLACE_TEXTUALLY EXACT_MATCH ~~~~~enabled "store.groupItems[rowNumber].valid == 0  and store.groupItems[rowNumber].item.isBag ~= 1"~~~~~ ~~~~~enabled "(store.groupItems[rowNumber].valid == 0  and store.groupItems[rowNumber].item.isBag ~= 1) or string.upper(store.groupItems[rowNumber].item.res or '') == 'PSTASH'"~~~~~
 	SET len = BUFFER_LENGTH
 	INSERT_BYTES len (STRING_LENGTH ~%psinv_menu%~)
 	WRITE_ASCIIE len ~%psinv_menu%~

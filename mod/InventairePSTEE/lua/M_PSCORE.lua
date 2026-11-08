@@ -27,7 +27,10 @@ FUNCS.AddPartyGold = { PROBE[1], PROBE[2], 2 }
 -- PSTEE backpack in the engine's item array (measured in game, SLOTS.IDS does not match): 18..33 then 44..47.
 P.BACKPACK = {}
 for i = 18, 33 do P.BACKPACK[#P.BACKPACK + 1] = i end
-for i = 44, 47 do P.BACKPACK[#P.BACKPACK + 1] = i end
+for i = 44, 46 do P.BACKPACK[#P.BACKPACK + 1] = i end
+-- The last backpack slot holds the stash bag (like Party Stash BG): the engine treats it as any carried bag, so quests
+-- see and take the stash's items, and an item dropped on it goes into the stash natively.
+P.BAG_SLOT = 47
 
 local function bytesAt(addr, bytes)
 	for i, b in ipairs(bytes) do
@@ -174,6 +177,103 @@ function PSC_Add(portrait, slot)
 	return res, why
 end
 
+-- Every party member carries one stash bag, in the last backpack slot.
+local function setSlot(sp, i, ptr)
+	EEex_Write64(EEex_UDToPtr(sp.m_equipment.m_items) + EEex_PtrSize * i, ptr)
+end
+
+local function isBag(a) return a ~= 0 and itemRes(a) == P.RES end
+
+local function placeBag(sp)
+	local at
+	for i = 0, P.BAG_SLOT do
+		local a = itemPtrAt(sp, i)
+		if isBag(a) and i ~= P.BAG_SLOT then
+			if at or isBag(itemPtrAt(sp, P.BAG_SLOT)) then  -- an extra copy
+				setSlot(sp, i, 0)
+				PSC_Eng_AddDisposableItem(gamePtr(), a)
+			else
+				at = i
+			end
+		end
+	end
+	local last = itemPtrAt(sp, P.BAG_SLOT)
+	if isBag(last) then return false end
+	if at then  -- the bag takes the last slot, whatever sat there takes its place
+		setSlot(sp, P.BAG_SLOT, itemPtrAt(sp, at))
+		setSlot(sp, at, last)
+		return true
+	end
+	if last ~= 0 then
+		for _, i in ipairs(P.BACKPACK) do
+			if itemPtrAt(sp, i) == 0 then
+				setSlot(sp, i, last)
+				setSlot(sp, P.BAG_SLOT, 0)
+				return true
+			end
+		end
+		return false  -- backpack full: the bag comes when a slot frees up
+	end
+	if sp.m_pArea ~= nil then
+		-- the engine puts a new item in the first free slot: it moves to the last slot next tick
+		EEex_Action_ExecuteResponseStringOnAIBaseInstantly('CreateItem("' .. P.RES .. '",0,0,0)', sp)
+	end
+	return false
+end
+
+P.bagAt = 0
+local function bagTick()
+	local eng = e:GetActiveEngine()
+	if eng ~= worldScreen and eng ~= inventoryScreen then return end
+	if EEex_EngineGlobal_CBaldurChitin.m_pEngineInventory.m_pTempItem ~= nil then return end  -- in hand: wait for the drop
+	local now = Infinity_GetClockTicks()
+	if now - P.bagAt < 300 then return end
+	P.bagAt = now
+	local moved = false
+	for p = 0, 5 do
+		local sp = EEex_Sprite_GetInPortrait(p)
+		if sp and placeBag(sp) then moved = true end
+	end
+	if moved and Infinity_IsMenuOnStack('INVENTORY') then pcall(Infinity_ActivateInventory) end
+end
+
+function PSC_BagTick()
+	local ok, why = pcall(bagTick)
+	if not ok then print('PSC bag ' .. tostring(why)) end
+	return false
+end
+
+-- PSC_TICK runs PSC_BagTick every frame on the world screen, so joining members get their bag too. Same pushes as Party
+-- Stash BG: never pushed outside the world screen (a pushed menu crashed character creation there).
+local function pushTick()
+	if Infinity_IsMenuOnStack('PSC_TICK') then return end
+	if worldScreen == nil or e:GetActiveEngine() ~= worldScreen then return end
+	Infinity_PushMenu('PSC_TICK')
+end
+
+if not P.pushWrapped then
+	P.pushWrapped = true
+	local push = Infinity_PushMenu
+	Infinity_PushMenu = function(...)
+		local m = ...
+		local r = table.pack(push(...))
+		if m ~= 'PSC_TICK' then pcall(pushTick) end
+		return table.unpack(r, 1, r.n)
+	end
+	EEex_Sprite_AddLoadedListener(function() pcall(pushTick) end)
+	EEex_GameState_AddInitializedListener(pushTick)
+	EEex_Menu_AddAfterMainFileReloadedListener(pushTick)
+end
+
+-- A drop into the bag pays like a sale (1 gold at a 0 % rate): the stash never pays.
+function PSC_UndoPay(goldBefore)
+	local paid = game:GetPartyGold() - goldBefore
+	if paid > 0 then PSC_Eng_AddPartyGold(gamePtr(), -paid) end
+end
+
+-- Resref of a CItem given as userdata.
+function PSC_ItemRes(item) return itemRes(EEex_UDToPtr(item)) end
+
 -- Resref of the item in a slot, nil when empty.
 function PSC_SlotRes(portrait, slot)
 	local sp = EEex_Sprite_GetInPortrait(portrait)
@@ -222,6 +322,7 @@ end
 P.pendingId = P.pendingId or {}
 function PSC_RefreshPage() P.refreshIn = 14 end
 function PSC_Tick()
+	PSC_BagTick()
 	if P.refreshIn then
 		-- the engine rebuilds the page's item tables only on this call; twice, for queued CreateItem actions
 		P.refreshIn = P.refreshIn - 1

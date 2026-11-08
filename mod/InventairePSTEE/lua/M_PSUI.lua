@@ -156,31 +156,35 @@ function PSUI_Take(i)
 	PSC_RefreshPage()
 end
 
+-- Must stay on the party: the game would not see it in the bag (M_PSQST.lua: counted, worn...), or it is a key.
+function PSUI_Keep(res)
+	if PSC_KEEP and PSC_KEEP[res] then return true end
+	local info = PSUI_ItemInfo(res)
+	return info ~= nil and info.type == 8
+end
+
 function PSUI_StoreAll()
 	local portrait = PSUI_Portrait()
 	local kept = 0
 	for _, slot in ipairs(PSC.BACKPACK) do
 		local res = PSC_SlotRes(portrait, slot)
-		if res and PSUI_IsQuest(res) then
-			kept = kept + 1  -- stays in the backpack, or the game's quests could no longer see it
+		if res and PSUI_Keep(res) then
+			kept = kept + 1
 		elseif res then
 			local ok, why = PSC_Add(portrait, slot)
 			if not ok then print('PSC store slot ' .. slot .. ' ' .. tostring(why)) end
 		end
 	end
-	TEXT_inventoryError = kept > 0 and (kept .. (kept > 1 and ' quest items stay' or ' quest item stays') .. ' in the backpack') or ''
+	TEXT_inventoryError = kept > 0 and (kept .. (kept > 1 and ' items must stay' or ' item must stay') .. ' in the backpack') or ''
 	PSUI_Refresh()
 	PSC_RefreshPage()
 end
 
--- Drag and drop onto the stash grid (same idea as Party Stash BG): menu buttons get no clicks while an item is in hand,
--- so while one is held a real slot widget bound to the first free backpack slot covers the grid. The game drops the item
--- there itself (cursor and all), then PSUI_DropTick moves it into the stash. Slot widgets ignore "enabled", so the 20
--- overlays stay at size 0 until needed. Infinity_SetArea would find the vanilla menu's widget of the same name: walk
--- this menu's items instead (the size-0 slots, in declaration order).
--- The cursor's place while the item was held says the drop was on the grid and not on the real backpack slot, which has
--- the same name.
-local drop = { over = false, held = false, n = nil, portrait = nil, slotInfo = {}, area = nil }
+-- Drag and drop onto the stash grid (same as Party Stash BG): menu buttons get no clicks while an item is in hand, so
+-- while one is held a real slot widget bound to the bag slot (group 19) covers the grid, and the game drops the item
+-- into the bag itself. Slot widgets ignore "enabled", so it stays at size 0 until needed. Infinity_SetArea would find the
+-- vanilla menu's widget of the same name: walk this menu's items instead (the size-0 slot).
+local drop = { held = false, slotInfo = {}, item = nil }
 
 local function holding()
 	local inv = EEex_EngineGlobal_CBaldurChitin.m_pEngineInventory
@@ -188,38 +192,29 @@ local function holding()
 end
 PSUI_Holding = holding
 
-local function firstFree(portrait)
-	for n, slot in ipairs(PSC.BACKPACK) do
-		if not PSC_SlotRes(portrait, slot) then return n - 1 end
-	end
-	return nil
-end
-
-local function overGrid()
-	local x, y = EEex_Menu_GetArea('INVENTORY')
-	return EEex_Menu_IsCursorWithinRect(x + PSUI_GRID[1], y + PSUI_GRID[2], PSUI_GRID[3], PSUI_GRID[4])
-end
-
--- Puts the overlay on the grid for backpack group n, nil = none.
-local function placeOverlay(n)
-	if drop.area == n then return end
-	if not drop.area then
-		drop.list = {}
-		local menu = EEex_Menu_Find('INVENTORY')
-		local item = menu and menu.items
-		while item ~= nil do
-			if item.type == 9 and item.area.w == 0 and item.area.h == 0 then drop.list[#drop.list + 1] = item end
-			item = item.next
+local function placeOverlay(on)
+	if not on then
+		if drop.item then
+			local a = drop.item.area
+			a.x, a.y, a.w, a.h = 0, 0, 0, 0
+			drop.item = nil
 		end
+		return
 	end
-	local old = drop.area and drop.list[drop.area + 1]
-	if old then old.area.x, old.area.y, old.area.w, old.area.h = 0, 0, 0, 0 end
-	local new = n and drop.list[n + 1]
-	if new then new.area.x, new.area.y, new.area.w, new.area.h = PSUI_GRID[1], PSUI_GRID[2], PSUI_GRID[3], PSUI_GRID[4] end
-	drop.area = n
+	local menu = EEex_Menu_Find('INVENTORY')
+	local item = menu and menu.items
+	while item ~= nil do
+		if item.type == 9 and item.area.w == 0 and item.area.h == 0 then
+			local a = item.area
+			a.x, a.y, a.w, a.h = PSUI_GRID[1], PSUI_GRID[2], PSUI_GRID[3], PSUI_GRID[4]
+			drop.item = item
+			return
+		end
+		item = item.next
+	end
 end
 
--- What an overlay shows: no icon, no placeholder. One table, refilled in place.
+-- What the overlay shows: no icon, no placeholder. One table, refilled in place.
 function PSUI_DropSlot(n)
 	local real = characters and characters[id] and characters[id].equipment['group' .. n]
 	local t = drop.slotInfo
@@ -233,29 +228,22 @@ end
 -- Called every frame by the inventory page.
 function PSUI_DropTick()
 	local now = holding()
-	if now then
-		drop.portrait = PSUI_Portrait()
-		drop.n = firstFree(drop.portrait)
-		placeOverlay(drop.n)
-		drop.over = overGrid()
-		drop.seen = Infinity_GetClockTicks()
-	elseif drop.held then
-		placeOverlay(nil)
-		local slot = drop.n and PSC.BACKPACK[drop.n + 1]
-		local res = slot and PSC_SlotRes(drop.portrait, slot)
-		-- the page closed with an item in hand: the game put it back, that was no drop
-		local fresh = Infinity_GetClockTicks() - drop.seen < 500
-		if drop.over and res and fresh then
-			if PSUI_IsQuest(res) then
-				TEXT_inventoryError = 'Quest items stay in the backpack'
-			else
-				local ok, why = PSC_Add(drop.portrait, slot)
-				if ok then TEXT_inventoryError = '' else print('PSC drop ' .. tostring(why)) end
-			end
-			PSUI_Refresh()
-			PSC_RefreshPage()
-		end
-		drop.over, drop.n = false, nil
+	if now then drop.gold = game:GetPartyGold() end
+	if now and not drop.held then
+		local res = PSC_ItemRes(EEex_EngineGlobal_CBaldurChitin.m_pEngineInventory.m_pTempItem)
+		local keep = PSUI_Keep(res)
+		if keep then TEXT_inventoryError = 'This item must stay in the backpack' end
+		placeOverlay(not keep and res ~= PSC.RES)
+	elseif drop.held and not now then
+		placeOverlay(false)
+		PSC_UndoPay(drop.gold)
+		PSUI_Refresh()
+		PSC_RefreshPage()
+		drop.recheck = Infinity_GetClockTicks() + 300  -- the engine may store the item a frame later
+	elseif drop.recheck and Infinity_GetClockTicks() >= drop.recheck then
+		drop.recheck = nil
+		PSC_UndoPay(drop.gold)
+		PSUI_Refresh()
 	end
 	drop.held = now
 	return false
