@@ -128,13 +128,14 @@ local function game_gold() return game:GetPartyGold() end
 
 local function gamePtr() return EEex_UDToPtr(EEex_EngineGlobal_CBaldurChitin.m_pObjectGame) end
 
--- Stash contents: { {res, count, uses, identified}, ... } in store order.
-function PSC_List()
+-- Contents of the stash (or of bag store `store`): { {res, count, uses, identified}, ... } in store order.
+function PSC_List(store)
 	if not PSC_Ready() then return {} end
+	store = store or P.RES
 	local game, out = gamePtr(), {}
-	PSC_Eng_DemandServerStore(game, resRef(P.RES), 0)
+	PSC_Eng_DemandServerStore(game, resRef(store), 0)
 	local ok, err = pcall(function()
-		local storePtr = PSC_Eng_GetServerStore(game, resRef(P.RES))
+		local storePtr = PSC_Eng_GetServerStore(game, resRef(store))
 		if storePtr == 0 then return end
 		EEex_Utility_IterateCPtrList(EEex_PtrToUD(storePtr, 'CStore').m_lInventory, function(data)
 			local fi = type(data) == 'number' and EEex_PtrToUD(data, 'CStoreFileItem') or data
@@ -143,7 +144,7 @@ function PSC_List()
 				uses = fi.m_usageCount:get(0), identified = bit32.band(EEex_ReadU32(ptr + 0x10), 1) ~= 0 }
 		end)
 	end)
-	PSC_Eng_ReleaseServerStore(game, resRef(P.RES))
+	PSC_Eng_ReleaseServerStore(game, resRef(store))
 	if not ok then P.lastError = tostring(err) end
 	return out
 end
@@ -234,6 +235,10 @@ local function bagTick()
 		local sp = EEex_Sprite_GetInPortrait(p)
 		if sp and placeBag(sp) then moved = true end
 	end
+	if next(P.pour) and P.pourLeftovers then
+		P.pourLeftovers()
+		moved = true
+	end
 	if moved and Infinity_IsMenuOnStack('INVENTORY') then pcall(Infinity_ActivateInventory) end
 end
 
@@ -316,6 +321,145 @@ function PSC_Take(portrait, itemRes)
 	if entry.identified then P.pendingId[#P.pendingId + 1] = { portrait = portrait, res = itemRes } end
 	return true
 end
+
+-----------------
+-- Bags        --
+-----------------
+
+-- Collected bags (same as Party Stash BG): a container bag put away with Store all is consumed, its contents go to
+-- the stash, and it is kept as a count (global PSTB_<res>) shown in the stash, never taken back. PST has no bag of
+-- its own: they come from mods (Bags of Torment...). Each collected kind is recorded in the save, string globals
+-- PSTBX_1..PSTBX_<n> (count PSTBX_N) plus two integer globals PSTBX_<n>A / PSTBX_<n>B (4 letters each), the BG
+-- format.
+local function bagCount(res) return EEex_GameState_GetGlobalInt('PSTB_' .. res) end
+local function setBagCount(res, n) EEex_GameState_SetGlobalInt('PSTB_' .. res, math.max(0, n)) end
+
+local function packRes(res, from)
+	local v = 0
+	for k = from + 3, from, -1 do v = v * 256 + (string.byte(res, k) or 0) end
+	return v
+end
+local function unpackRes(v)
+	local out = {}
+	for _ = 1, 4 do
+		local c = v % 256
+		if c > 0 then out[#out + 1] = string.char(c) end
+		v = math.floor(v / 256)
+	end
+	return table.concat(out)
+end
+
+-- Kinds of bags collected in this save.
+local function bagList()
+	local out = {}
+	for i = 1, EEex_GameState_GetGlobalInt('PSTBX_N') do
+		local r = string.upper(EEex_GameState_GetGlobalString('PSTBX_' .. i) or '')
+		if r == '' then
+			r = unpackRes(EEex_GameState_GetGlobalInt('PSTBX_' .. i .. 'A')) .. unpackRes(EEex_GameState_GetGlobalInt('PSTBX_' .. i .. 'B'))
+		end
+		if r ~= '' then out[#out + 1] = r end
+	end
+	return out
+end
+local function recordBag(res)
+	for _, r in ipairs(bagList()) do if r == res then return end end
+	local n = EEex_GameState_GetGlobalInt('PSTBX_N') + 1
+	EEex_GameState_SetGlobalString('PSTBX_' .. n, res)
+	EEex_GameState_SetGlobalInt('PSTBX_' .. n .. 'A', packRes(res, 1))
+	EEex_GameState_SetGlobalInt('PSTBX_' .. n .. 'B', packRes(res, 5))
+	EEex_GameState_SetGlobalInt('PSTBX_N', n)
+end
+
+-- { {res, count}, ... } of the collected bags.
+function PSC_Bags()
+	local out = {}
+	if not PSC_Ready() then return out end
+	for _, r in ipairs(bagList()) do
+		local n = bagCount(r)
+		if n > 0 then out[#out + 1] = { res = r, count = n } end
+	end
+	return out
+end
+
+-- A container bag: an item of type 36 with its own store (a type-36 item without one holds nothing).
+P.bagStore = P.bagStore or {}
+function PSC_IsBag(res)
+	if not res or res == P.RES then return false end
+	if P.bagStore[res] == nil then
+		local ok, isBag = pcall(function()
+			local h = EEex_Resource_Demand(res, 'ITM')
+			if not h or EEex_ReadU16(EEex_UDToPtr(h) + 0x1C) ~= 36 then return false end
+			return EEex_Resource_Demand(res, 'STO') ~= nil
+		end)
+		P.bagStore[res] = ok and isBag == true
+	end
+	return P.bagStore[res]
+end
+
+-- Pours bag store `bag` into the stash through `portrait`'s backpack (one free slot is enough). Instant CreateItem, as
+-- for the stash bag (safe on pstee2). Returns true once the bag store is empty; what is left waits for a free slot
+-- (P.pour, retried by the tick).
+P.pour = P.pour or {}
+function PSC_PourBag(portrait, bag)
+	local sp = EEex_Sprite_GetInPortrait(portrait)
+	if not sp then return false end
+	for _ = 1, 1000 do
+		local e = PSC_List(bag)[1]
+		if not e then P.pour[bag] = nil return true end
+		if not freeSlot(sp) then break end
+		local before = {}
+		for _, i in ipairs(P.BACKPACK) do before[i] = itemPtrAt(sp, i) end
+		local stack = stackOf(e.res)
+		local want = stack > 1 and math.min(math.max(1, e.count), stack) or 1
+		local taken = PSC_Eng_TakeItemFromStore(gamePtr(), resRef(bag), resRef(e.res, 32), want) % 65536
+		if taken == 0 then break end
+		local uses = stack > 1 and taken * math.max(1, e.uses) or math.max(0, e.uses)
+		EEex_Action_ExecuteResponseStringOnAIBaseInstantly(string.format('CreateItem("%s",%d,0,0)', e.res, uses), sp)
+		-- the new item: a slot that changed (none = merged into a pile already in the backpack, it stays there)
+		for _, i in ipairs(P.BACKPACK) do
+			local a = itemPtrAt(sp, i)
+			if a ~= 0 and a ~= before[i] and itemRes(a) == e.res then
+				if e.identified then EEex_WriteU32(a + 0x24, bit32.bor(EEex_ReadU32(a + 0x24), 1)) end
+				PSC_Add(portrait, i)
+				break
+			end
+		end
+	end
+	P.pour[bag] = true
+	return false
+end
+
+-- Collects the bag in `slot` of `portrait`: the item goes, the count grows, its contents go to the stash.
+function PSC_CollectBag(portrait, slot)
+	if not PSC_Ready() then return false, P.why end
+	local sp = EEex_Sprite_GetInPortrait(portrait)
+	if not sp then return false, 'no such portrait' end
+	local a = itemPtrAt(sp, slot)
+	if a == 0 then return false, 'empty slot' end
+	local res = itemRes(a)
+	if not PSC_IsBag(res) then return false, 'not a container bag' end
+	setSlot(sp, slot, 0)
+	PSC_Eng_AddDisposableItem(gamePtr(), a)
+	recordBag(res)
+	setBagCount(res, bagCount(res) + 1)
+	PSC_PourBag(portrait, res)
+	return true
+end
+
+-- Contents left in a collected bag (backpack was full): poured as soon as someone has room.
+local function pourLeftovers()
+	for res in pairs(P.pour) do
+		if bagCount(res) > 0 then
+			for p = 0, 5 do
+				local sp = EEex_Sprite_GetInPortrait(p)
+				if sp and freeSlot(sp) then PSC_PourBag(p, res) break end
+			end
+		else
+			P.pour[res] = nil
+		end
+	end
+end
+P.pourLeftovers = pourLeftovers
 
 -- CreateItem makes the item unidentified when its header says so: restore the state it had in the stash once the
 -- queued action has run (CItem flags at +0x24, bit 0 = identified). Called every frame by the inventory page.

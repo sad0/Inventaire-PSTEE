@@ -3,7 +3,7 @@
 A redesigned inventory page with a shared party stash for **Planescape: Torment Enhanced Edition** (v3.2.2.0). It brings
 [Party Stash](https://github.com/sad0/PartyStash-EE) from the Baldur's Gate games to Torment, with a new painted page.
 
-**Status: preview (v0.8).** It works in play tests, but it has not been tested through a full playthrough.
+**Status: preview (v0.9).** It works in play tests, but it has not been tested through a full playthrough.
 
 ## Features
 
@@ -12,6 +12,9 @@ A redesigned inventory page with a shared party stash for **Planescape: Torment 
   take it back.
 - **Quests keep working:** every party member carries a stash bag in the last backpack slot, so the game sees what the
   stash holds. This leaves 19 free backpack slots.
+- **Bags from other mods** (such as [Bags of Torment](https://github.com/Argent77/A7-BagsOfTorment)), as in Party Stash:
+  **Store all** asks first, then empties each bag into the stash and keeps the bag there (end of the All and Misc tabs).
+  Collected bags cannot be taken back.
 - **New page:** details for AC, THAC0, HP and damage, including attacks per round.
 
 ## Requirements
@@ -24,7 +27,7 @@ The game must be started through `InfinityLoader.exe`, as EEex requires.
 ## Install
 
 1. Close the game. Back up your saves if you care about them.
-2. Download `InventairePSTEE-v0.8.zip` from [Releases](https://github.com/sad0/Inventaire-PSTEE/releases).
+2. Download `InventairePSTEE-v0.9.zip` from [Releases](https://github.com/sad0/Inventaire-PSTEE/releases).
 3. Extract it into the game folder, next to `Torment.exe`.
 4. Run `setup-InventairePSTEE.exe`.
 
@@ -32,11 +35,13 @@ The cloned repository cannot be installed as it is: the mod's art is built from 
 
 ## Known limits
 
-- **Items that stay in the backpack:** door and container keys, and the Tail (a dialogue counts it, and counting does not
-  see the stash).
+- **Items that stay in the backpack:** door and container keys, the Tail, and the items a dialogue transforms (the
+  tankard, the teeth, the copper earring, Bags of Torment's sealed Pocket Singularity...). The game does not see the
+  stash when it counts or transforms an item.
 - **Merchants:** avoid clicking the stash bag's row in the sell list. The protections from Party Stash are in place, but
   this case is untested.
 - **Language:** English only.
+- **Uninstalling:** the stash contents and the collected bags are lost. Take out what you want to keep first.
 - **Not tested yet:** a party of 6, a member joining mid-game, opening a door with a key from the stash, uninstalling with
   the bag in a save.
 

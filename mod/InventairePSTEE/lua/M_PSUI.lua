@@ -117,6 +117,12 @@ function PSUI_Refresh()
 		if inTab(e.res, PSUI_ItemInfo(e.res), tab) then U.view[#U.view + 1] = e end
 	end
 	table.sort(U.view, SORTERS[U.SORTS[U.sort]])
+	-- the collected bags, after the items (All and Misc tabs)
+	if tab == 1 or tab == 8 then
+		for _, b in ipairs(PSC_Bags()) do
+			U.view[#U.view + 1] = { res = b.res, count = b.count, uses = 0, identified = true, bag = true }
+		end
+	end
 	if U.page > PSUI_Pages() then U.page = PSUI_Pages() end
 end
 
@@ -150,6 +156,7 @@ function PSUI_Has(i) return cell(i) ~= nil end
 function PSUI_Take(i)
 	local e = cell(i)
 	if not e then return end
+	if e.bag then TEXT_inventoryError = 'Collected bags stay in the stash' return end
 	local ok, why = PSC_Take(PSUI_Portrait(), e.res)
 	if not ok then print('PSC take failed ' .. tostring(why)) end
 	PSUI_Refresh()
@@ -163,13 +170,38 @@ function PSUI_Keep(res)
 	return info ~= nil and info.type == 8
 end
 
+-- Container bags (Bags of Torment...), same as Party Stash BG: asked once, then emptied into the stash and collected.
+-- The popup shows a TLK string: the installer writes its strref here.
+PSUI_BAGS_WARN = -1
+local function collectBags(portrait, slots)
+	if #slots == 0 or Infinity_IsMenuOnStack('POPUP_TWOBUTTON') then return end
+	Popup2Button = {
+		info = PSUI_BAGS_WARN,
+		okText = 'OK',
+		okFunc = function()
+			local n = 0
+			for _, slot in ipairs(slots) do
+				local ok, why = PSC_CollectBag(portrait, slot)
+				if ok then n = n + 1 else print('PSC collect slot ' .. slot .. ' ' .. tostring(why)) end
+			end
+			TEXT_inventoryError = n .. (n > 1 and ' bags' or ' bag') .. ' emptied into the stash'
+			PSUI_Refresh()
+			PSC_RefreshPage()
+		end,
+		cancelFunc = function() end,
+	}
+	Infinity_PushMenu('POPUP_TWOBUTTON')
+end
+
 function PSUI_StoreAll()
 	local portrait = PSUI_Portrait()
-	local kept = 0
+	local kept, bags = 0, {}
 	for _, slot in ipairs(PSC.BACKPACK) do
 		local res = PSC_SlotRes(portrait, slot)
 		if res and PSUI_Keep(res) then
 			kept = kept + 1
+		elseif res and PSC_IsBag(res) then
+			bags[#bags + 1] = slot
 		elseif res then
 			local ok, why = PSC_Add(portrait, slot)
 			if not ok then print('PSC store slot ' .. slot .. ' ' .. tostring(why)) end
@@ -178,6 +210,7 @@ function PSUI_StoreAll()
 	TEXT_inventoryError = kept > 0 and (kept .. (kept > 1 and ' items must stay' or ' item must stay') .. ' in the backpack') or ''
 	PSUI_Refresh()
 	PSC_RefreshPage()
+	collectBags(portrait, bags)
 end
 
 -- Drag and drop onto the stash grid (same as Party Stash BG): menu buttons get no clicks while an item is in hand, so
@@ -232,8 +265,10 @@ function PSUI_DropTick()
 	if now and not drop.held then
 		local res = PSC_ItemRes(EEex_EngineGlobal_CBaldurChitin.m_pEngineInventory.m_pTempItem)
 		local keep = PSUI_Keep(res)
+		local bag = PSC_IsBag(res)
 		if keep then TEXT_inventoryError = 'This item must stay in the backpack' end
-		placeOverlay(not keep and res ~= PSC.RES)
+		if bag then TEXT_inventoryError = 'Bags: use Store all to empty them into the stash' end
+		placeOverlay(not keep and not bag and res ~= PSC.RES)
 	elseif drop.held and not now then
 		placeOverlay(false)
 		PSC_UndoPay(drop.gold)

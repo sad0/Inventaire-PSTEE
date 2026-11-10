@@ -1,7 +1,7 @@
 // Inventaire PSTEE: Party Stash inventory page for Planescape: Torment EE (preview).
 BACKUP ~weidu_external/backup/InventairePSTEE~
 AUTHOR ~sad0~
-VERSION ~v0.8~
+VERSION ~v0.9~
 
 LANGUAGE ~English~ ~english~
 
@@ -18,7 +18,10 @@ COPY ~InventairePSTEE/lua/M_PSINV.lua~ ~override~
 COPY ~InventairePSTEE/lua/M_PSCORE.lua~ ~override~   // step 2a: stash core (EEex), console-tested
 COPY ~InventairePSTEE/lua/M_PSQST.lua~ ~override~    // quest items (tools/build_quest_items.py)
 COPY ~InventairePSTEE/lua/M_PSGRID.lua~ ~override~   // stash grid area (tools/build_mod_j.py)
+// The bag popup (POPUP_TWOBUTTON) shows a TLK string: its strref goes into the Lua file.
+OUTER_SET ps_bags_warn = RESOLVE_STR_REF (~Your bags will be emptied into the stash and kept there. Collected bags cannot be taken back.~)
 COPY ~InventairePSTEE/lua/M_PSUI.lua~ ~override~     // step 2b: stash grid on the inventory page
+	REPLACE_TEXTUALLY ~PSUI_BAGS_WARN = -1~ ~PSUI_BAGS_WARN = %ps_bags_warn%~
 
 // The stash store (step 2a): a hidden bag store (type 5) built from a vanilla STORV1.1 store, no stock, buys every
 // item type, practically unlimited capacity.
