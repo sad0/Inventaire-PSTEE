@@ -16,7 +16,7 @@
 - **Quests see the stash:** quest items can now go into the stash. Dialogues and scripts still find them and can take them.
 - **Exceptions:** door and container keys and the Tail stay in the backpack, with a message.
 - **Dropping on the grid** now puts the item straight into the bag.
-- **Merchants:** the bag can't be opened or sold from the sell list (untested in play, avoid clicking it for now).
+- **Merchants:** the bag can't be opened or sold from the sell list. Not tested in play yet: share your results!
 - **Fixed:** dropping an item on the grid no longer earns 1 gold.
 
 ## v0.7

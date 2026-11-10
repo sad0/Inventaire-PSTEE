@@ -38,12 +38,11 @@ The cloned repository cannot be installed as it is: the mod's art is built from 
 - **Items that stay in the backpack:** door and container keys, the Tail, and the items a dialogue transforms (the
   tankard, the teeth, the copper earring, Bags of Torment's sealed Pocket Singularity...). The game does not see the
   stash when it counts or transforms an item.
-- **Merchants:** avoid clicking the stash bag's row in the sell list. The protections from Party Stash are in place, but
-  this case is untested.
 - **Language:** English only.
 - **Uninstalling:** the stash contents and the collected bags are lost. Take out what you want to keep first.
-- **Not tested yet:** a party of 6, a member joining mid-game, opening a door with a key from the stash, uninstalling with
-  the bag in a save.
+- **Not tested yet:** selling the stash bag from a merchant's sell list, a full playthrough, a party of 6, a member joining
+  mid-game, opening a door with a key from the stash, uninstalling with the bag in a save. Tried one of these? Please share
+  your results on [Discord](https://discord.gg/3XzeQv7HeS) or [GitHub](https://github.com/sad0/Inventaire-PSTEE/issues)!
 
 ## Not there yet
 
