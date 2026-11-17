@@ -502,6 +502,7 @@ menu
 		area 501 238 40 40
 		tooltip lua "PSUI_Name(1)"
 		action "PSUI_Take(1)"
+		actionAlt "PSUI_Desc(1)"
 	}
 	label
 	{
@@ -530,6 +531,7 @@ menu
 		area 551 238 40 40
 		tooltip lua "PSUI_Name(2)"
 		action "PSUI_Take(2)"
+		actionAlt "PSUI_Desc(2)"
 	}
 	label
 	{
@@ -558,6 +560,7 @@ menu
 		area 601 238 40 40
 		tooltip lua "PSUI_Name(3)"
 		action "PSUI_Take(3)"
+		actionAlt "PSUI_Desc(3)"
 	}
 	label
 	{
@@ -586,6 +589,7 @@ menu
 		area 651 238 40 40
 		tooltip lua "PSUI_Name(4)"
 		action "PSUI_Take(4)"
+		actionAlt "PSUI_Desc(4)"
 	}
 	label
 	{
@@ -614,6 +618,7 @@ menu
 		area 701 238 40 40
 		tooltip lua "PSUI_Name(5)"
 		action "PSUI_Take(5)"
+		actionAlt "PSUI_Desc(5)"
 	}
 	label
 	{
@@ -642,6 +647,7 @@ menu
 		area 751 238 40 40
 		tooltip lua "PSUI_Name(6)"
 		action "PSUI_Take(6)"
+		actionAlt "PSUI_Desc(6)"
 	}
 	label
 	{
@@ -670,6 +676,7 @@ menu
 		area 801 238 40 40
 		tooltip lua "PSUI_Name(7)"
 		action "PSUI_Take(7)"
+		actionAlt "PSUI_Desc(7)"
 	}
 	label
 	{
@@ -698,6 +705,7 @@ menu
 		area 851 238 40 40
 		tooltip lua "PSUI_Name(8)"
 		action "PSUI_Take(8)"
+		actionAlt "PSUI_Desc(8)"
 	}
 	label
 	{
@@ -726,6 +734,7 @@ menu
 		area 901 238 40 40
 		tooltip lua "PSUI_Name(9)"
 		action "PSUI_Take(9)"
+		actionAlt "PSUI_Desc(9)"
 	}
 	label
 	{
@@ -754,6 +763,7 @@ menu
 		area 951 238 40 40
 		tooltip lua "PSUI_Name(10)"
 		action "PSUI_Take(10)"
+		actionAlt "PSUI_Desc(10)"
 	}
 	label
 	{
@@ -782,6 +792,7 @@ menu
 		area 501 284 40 40
 		tooltip lua "PSUI_Name(11)"
 		action "PSUI_Take(11)"
+		actionAlt "PSUI_Desc(11)"
 	}
 	label
 	{
@@ -810,6 +821,7 @@ menu
 		area 551 284 40 40
 		tooltip lua "PSUI_Name(12)"
 		action "PSUI_Take(12)"
+		actionAlt "PSUI_Desc(12)"
 	}
 	label
 	{
@@ -838,6 +850,7 @@ menu
 		area 601 284 40 40
 		tooltip lua "PSUI_Name(13)"
 		action "PSUI_Take(13)"
+		actionAlt "PSUI_Desc(13)"
 	}
 	label
 	{
@@ -866,6 +879,7 @@ menu
 		area 651 284 40 40
 		tooltip lua "PSUI_Name(14)"
 		action "PSUI_Take(14)"
+		actionAlt "PSUI_Desc(14)"
 	}
 	label
 	{
@@ -894,6 +908,7 @@ menu
 		area 701 284 40 40
 		tooltip lua "PSUI_Name(15)"
 		action "PSUI_Take(15)"
+		actionAlt "PSUI_Desc(15)"
 	}
 	label
 	{
@@ -922,6 +937,7 @@ menu
 		area 751 284 40 40
 		tooltip lua "PSUI_Name(16)"
 		action "PSUI_Take(16)"
+		actionAlt "PSUI_Desc(16)"
 	}
 	label
 	{
@@ -950,6 +966,7 @@ menu
 		area 801 284 40 40
 		tooltip lua "PSUI_Name(17)"
 		action "PSUI_Take(17)"
+		actionAlt "PSUI_Desc(17)"
 	}
 	label
 	{
@@ -978,6 +995,7 @@ menu
 		area 851 284 40 40
 		tooltip lua "PSUI_Name(18)"
 		action "PSUI_Take(18)"
+		actionAlt "PSUI_Desc(18)"
 	}
 	label
 	{
@@ -1006,6 +1024,7 @@ menu
 		area 901 284 40 40
 		tooltip lua "PSUI_Name(19)"
 		action "PSUI_Take(19)"
+		actionAlt "PSUI_Desc(19)"
 	}
 	label
 	{
@@ -1034,6 +1053,7 @@ menu
 		area 951 284 40 40
 		tooltip lua "PSUI_Name(20)"
 		action "PSUI_Take(20)"
+		actionAlt "PSUI_Desc(20)"
 	}
 	label
 	{
@@ -1062,6 +1082,7 @@ menu
 		area 501 330 40 40
 		tooltip lua "PSUI_Name(21)"
 		action "PSUI_Take(21)"
+		actionAlt "PSUI_Desc(21)"
 	}
 	label
 	{
@@ -1090,6 +1111,7 @@ menu
 		area 551 330 40 40
 		tooltip lua "PSUI_Name(22)"
 		action "PSUI_Take(22)"
+		actionAlt "PSUI_Desc(22)"
 	}
 	label
 	{
@@ -1118,6 +1140,7 @@ menu
 		area 601 330 40 40
 		tooltip lua "PSUI_Name(23)"
 		action "PSUI_Take(23)"
+		actionAlt "PSUI_Desc(23)"
 	}
 	label
 	{
@@ -1146,6 +1169,7 @@ menu
 		area 651 330 40 40
 		tooltip lua "PSUI_Name(24)"
 		action "PSUI_Take(24)"
+		actionAlt "PSUI_Desc(24)"
 	}
 	label
 	{
@@ -1174,6 +1198,7 @@ menu
 		area 701 330 40 40
 		tooltip lua "PSUI_Name(25)"
 		action "PSUI_Take(25)"
+		actionAlt "PSUI_Desc(25)"
 	}
 	label
 	{
@@ -1202,6 +1227,7 @@ menu
 		area 751 330 40 40
 		tooltip lua "PSUI_Name(26)"
 		action "PSUI_Take(26)"
+		actionAlt "PSUI_Desc(26)"
 	}
 	label
 	{
@@ -1230,6 +1256,7 @@ menu
 		area 801 330 40 40
 		tooltip lua "PSUI_Name(27)"
 		action "PSUI_Take(27)"
+		actionAlt "PSUI_Desc(27)"
 	}
 	label
 	{
@@ -1258,6 +1285,7 @@ menu
 		area 851 330 40 40
 		tooltip lua "PSUI_Name(28)"
 		action "PSUI_Take(28)"
+		actionAlt "PSUI_Desc(28)"
 	}
 	label
 	{
@@ -1286,6 +1314,7 @@ menu
 		area 901 330 40 40
 		tooltip lua "PSUI_Name(29)"
 		action "PSUI_Take(29)"
+		actionAlt "PSUI_Desc(29)"
 	}
 	label
 	{
@@ -1314,6 +1343,7 @@ menu
 		area 951 330 40 40
 		tooltip lua "PSUI_Name(30)"
 		action "PSUI_Take(30)"
+		actionAlt "PSUI_Desc(30)"
 	}
 	label
 	{
@@ -1342,6 +1372,7 @@ menu
 		area 501 376 40 40
 		tooltip lua "PSUI_Name(31)"
 		action "PSUI_Take(31)"
+		actionAlt "PSUI_Desc(31)"
 	}
 	label
 	{
@@ -1370,6 +1401,7 @@ menu
 		area 551 376 40 40
 		tooltip lua "PSUI_Name(32)"
 		action "PSUI_Take(32)"
+		actionAlt "PSUI_Desc(32)"
 	}
 	label
 	{
@@ -1398,6 +1430,7 @@ menu
 		area 601 376 40 40
 		tooltip lua "PSUI_Name(33)"
 		action "PSUI_Take(33)"
+		actionAlt "PSUI_Desc(33)"
 	}
 	label
 	{
@@ -1426,6 +1459,7 @@ menu
 		area 651 376 40 40
 		tooltip lua "PSUI_Name(34)"
 		action "PSUI_Take(34)"
+		actionAlt "PSUI_Desc(34)"
 	}
 	label
 	{
@@ -1454,6 +1488,7 @@ menu
 		area 701 376 40 40
 		tooltip lua "PSUI_Name(35)"
 		action "PSUI_Take(35)"
+		actionAlt "PSUI_Desc(35)"
 	}
 	label
 	{
@@ -1482,6 +1517,7 @@ menu
 		area 751 376 40 40
 		tooltip lua "PSUI_Name(36)"
 		action "PSUI_Take(36)"
+		actionAlt "PSUI_Desc(36)"
 	}
 	label
 	{
@@ -1510,6 +1546,7 @@ menu
 		area 801 376 40 40
 		tooltip lua "PSUI_Name(37)"
 		action "PSUI_Take(37)"
+		actionAlt "PSUI_Desc(37)"
 	}
 	label
 	{
@@ -1538,6 +1575,7 @@ menu
 		area 851 376 40 40
 		tooltip lua "PSUI_Name(38)"
 		action "PSUI_Take(38)"
+		actionAlt "PSUI_Desc(38)"
 	}
 	label
 	{
@@ -1566,6 +1604,7 @@ menu
 		area 901 376 40 40
 		tooltip lua "PSUI_Name(39)"
 		action "PSUI_Take(39)"
+		actionAlt "PSUI_Desc(39)"
 	}
 	label
 	{
@@ -1594,6 +1633,7 @@ menu
 		area 951 376 40 40
 		tooltip lua "PSUI_Name(40)"
 		action "PSUI_Take(40)"
+		actionAlt "PSUI_Desc(40)"
 	}
 	label
 	{
@@ -1622,6 +1662,7 @@ menu
 		area 501 422 40 40
 		tooltip lua "PSUI_Name(41)"
 		action "PSUI_Take(41)"
+		actionAlt "PSUI_Desc(41)"
 	}
 	label
 	{
@@ -1650,6 +1691,7 @@ menu
 		area 551 422 40 40
 		tooltip lua "PSUI_Name(42)"
 		action "PSUI_Take(42)"
+		actionAlt "PSUI_Desc(42)"
 	}
 	label
 	{
@@ -1678,6 +1720,7 @@ menu
 		area 601 422 40 40
 		tooltip lua "PSUI_Name(43)"
 		action "PSUI_Take(43)"
+		actionAlt "PSUI_Desc(43)"
 	}
 	label
 	{
@@ -1706,6 +1749,7 @@ menu
 		area 651 422 40 40
 		tooltip lua "PSUI_Name(44)"
 		action "PSUI_Take(44)"
+		actionAlt "PSUI_Desc(44)"
 	}
 	label
 	{
@@ -1734,6 +1778,7 @@ menu
 		area 701 422 40 40
 		tooltip lua "PSUI_Name(45)"
 		action "PSUI_Take(45)"
+		actionAlt "PSUI_Desc(45)"
 	}
 	label
 	{
@@ -1762,6 +1807,7 @@ menu
 		area 751 422 40 40
 		tooltip lua "PSUI_Name(46)"
 		action "PSUI_Take(46)"
+		actionAlt "PSUI_Desc(46)"
 	}
 	label
 	{
@@ -1790,6 +1836,7 @@ menu
 		area 801 422 40 40
 		tooltip lua "PSUI_Name(47)"
 		action "PSUI_Take(47)"
+		actionAlt "PSUI_Desc(47)"
 	}
 	label
 	{
@@ -1818,6 +1865,7 @@ menu
 		area 851 422 40 40
 		tooltip lua "PSUI_Name(48)"
 		action "PSUI_Take(48)"
+		actionAlt "PSUI_Desc(48)"
 	}
 	label
 	{
@@ -1846,6 +1894,7 @@ menu
 		area 901 422 40 40
 		tooltip lua "PSUI_Name(49)"
 		action "PSUI_Take(49)"
+		actionAlt "PSUI_Desc(49)"
 	}
 	label
 	{
@@ -1874,6 +1923,7 @@ menu
 		area 951 422 40 40
 		tooltip lua "PSUI_Name(50)"
 		action "PSUI_Take(50)"
+		actionAlt "PSUI_Desc(50)"
 	}
 	label
 	{
@@ -1902,6 +1952,7 @@ menu
 		area 501 468 40 40
 		tooltip lua "PSUI_Name(51)"
 		action "PSUI_Take(51)"
+		actionAlt "PSUI_Desc(51)"
 	}
 	label
 	{
@@ -1930,6 +1981,7 @@ menu
 		area 551 468 40 40
 		tooltip lua "PSUI_Name(52)"
 		action "PSUI_Take(52)"
+		actionAlt "PSUI_Desc(52)"
 	}
 	label
 	{
@@ -1958,6 +2010,7 @@ menu
 		area 601 468 40 40
 		tooltip lua "PSUI_Name(53)"
 		action "PSUI_Take(53)"
+		actionAlt "PSUI_Desc(53)"
 	}
 	label
 	{
@@ -1986,6 +2039,7 @@ menu
 		area 651 468 40 40
 		tooltip lua "PSUI_Name(54)"
 		action "PSUI_Take(54)"
+		actionAlt "PSUI_Desc(54)"
 	}
 	label
 	{
@@ -2014,6 +2068,7 @@ menu
 		area 701 468 40 40
 		tooltip lua "PSUI_Name(55)"
 		action "PSUI_Take(55)"
+		actionAlt "PSUI_Desc(55)"
 	}
 	label
 	{
@@ -2042,6 +2097,7 @@ menu
 		area 751 468 40 40
 		tooltip lua "PSUI_Name(56)"
 		action "PSUI_Take(56)"
+		actionAlt "PSUI_Desc(56)"
 	}
 	label
 	{
@@ -2070,6 +2126,7 @@ menu
 		area 801 468 40 40
 		tooltip lua "PSUI_Name(57)"
 		action "PSUI_Take(57)"
+		actionAlt "PSUI_Desc(57)"
 	}
 	label
 	{
@@ -2098,6 +2155,7 @@ menu
 		area 851 468 40 40
 		tooltip lua "PSUI_Name(58)"
 		action "PSUI_Take(58)"
+		actionAlt "PSUI_Desc(58)"
 	}
 	label
 	{
@@ -2126,6 +2184,7 @@ menu
 		area 901 468 40 40
 		tooltip lua "PSUI_Name(59)"
 		action "PSUI_Take(59)"
+		actionAlt "PSUI_Desc(59)"
 	}
 	label
 	{
@@ -2154,6 +2213,7 @@ menu
 		area 951 468 40 40
 		tooltip lua "PSUI_Name(60)"
 		action "PSUI_Take(60)"
+		actionAlt "PSUI_Desc(60)"
 	}
 	label
 	{

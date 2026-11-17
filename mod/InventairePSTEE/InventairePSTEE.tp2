@@ -1,7 +1,7 @@
 // Inventaire PSTEE: Party Stash inventory page for Planescape: Torment EE (preview).
 BACKUP ~weidu_external/backup/InventairePSTEE~
 AUTHOR ~sad0~
-VERSION ~v0.9~
+VERSION ~v0.10~
 
 LANGUAGE ~English~ ~english~
 
@@ -19,7 +19,7 @@ COPY ~InventairePSTEE/lua/M_PSCORE.lua~ ~override~   // step 2a: stash core (EEe
 COPY ~InventairePSTEE/lua/M_PSQST.lua~ ~override~    // quest items (tools/build_quest_items.py)
 COPY ~InventairePSTEE/lua/M_PSGRID.lua~ ~override~   // stash grid area (tools/build_mod_j.py)
 // The bag popup (POPUP_TWOBUTTON) shows a TLK string: its strref goes into the Lua file.
-OUTER_SET ps_bags_warn = RESOLVE_STR_REF (~Your bags will be emptied into the stash and kept there. Collected bags cannot be taken back.~)
+OUTER_SET ps_bags_warn = RESOLVE_STR_REF (~Store all will also empty your bags into the stash and keep them there. Collected bags cannot be taken back. Cancel stores nothing.~)
 COPY ~InventairePSTEE/lua/M_PSUI.lua~ ~override~     // step 2b: stash grid on the inventory page
 	REPLACE_TEXTUALLY ~PSUI_BAGS_WARN = -1~ ~PSUI_BAGS_WARN = %ps_bags_warn%~
 
@@ -66,13 +66,14 @@ COPY ~InventairePSTEE/menu/inventory.menu~ ~weidu_external/InventairePSTEE/inven
 	READ_ASCII 0 psinv_menu (SOURCE_SIZE)
 
 COPY_EXISTING ~UI.MENU~ ~override~
-	PATCH_FOR_EACH anchor IN ~name 'INVENTORY'~ ~mosaic 'INVBG'~ BEGIN
-		PATCH_IF (INDEX_BUFFER (EXACT_MATCH ~%anchor%~) < 0) BEGIN
+	// Single or double quotes: other UI mods (Blizzard in Baator...) rewrite these lines with "..." (szef, 2026-11-17).
+	PATCH_FOR_EACH anchor IN ~name[ %TAB%]+['"]INVENTORY['"]~ ~mosaic[ %TAB%]+['"]INVBG['"]~ BEGIN
+		PATCH_IF (INDEX_BUFFER (~%anchor%~) < 0) BEGIN
 			PATCH_FAIL ~UI.MENU: %anchor% not found (another inventory mod?)~
 		END
 	END
-	REPLACE_TEXTUALLY EXACT_MATCH ~name 'INVENTORY'~ ~name 'INVENTORY_VANILLA'~
-	REPLACE_TEXTUALLY EXACT_MATCH ~mosaic 'INVBG'~ ~mosaic lua "psInvBackground()"~
+	REPLACE_TEXTUALLY CASE_SENSITIVE ~name[ %TAB%]+['"]INVENTORY['"]~ ~name 'INVENTORY_VANILLA'~
+	REPLACE_TEXTUALLY CASE_SENSITIVE ~mosaic[ %TAB%]+['"]INVBG['"]~ ~mosaic lua "psInvBackground()"~
 	// A merchant must never open the stash as a bag (the game crashes on BG): no description or open from the sell list,
 	// no selection, and its row is greyed like an unsellable item (same patches as Party Stash BG).
 	REPLACE_TEXTUALLY EXACT_MATCH ~if(store.groupItems[storeGroupItemsVar].item.isBag == 1) then~ ~~~~~if(store.groupItems[storeGroupItemsVar].item.isBag == 1 and string.upper(store.groupItems[storeGroupItemsVar].item.res or '') ~= 'PSTASH') then~~~~~

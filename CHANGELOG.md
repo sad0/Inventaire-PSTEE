@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.10
+
+- **Fixed:** the installer stopped when another mod (Blizzard in Baator...) had rewritten the inventory background
+  with double quotes. Thanks szef!
+- **Store all** with bags in the backpack now asks first, and **Cancel** stores nothing.
+- **Store all** names the items that stay in the backpack.
+- **Right-click** a stash item, collected bags included, to read its description.
+
 ## v0.9
 
 - **Bags from other mods** (Bags of Torment...), as in Party Stash: **Store all** asks first, then empties each bag into

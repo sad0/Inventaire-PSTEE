@@ -347,7 +347,7 @@ menu
                  f'\t\ttext lua "PSUI_Count({i})"\n\t\ttext style "normal"\n\t\ttext point 10\n'
                  f'\t\ttext align right bottom\n\t}}\n')
         m.append(f'\tbutton\n\t{{\n\t\tenabled "PSUI_Has({i}) and not PSUI_Holding()"\n\t\tarea {x} {y} {w} {h}\n'
-                 f'\t\ttooltip lua "PSUI_Name({i})"\n\t\taction "PSUI_Take({i})"\n\t}}\n')
+                 f'\t\ttooltip lua "PSUI_Name({i})"\n\t\taction "PSUI_Take({i})"\n\t\tactionAlt "PSUI_Desc({i})"\n\t}}\n')
     gx = min(r[0] for r in L["stash"])
     gy = min(r[1] for r in L["stash"])
     gw = max(r[0] + r[2] for r in L["stash"]) - gx

@@ -48,7 +48,8 @@ function PSUI_ItemInfo(res)
 		if not h then return nil end
 		local p = EEex_UDToPtr(h)
 		return { type = EEex_ReadU16(p + 0x1C), icon = readRes(p + 0x3A), unidName = EEex_ReadU32(p + 0x08),
-			idName = EEex_ReadU32(p + 0x0C), weight = EEex_ReadU32(p + 0x4C), price = EEex_ReadU32(p + 0x34) }
+			idName = EEex_ReadU32(p + 0x0C), weight = EEex_ReadU32(p + 0x4C), price = EEex_ReadU32(p + 0x34),
+			unidDesc = EEex_ReadU32(p + 0x50), idDesc = EEex_ReadU32(p + 0x54) }
 	end)
 	U.itm[res] = ok and info or false
 	return ok and info or nil
@@ -153,6 +154,17 @@ end
 
 function PSUI_Has(i) return cell(i) ~= nil end
 
+-- Right click on a stash cell: the game's item description (szef: collected bags could not be read any more).
+local function validRef(r) return r and r > 0 and r < 0xFFFFFFFF and r or nil end
+function PSUI_Desc(i)
+	local e = cell(i)
+	local info = e and PSUI_ItemInfo(e.res)
+	if not info then return end
+	local ref = validRef(e.identified and info.idDesc or info.unidDesc) or validRef(info.idDesc) or validRef(info.unidDesc)
+	-- mode 2 = not a backpack slot: no identify / use buttons
+	showItemDescription({ name = entryName(e), description = ref and Infinity_FetchString(ref) or '', icon = info.icon }, 2)
+end
+
 function PSUI_Take(i)
 	local e = cell(i)
 	if not e then return end
@@ -170,47 +182,51 @@ function PSUI_Keep(res)
 	return info ~= nil and info.type == 8
 end
 
--- Container bags (Bags of Torment...), same as Party Stash BG: asked once, then emptied into the stash and collected.
+-- Container bags (Bags of Torment...), same as Party Stash BG: they are emptied into the stash and collected. With
+-- bags in the backpack, Store all asks first; Cancel stores nothing (szef 2026-11-15: Cancel stored the rest anyway).
 -- The popup shows a TLK string: the installer writes its strref here.
 PSUI_BAGS_WARN = -1
-local function collectBags(portrait, slots)
-	if #slots == 0 or Infinity_IsMenuOnStack('POPUP_TWOBUTTON') then return end
-	Popup2Button = {
-		info = PSUI_BAGS_WARN,
-		okText = 'OK',
-		okFunc = function()
-			local n = 0
-			for _, slot in ipairs(slots) do
-				local ok, why = PSC_CollectBag(portrait, slot)
-				if ok then n = n + 1 else print('PSC collect slot ' .. slot .. ' ' .. tostring(why)) end
-			end
-			TEXT_inventoryError = n .. (n > 1 and ' bags' or ' bag') .. ' emptied into the stash'
-			PSUI_Refresh()
-			PSC_RefreshPage()
-		end,
-		cancelFunc = function() end,
-	}
-	Infinity_PushMenu('POPUP_TWOBUTTON')
-end
 
-function PSUI_StoreAll()
-	local portrait = PSUI_Portrait()
-	local kept, bags = 0, {}
+local function storeAll(portrait, withBags)
+	local kept, bags = {}, 0
 	for _, slot in ipairs(PSC.BACKPACK) do
 		local res = PSC_SlotRes(portrait, slot)
 		if res and PSUI_Keep(res) then
-			kept = kept + 1
+			kept[#kept + 1] = entryName({ res = res, identified = true })
 		elseif res and PSC_IsBag(res) then
-			bags[#bags + 1] = slot
+			if withBags then
+				local ok, why = PSC_CollectBag(portrait, slot)
+				if ok then bags = bags + 1 else print('PSC collect slot ' .. slot .. ' ' .. tostring(why)) end
+			end
 		elseif res then
 			local ok, why = PSC_Add(portrait, slot)
 			if not ok then print('PSC store slot ' .. slot .. ' ' .. tostring(why)) end
 		end
 	end
-	TEXT_inventoryError = kept > 0 and (kept .. (kept > 1 and ' items must stay' or ' item must stay') .. ' in the backpack') or ''
+	local msg = {}
+	-- name what stays, so the player knows why (szef: "1 item must stay" with Annah)
+	if #kept > 0 then msg[#msg + 1] = 'Stays in the backpack (a quest needs it there): ' .. table.concat(kept, ', ') end
+	if bags > 0 then msg[#msg + 1] = bags .. (bags > 1 and ' bags' or ' bag') .. ' emptied into the stash' end
+	TEXT_inventoryError = table.concat(msg, '. ')
 	PSUI_Refresh()
 	PSC_RefreshPage()
-	collectBags(portrait, bags)
+end
+
+function PSUI_StoreAll()
+	local portrait = PSUI_Portrait()
+	local hasBag = false
+	for _, slot in ipairs(PSC.BACKPACK) do
+		if PSC_IsBag(PSC_SlotRes(portrait, slot)) then hasBag = true break end
+	end
+	if not hasBag then storeAll(portrait, false) return end
+	if Infinity_IsMenuOnStack('POPUP_TWOBUTTON') then return end
+	Popup2Button = {
+		info = PSUI_BAGS_WARN,
+		okText = 'OK',
+		okFunc = function() storeAll(portrait, true) end,
+		cancelFunc = function() end,
+	}
+	Infinity_PushMenu('POPUP_TWOBUTTON')
 end
 
 -- Drag and drop onto the stash grid (same as Party Stash BG): menu buttons get no clicks while an item is in hand, so

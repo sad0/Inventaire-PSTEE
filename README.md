@@ -3,13 +3,13 @@
 A redesigned inventory page with a shared party stash for **Planescape: Torment Enhanced Edition** (v3.2.2.0). It brings
 [Party Stash](https://github.com/sad0/PartyStash-EE) from the Baldur's Gate games to Torment, with a new painted page.
 
-**Status: preview (v0.9).** It works in play tests, but it has not been tested through a full playthrough.
+**Status: preview (v0.10).** It works in play tests, but it has not been tested through a full playthrough.
 
 ## Features
 
 - **Shared stash:** one stash for the whole party, with 8 tabs, 5 sort orders and pages.
 - **Drag and drop:** drag an item onto the grid to store it, or use **Store all** for the backpack. Click a stash item to
-  take it back.
+  take it back, right-click it to read its description.
 - **Quests keep working:** every party member carries a stash bag in the last backpack slot, so the game sees what the
   stash holds. This leaves 19 free backpack slots.
 - **Bags from other mods** (such as [Bags of Torment](https://github.com/Argent77/A7-BagsOfTorment)), as in Party Stash:
@@ -27,7 +27,7 @@ The game must be started through `InfinityLoader.exe`, as EEex requires.
 ## Install
 
 1. Close the game. Back up your saves if you care about them.
-2. Download `InventairePSTEE-v0.9.zip` from [Releases](https://github.com/sad0/Inventaire-PSTEE/releases).
+2. Download `InventairePSTEE-v0.10.zip` from [Releases](https://github.com/sad0/Inventaire-PSTEE/releases).
 3. Extract it into the game folder, next to `Torment.exe`.
 4. Run `setup-InventairePSTEE.exe`.
 
